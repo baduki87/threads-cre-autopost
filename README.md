@@ -29,12 +29,23 @@
 1. **Threads 는 이미지를 공개 URL 로만 받는다.** 로컬 파일 업로드가 불가능하다.
    그래서 카드를 `docs/img/` 에 커밋한 뒤 `raw.githubusercontent.com` URL 로 넘긴다.
    `PUBLIC_IMAGE_BASE` 를 설정하면 다른 호스팅을 쓸 수 있다.
+   리포가 **공개(public)** 여야 한다. 비공개 리포의 raw URL 은 외부에서 열 수 없어
+   Threads 가 이미지를 가져가지 못한다.
 2. **발행은 2단계다.** 컨테이너 생성 → 처리 완료 대기 → 발행. 바로 발행하면 실패한다.
 3. **액세스 토큰은 약 60일 뒤 만료된다.** `refresh-token.yml` 이 주 1회 갱신한다.
    이걸 꺼두면 두 달 뒤 조용히 죽는다.
 
 부수적으로, 국토부 사이트는 첫 요청에 307 + 쿠키 챌린지를 건다.
 `requests.Session` 으로 쿠키를 물고 리다이렉트를 따라가야 본문을 받을 수 있다.
+
+## 설정
+
+키 발급 방법은 [docs/SETUP.md](docs/SETUP.md) 에 단계별로 정리했다.
+준비 상태는 아래 명령으로 언제든 확인할 수 있다.
+
+```bash
+./.venv/bin/python tools/check_setup.py
+```
 
 ## 로컬 실행
 

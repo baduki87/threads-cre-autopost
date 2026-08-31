@@ -1,0 +1,165 @@
+"""준비 상태 점검.
+
+키를 하나씩 확인하고, 있으면 실제로 연결해본다.
+설정하다 막혔을 때 무엇이 문제인지 바로 알 수 있게 하는 것이 목적이다.
+
+사용법:  ./.venv/bin/python tools/check_setup.py
+"""
+from __future__ import annotations
+
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+OK = "✅"
+NO = "❌"
+SKIP = "⏭️"
+
+results: list[tuple[str, bool]] = []
+
+
+def report(name: str, ok: bool, detail: str) -> None:
+    mark = OK if ok else NO
+    print(f"{mark} {name}\n   {detail}\n")
+    results.append((name, ok))
+
+
+def check_molit() -> None:
+    """키가 필요 없는 소스. 항상 확인 가능하다."""
+    from src.collect import fetch_molit
+
+    try:
+        items = fetch_molit(5)
+    except Exception as e:
+        report("국토교통부 보도자료", False, f"수집 실패: {e}")
+        return
+    if not items:
+        report("국토교통부 보도자료", False, "연결은 됐지만 0건입니다. RSS 주소가 바뀌었을 수 있습니다.")
+        return
+    report("국토교통부 보도자료", True, f"{len(items)}건 수집 — 최신: {items[0].title[:40]}")
+
+
+def check_naver() -> None:
+    cid = os.environ.get("NAVER_CLIENT_ID")
+    csec = os.environ.get("NAVER_CLIENT_SECRET")
+    if not cid or not csec:
+        print(f"{SKIP} 네이버 뉴스 검색\n   NAVER_CLIENT_ID / NAVER_CLIENT_SECRET 미설정 (아직 발급 전)\n")
+        return
+
+    import requests
+
+    try:
+        r = requests.get(
+            "https://openapi.naver.com/v1/search/news.json",
+            headers={"X-Naver-Client-Id": cid, "X-Naver-Client-Secret": csec},
+            params={"query": "상업용 부동산", "display": 3},
+            timeout=15,
+        )
+    except requests.RequestException as e:
+        report("네이버 뉴스 검색", False, f"연결 실패: {e}")
+        return
+    if r.status_code == 401:
+        report("네이버 뉴스 검색", False, "인증 실패(401). 키를 다시 확인하세요.")
+        return
+    if not r.ok:
+        report("네이버 뉴스 검색", False, f"HTTP {r.status_code}: {r.text[:120]}")
+        return
+    n = len(r.json().get("items", []))
+    report("네이버 뉴스 검색", True, f"검색 정상 — '상업용 부동산' {n}건")
+
+
+def check_anthropic() -> None:
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        print(f"{SKIP} Claude API\n   ANTHROPIC_API_KEY 미설정 (아직 발급 전)\n")
+        return
+
+    import anthropic
+
+    try:
+        client = anthropic.Anthropic()
+        resp = client.messages.create(
+            model="claude-opus-5",
+            max_tokens=32,
+            messages=[{"role": "user", "content": "'준비완료' 라고만 답하세요."}],
+        )
+        text = "".join(b.text for b in resp.content if b.type == "text").strip()
+    except anthropic.AuthenticationError:
+        report("Claude API", False, "인증 실패. 키를 다시 확인하세요.")
+        return
+    except Exception as e:
+        report("Claude API", False, f"호출 실패: {e}")
+        return
+    report("Claude API", True, f"호출 정상 — 응답: {text[:30]}")
+
+
+def check_threads() -> None:
+    token = os.environ.get("THREADS_ACCESS_TOKEN")
+    user_id = os.environ.get("THREADS_USER_ID")
+    if not token or not user_id:
+        print(f"{SKIP} Threads\n   THREADS_ACCESS_TOKEN / THREADS_USER_ID 미설정 (아직 발급 전)\n")
+        return
+
+    import requests
+
+    try:
+        r = requests.get(
+            f"https://graph.threads.net/v1.0/{user_id}",
+            params={"fields": "username", "access_token": token},
+            timeout=20,
+        )
+    except requests.RequestException as e:
+        report("Threads", False, f"연결 실패: {e}")
+        return
+    if not r.ok:
+        report("Threads", False, f"HTTP {r.status_code}: {r.text[:200]}")
+        return
+    report("Threads", True, f"계정 연결 정상 — @{r.json().get('username')}")
+
+
+def check_font() -> None:
+    from src.card import _load
+
+    try:
+        f = _load("bold", 40)
+    except RuntimeError as e:
+        report("한글 폰트", False, str(e))
+        return
+    report("한글 폰트", True, f"{f.getname()}")
+
+
+def check_image_host() -> None:
+    """Threads 는 공개 URL 로만 이미지를 받는다. 여기가 막히면 발행이 안 된다."""
+    base = os.environ.get("PUBLIC_IMAGE_BASE")
+    repo = os.environ.get("GITHUB_REPOSITORY")
+    if base:
+        report("이미지 공개 URL", True, f"PUBLIC_IMAGE_BASE 사용: {base}")
+        return
+    if repo:
+        report("이미지 공개 URL", True, f"리포 raw URL 사용: {repo} (공개 리포여야 합니다)")
+        return
+    print(
+        f"{SKIP} 이미지 공개 URL\n"
+        "   로컬에서는 확인할 수 없습니다. GitHub Actions 에서 자동 설정되거나,\n"
+        "   PUBLIC_IMAGE_BASE 로 직접 지정합니다. 리포가 비공개면 발행이 실패합니다.\n"
+    )
+
+
+if __name__ == "__main__":
+    print("=" * 56)
+    print(" 준비 상태 점검")
+    print("=" * 56 + "\n")
+
+    check_font()
+    check_molit()
+    check_naver()
+    check_anthropic()
+    check_threads()
+    check_image_host()
+
+    failed = [n for n, ok in results if not ok]
+    print("=" * 56)
+    if failed:
+        print(f"확인 필요: {', '.join(failed)}")
+        sys.exit(1)
+    print("점검한 항목은 모두 정상입니다. (⏭️ 는 아직 발급 전이라 건너뛴 항목)")
