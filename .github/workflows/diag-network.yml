@@ -9,24 +9,47 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
       - name: 러너 위치
         run: curl -s --max-time 10 https://ipinfo.io/json || echo "(위치 조회 실패)"
 
-      - name: 엔드포인트별 접속 테스트
+      - name: 국토부 - 쿠키 저장소 사용 (실제 코드와 같은 조건)
+        run: |
+          UA="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/122.0 Safari/537.36"
+          for try in 1 2 3; do
+            echo "--- 시도 $try"
+            curl -sL --max-time 30 -A "$UA" -c /tmp/cj -b /tmp/cj \
+                 -o /tmp/molit.xml -w "http=%{http_code} time=%{time_total}s size=%{size_download}\n" \
+                 "https://www.molit.go.kr/dev/board/board_rss.jsp?rss_id=NEWS" || echo "curl 실패 rc=$?"
+            head -c 150 /tmp/molit.xml 2>/dev/null; echo
+          done
+
+      - name: 국토부 - 실제 파이썬 코드로 3회 시도
+        run: |
+          pip install -q -r requirements.txt
+          python - <<'PY'
+          from src.collect import fetch_molit
+          for i in (1, 2, 3):
+              try:
+                  items = fetch_molit(5)
+                  print(f"시도 {i}: {len(items)}건" + (f" — {items[0].title[:40]}" if items else ""))
+              except Exception as e:
+                  print(f"시도 {i}: 예외 {type(e).__name__}: {str(e)[:150]}")
+          PY
+
+      - name: 대체 소스 접속 테스트
+        if: always()
         run: |
           probe() {
-            name="$1"; url="$2"
-            out=$(curl -sL --max-time 20 -o /dev/null \
-                  -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/122.0 Safari/537.36" \
-                  -w "%{http_code} %{time_total}s" "$url" 2>&1) \
-              && echo "OK   | $name | $out" \
-              || echo "FAIL | $name | $out"
+            out=$(curl -sL --max-time 20 -o /dev/null -w "%{http_code} %{time_total}s" "$2" 2>&1) \
+              && echo "OK   | $1 | $out" || echo "FAIL | $1 | $out"
           }
-          probe "국토부 RSS"        "https://www.molit.go.kr/dev/board/board_rss.jsp?rss_id=NEWS"
-          probe "국토부 메인"        "https://www.molit.go.kr"
           probe "네이버 검색API"     "https://openapi.naver.com/v1/search/news.json?query=test"
           probe "공공데이터포털 API"  "https://apis.data.go.kr"
           probe "한국부동산원"        "https://www.reb.or.kr"
           probe "한국은행 ECOS"      "https://ecos.bok.or.kr"
           probe "연합뉴스"           "https://www.yna.co.kr"
-          probe "네이버 뉴스"        "https://news.naver.com"
