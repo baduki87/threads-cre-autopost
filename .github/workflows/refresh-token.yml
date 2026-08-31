@@ -1,0 +1,40 @@
+name: Threads 토큰 갱신
+
+# 장기 토큰도 만료된다(약 60일). 갱신하지 않으면 두 달 뒤 파이프라인이
+# 아무 소리 없이 죽는다. 주 1회 돌려 만료 한참 전에 미리 연장한다.
+on:
+  schedule:
+    - cron: "0 20 * * 0"   # 매주 일요일 KST 05:00
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: 의존성 설치
+        run: pip install -q requests
+
+      - name: 토큰 갱신 후 시크릿에 다시 저장
+        env:
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          # 시크릿을 쓰려면 repo 스코프 PAT 가 필요하다.
+          # GITHUB_TOKEN 으로는 시크릿을 갱신할 수 없다.
+          GH_TOKEN: ${{ secrets.REPO_ADMIN_TOKEN }}
+        run: |
+          NEW_TOKEN=$(python -m src.publish refresh | tail -1)
+          if [ -z "$NEW_TOKEN" ]; then
+            echo "빈 토큰을 받았습니다. 갱신을 중단합니다." >&2
+            exit 1
+          fi
+          # 이후 로그에 토큰이 찍히지 않도록 마스킹한다
+          echo "::add-mask::$NEW_TOKEN"
+          gh secret set THREADS_ACCESS_TOKEN --body "$NEW_TOKEN"
+          echo "토큰 갱신 및 시크릿 저장 완료"

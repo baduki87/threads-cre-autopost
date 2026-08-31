@@ -1,0 +1,63 @@
+name: 매일 스레드 발행
+
+on:
+  schedule:
+    # KST 08:00 = UTC 23:00 (전날). Actions cron 은 UTC 기준이다.
+    - cron: "0 23 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "발행하지 않고 결과물만 생성"
+        type: boolean
+        default: true
+
+concurrency:
+  group: daily-post
+  cancel-in-progress: false
+
+permissions:
+  contents: write   # 카드 이미지와 상태 파일을 커밋해야 한다
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: 한글 폰트 설치
+        # 러너에는 한글 폰트가 없어 카드가 두부(□□□)로 렌더링된다
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq fonts-nanum
+
+      - name: 의존성 설치
+        run: pip install -q -r requirements.txt
+
+      - name: 커밋 사용자 설정
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: 파이프라인 실행
+        env:
+          # 수동 실행이면 입력값을, 스케줄 실행이면 0(=실제 발행)을 쓴다.
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '1' || '0' }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          THREADS_ACCOUNT_HANDLE: ${{ vars.THREADS_ACCOUNT_HANDLE }}
+        run: python -m src.main
+
+      - name: 결과물 업로드 (DRY_RUN 검증용)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-output
+          path: out/
+          if-no-files-found: ignore
+          retention-days: 14
