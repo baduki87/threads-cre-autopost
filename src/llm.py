@@ -1,22 +1,29 @@
-"""Claude API 호출 공통 래퍼.
+"""LLM 호출 공통 래퍼. 무료(Gemini)와 유료(Claude)를 바꿔 쓸 수 있다.
 
-응답은 프롬프트로 JSON 을 지시하고 직접 파싱한다. SDK 버전이 올라가도
-깨지지 않고, 실패했을 때 원문을 그대로 로그로 볼 수 있어 디버깅이 쉽다.
+LLM_PROVIDER 환경변수로 고른다:
+  auto    (기본) 있는 키를 보고 알아서 고른다. Claude 키가 있으면 Claude 우선
+  gemini  Google Gemini 무료 등급 (신용카드 불필요)
+  claude  Anthropic Claude (유료)
+
+응답은 프롬프트로 JSON 을 지시하고 직접 파싱한다. 어느 제공자를 쓰든
+같은 방식이라 갈아탈 때 select.py / compose.py 는 손댈 필요가 없다.
 """
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 
-import anthropic
+import requests
 
-MODEL = "claude-opus-5"
+CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL", "claude-opus-5")
+GEMINI_API = "https://generativelanguage.googleapis.com/v1beta"
+
+_gemini_model_cache: str | None = None
 
 
-def _client() -> anthropic.Anthropic:
-    return anthropic.Anthropic()
-
+# ---------------------------------------------------------------- 공통
 
 def _extract_json(text: str) -> dict:
     """모델이 코드펜스나 설명을 덧붙여도 JSON 객체를 건져낸다."""
@@ -31,29 +38,145 @@ def _extract_json(text: str) -> dict:
     return json.loads(candidate)
 
 
-def ask_json(system: str, prompt: str, *, effort: str = "high", max_tokens: int = 8000) -> dict:
+def provider() -> str:
+    choice = os.environ.get("LLM_PROVIDER", "auto").strip().lower()
+    if choice in {"claude", "gemini"}:
+        return choice
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        return "claude"
+    if os.environ.get("GEMINI_API_KEY"):
+        return "gemini"
+    raise RuntimeError(
+        "LLM 키가 없습니다. 무료로 쓰려면 GEMINI_API_KEY 를, "
+        "Claude 를 쓰려면 ANTHROPIC_API_KEY 를 설정하세요."
+    )
+
+
+# ---------------------------------------------------------------- Gemini
+
+def list_gemini_models() -> list[str]:
+    """이 키로 쓸 수 있는 모델 목록. 모델명이 자주 바뀌어 하드코딩하지 않는다."""
+    key = os.environ.get("GEMINI_API_KEY")
+    if not key:
+        raise RuntimeError("GEMINI_API_KEY 가 설정되지 않았습니다.")
+    r = requests.get(f"{GEMINI_API}/models", params={"key": key}, timeout=20)
+    r.raise_for_status()
+    out = []
+    for m in r.json().get("models", []):
+        if "generateContent" in (m.get("supportedGenerationMethods") or []):
+            out.append(m["name"].removeprefix("models/"))
+    return out
+
+
+def _version_score(name: str) -> float:
+    """이름에서 버전 숫자를 뽑아 최신을 고른다. gemini-3.6-flash -> 3.6"""
+    m = re.search(r"(\d+(?:\.\d+)?)", name)
+    return float(m.group(1)) if m else 0.0
+
+
+def resolve_gemini_model() -> str:
+    """무료 등급에서 쓸 수 있는 flash 계열 중 가장 최신을 고른다."""
+    global _gemini_model_cache
+    if _gemini_model_cache:
+        return _gemini_model_cache
+
+    forced = os.environ.get("GEMINI_MODEL")
+    if forced:
+        _gemini_model_cache = forced
+        return forced
+
+    models = list_gemini_models()
+    # 무료 등급은 flash 계열만 열려 있다. 미리보기/실험판은 뒤로 미룬다.
+    flash = [m for m in models if "flash" in m and "lite" not in m]
+    stable = [m for m in flash if not re.search(r"preview|exp|latest", m)]
+    pool = stable or flash or models
+    if not pool:
+        raise RuntimeError(f"쓸 수 있는 모델이 없습니다. 조회 결과: {models[:10]}")
+
+    chosen = sorted(pool, key=_version_score, reverse=True)[0]
+    _gemini_model_cache = chosen
+    print(f"[llm] Gemini 모델 자동 선택: {chosen}", file=sys.stderr)
+    return chosen
+
+
+def _ask_gemini(system: str, prompt: str, max_tokens: int) -> str:
+    key = os.environ["GEMINI_API_KEY"]
+    model = resolve_gemini_model()
+    body = {
+        "systemInstruction": {"parts": [{"text": system}]},
+        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+        "generationConfig": {
+            # JSON 만 내놓도록 강제한다. 파싱 실패가 크게 줄어든다.
+            "responseMimeType": "application/json",
+            "maxOutputTokens": max_tokens,
+        },
+    }
+    r = requests.post(
+        f"{GEMINI_API}/models/{model}:generateContent",
+        params={"key": key},
+        json=body,
+        timeout=120,
+    )
+    if r.status_code == 429:
+        raise RuntimeError(
+            "Gemini 무료 등급 한도를 넘었습니다. 잠시 후 다시 시도하세요.\n"
+            f"응답: {r.text[:300]}"
+        )
+    if not r.ok:
+        raise RuntimeError(f"Gemini 호출 실패 ({r.status_code}): {r.text[:400]}")
+
+    data = r.json()
+    candidates = data.get("candidates") or []
+    if not candidates:
+        raise RuntimeError(f"Gemini 응답이 비어 있습니다: {json.dumps(data)[:400]}")
+    parts = candidates[0].get("content", {}).get("parts") or []
+    return "".join(p.get("text", "") for p in parts)
+
+
+# ---------------------------------------------------------------- Claude
+
+def _ask_claude(system: str, prompt: str, effort: str, max_tokens: int) -> str:
+    import anthropic
+
+    client = anthropic.Anthropic()
+    resp = client.messages.create(
+        model=CLAUDE_MODEL,
+        max_tokens=max_tokens,
+        system=system,
+        thinking={"type": "adaptive"},
+        output_config={"effort": effort},
+        messages=[{"role": "user", "content": prompt}],
+    )
+    return "".join(b.text for b in resp.content if b.type == "text")
+
+
+# ---------------------------------------------------------------- 진입점
+
+def ask_json(system: str, prompt: str, *, effort: str = "high",
+             max_tokens: int = 8000) -> dict:
     """JSON 객체 하나를 돌려받는다. 파싱 실패 시 한 번만 재시도한다."""
-    client = _client()
-    messages = [{"role": "user", "content": prompt}]
+    which = provider()
+    retry_note = "\n\n반드시 JSON 객체 하나만 출력하세요. 다른 텍스트는 붙이지 마세요."
 
     for attempt in (1, 2):
-        resp = client.messages.create(
-            model=MODEL,
-            max_tokens=max_tokens,
-            system=system,
-            thinking={"type": "adaptive"},
-            output_config={"effort": effort},
-            messages=messages,
-        )
-        text = "".join(b.text for b in resp.content if b.type == "text")
+        body = prompt if attempt == 1 else prompt + retry_note
+        if which == "gemini":
+            text = _ask_gemini(system, body, max_tokens)
+        else:
+            text = _ask_claude(system, body, effort, max_tokens)
         try:
             return _extract_json(text)
         except (ValueError, json.JSONDecodeError) as e:
             if attempt == 2:
                 raise
             print(f"[llm] JSON 파싱 실패, 재시도합니다: {e}", file=sys.stderr)
-            messages = [
-                {"role": "user", "content": prompt},
-                {"role": "user", "content": "직전 응답을 JSON 객체 하나만으로 다시 출력하세요. 다른 텍스트는 붙이지 마세요."},
-            ]
     raise RuntimeError("unreachable")
+
+
+if __name__ == "__main__":
+    print(f"제공자: {provider()}")
+    if provider() == "gemini":
+        print("사용 가능한 모델:")
+        for m in list_gemini_models():
+            print(f"  - {m}")
+        print(f"\n자동 선택: {resolve_gemini_model()}")

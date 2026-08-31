@@ -69,28 +69,51 @@ def check_naver() -> None:
     report("네이버 뉴스 검색", True, f"검색 정상 — '상업용 부동산' {n}건")
 
 
-def check_anthropic() -> None:
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        print(f"{SKIP} Claude API\n   ANTHROPIC_API_KEY 미설정 (아직 발급 전)\n")
+def check_llm() -> None:
+    """무료(Gemini) 또는 유료(Claude) 중 설정된 쪽을 확인한다."""
+    from src import llm
+
+    has_gemini = bool(os.environ.get("GEMINI_API_KEY"))
+    has_claude = bool(os.environ.get("ANTHROPIC_API_KEY"))
+    if not has_gemini and not has_claude:
+        print(
+            f"{SKIP} 글 생성 AI\n"
+            "   GEMINI_API_KEY(무료) 또는 ANTHROPIC_API_KEY(유료) 중 하나가 필요합니다.\n"
+        )
+        return
+
+    which = llm.provider()
+
+    if which == "gemini":
+        try:
+            models = llm.list_gemini_models()
+        except Exception as e:
+            report("글 생성 AI (Gemini)", False, f"모델 조회 실패: {str(e)[:150]}")
+            return
+        try:
+            chosen = llm.resolve_gemini_model()
+            out = llm.ask_json("당신은 테스트 응답기입니다.",
+                               '{"ok": true} 형태의 JSON 만 출력하세요.')
+        except Exception as e:
+            report("글 생성 AI (Gemini)", False, f"호출 실패: {str(e)[:200]}")
+            return
+        flash = [m for m in models if "flash" in m]
+        report("글 생성 AI (Gemini · 무료)", True,
+               f"모델 {chosen} 사용 / 호출 정상 (응답 {out}) — flash 계열 {len(flash)}종 사용 가능")
         return
 
     import anthropic
 
     try:
-        client = anthropic.Anthropic()
-        resp = client.messages.create(
-            model="claude-opus-5",
-            max_tokens=32,
-            messages=[{"role": "user", "content": "'준비완료' 라고만 답하세요."}],
-        )
-        text = "".join(b.text for b in resp.content if b.type == "text").strip()
+        out = llm.ask_json("당신은 테스트 응답기입니다.",
+                           '{"ok": true} 형태의 JSON 만 출력하세요.')
     except anthropic.AuthenticationError:
-        report("Claude API", False, "인증 실패. 키를 다시 확인하세요.")
+        report("글 생성 AI (Claude)", False, "인증 실패. 키를 다시 확인하세요.")
         return
     except Exception as e:
-        report("Claude API", False, f"호출 실패: {e}")
+        report("글 생성 AI (Claude)", False, f"호출 실패: {str(e)[:200]}")
         return
-    report("Claude API", True, f"호출 정상 — 응답: {text[:30]}")
+    report("글 생성 AI (Claude · 유료)", True, f"{llm.CLAUDE_MODEL} 호출 정상 (응답 {out})")
 
 
 def check_threads() -> None:
@@ -153,7 +176,7 @@ if __name__ == "__main__":
     check_font()
     check_molit()
     check_naver()
-    check_anthropic()
+    check_llm()
     check_threads()
     check_image_host()
 

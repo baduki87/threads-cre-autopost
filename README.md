@@ -12,9 +12,10 @@
 | 파일 | 역할 |
 |---|---|
 | `src/collect.py` | 국토부 보도자료 RSS + 네이버 뉴스 검색 API 수집 |
-| `src/select.py` | 중복 제거 후 Claude 로 투자자 관점 스코어링, 상위 1건 선정 |
+| `src/select.py` | 중복 제거 후 AI 로 투자자 관점 스코어링, 상위 1건 선정 |
 | `src/compose.py` | `config/voice.md` 를 주입해 훅·본문·관점 생성 |
 | `src/card.py` | 1080×1350 카드 PNG 렌더링 (Pillow) |
+| `src/llm.py` | LLM 호출 래퍼. Gemini(무료) / Claude(유료) 전환 가능 |
 | `src/publish.py` | Threads 발행 (컨테이너 생성 → 대기 → 발행), 토큰 갱신 |
 | `src/main.py` | 파이프라인 오케스트레이션 |
 | `config/voice.md` | **톤·관점 지침. 품질의 대부분을 여기가 결정한다** |
@@ -77,7 +78,7 @@ DRY_RUN=1 ./.venv/bin/python -m src.main
 
 | 이름 | 용도 |
 |---|---|
-| `ANTHROPIC_API_KEY` | 선별·카피 생성 |
+| `GEMINI_API_KEY` **또는** `ANTHROPIC_API_KEY` | 선별·카피 생성. Gemini 는 무료 등급이 있다 |
 | `NAVER_CLIENT_ID` / `NAVER_CLIENT_SECRET` | 뉴스 검색 |
 | `THREADS_ACCESS_TOKEN` / `THREADS_USER_ID` | 발행 |
 | `REPO_ADMIN_TOKEN` | 토큰 갱신 워크플로가 시크릿을 다시 쓸 때 필요한 PAT (repo 스코프) |

@@ -8,25 +8,58 @@
 
 ---
 
-## 1. Anthropic API 키 (글을 써주는 부분)
+## 1. 글을 써주는 AI — 무료 또는 유료
 
-가장 쉽고, 이것만 있어도 **글 품질을 바로 확인**할 수 있다. 여기부터 하는 걸 권한다.
+이 프로그램에서 **돈이 드는 부분은 여기 하나뿐이다.** 나머지는 전부 무료다.
+두 가지 중 하나만 고르면 된다. 나중에 바꿔도 코드는 안 건드려도 된다.
 
-1. https://console.anthropic.com 접속 → 로그인
-2. 왼쪽 메뉴 **API keys** → **Create Key**
-3. 나온 키를 복사 (`sk-ant-...` 로 시작). **다시 볼 수 없으니 바로 저장**
-4. 결제 수단 등록 필요 (Billing 메뉴)
+### 방법 A — Gemini (무료, 신용카드 불필요) ← 추천
 
-터미널에서 테스트:
+1. https://aistudio.google.com/apikey 접속 → 구글 계정으로 로그인
+2. **Create API key** 클릭
+3. 나온 키를 복사
 
 ```bash
-export ANTHROPIC_API_KEY="sk-ant-여기에붙여넣기"
+export GEMINI_API_KEY="복사한키"
 ./.venv/bin/python tools/check_setup.py
 ```
 
-비용은 하루 1건 발행 기준으로 매우 적다. 선별 + 카피 생성 합쳐 한 번에 몇 백 원 수준.
+무료 등급은 flash 계열 모델만 열려 있는데, 우리는 하루에 2번만 호출하므로
+한도에 걸릴 일이 없다. 모델명은 자주 바뀌므로 코드가 **쓸 수 있는 모델을
+직접 조회해서 최신 flash 를 자동으로 고른다.** 직접 지정하고 싶으면
+`GEMINI_MODEL` 환경변수를 쓰면 된다.
 
----
+지금 어떤 모델을 쓸 수 있는지 보려면:
+
+```bash
+./.venv/bin/python -m src.llm
+```
+
+> 무료 등급은 보낸 내용이 구글 모델 학습에 쓰일 수 있다.
+> 우리가 보내는 건 이미 공개된 뉴스 기사라 문제되지 않는다.
+
+### 방법 B — Claude (유료, 품질 우선)
+
+글의 "관점" 부분 품질을 더 끌어올리고 싶을 때. 최소 충전 금액은 US$5.
+
+1. https://console.anthropic.com → **API keys** → **Create Key**
+2. 결제 수단 등록 (Billing)
+
+```bash
+export ANTHROPIC_API_KEY="sk-ant-..."
+./.venv/bin/python tools/check_setup.py
+```
+
+하루 1건 발행 기준으로 한 달에 몇 백 원~2천 원 수준이라, US$5 를 넣으면
+몇 달은 간다. 다만 **무료가 목표라면 방법 A 로 충분하다.**
+
+### 둘 다 넣으면?
+
+Claude 가 우선 사용된다. 강제로 고르려면:
+
+```bash
+export LLM_PROVIDER=gemini   # 또는 claude
+```
 
 ## 2. 네이버 검색 API (뉴스를 모아오는 부분)
 
@@ -98,7 +131,8 @@ gh repo create 리포이름 --public --source=. --push
 리포를 만든 뒤 시크릿 등록:
 
 ```bash
-gh secret set ANTHROPIC_API_KEY
+gh secret set GEMINI_API_KEY        # 무료로 쓸 경우
+# gh secret set ANTHROPIC_API_KEY   # 유료로 쓸 경우
 gh secret set NAVER_CLIENT_ID
 gh secret set NAVER_CLIENT_SECRET
 gh secret set THREADS_ACCESS_TOKEN
