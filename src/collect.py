@@ -5,6 +5,7 @@ import html
 import os
 import re
 import sys
+import time
 from datetime import datetime, timedelta, timezone
 
 import feedparser
@@ -30,6 +31,25 @@ def _session() -> requests.Session:
     return s
 
 
+def _get_with_retry(sess: requests.Session, url: str, *, tries: int = 3,
+                    timeout: int = 25, **kwargs) -> requests.Response:
+    """일시적인 연결 실패로 하루치 수집을 통째로 잃지 않도록 재시도한다.
+    해외 리전에서 국내 사이트로 붙을 때 간헐적인 타임아웃이 실제로 발생한다."""
+    last: Exception | None = None
+    for attempt in range(1, tries + 1):
+        try:
+            resp = sess.get(url, timeout=timeout, **kwargs)
+            resp.raise_for_status()
+            return resp
+        except requests.RequestException as e:
+            last = e
+            if attempt < tries:
+                wait = 2 ** attempt
+                print(f"[collect] {url} 실패({attempt}/{tries}) — {wait}초 후 재시도", file=sys.stderr)
+                time.sleep(wait)
+    raise last  # type: ignore[misc]
+
+
 def _strip_tags(text: str) -> str:
     return html.unescape(re.sub(r"<[^>]+>", "", text or "")).strip()
 
@@ -37,10 +57,9 @@ def _strip_tags(text: str) -> str:
 def fetch_molit(limit: int = 15) -> list[Article]:
     sess = _session()
     try:
-        resp = sess.get(MOLIT_RSS, timeout=25)
-        resp.raise_for_status()
+        resp = _get_with_retry(sess, MOLIT_RSS)
     except requests.RequestException as e:
-        print(f"[collect] 국토부 RSS 실패: {e}", file=sys.stderr)
+        print(f"[collect] 국토부 RSS 최종 실패: {e}", file=sys.stderr)
         return []
 
     feed = feedparser.parse(resp.content)
@@ -71,18 +90,19 @@ def fetch_naver_news(keywords: list[str], per_keyword: int = 10) -> list[Article
         return []
 
     headers = {"X-Naver-Client-Id": cid, "X-Naver-Client-Secret": csec}
+    sess = _session()
     out: list[Article] = []
     for kw in keywords:
         try:
-            r = requests.get(
+            r = _get_with_retry(
+                sess,
                 NAVER_NEWS_API,
                 headers=headers,
                 params={"query": kw, "display": per_keyword, "sort": "date"},
                 timeout=15,
             )
-            r.raise_for_status()
         except requests.RequestException as e:
-            print(f"[collect] 네이버 검색 실패 ({kw}): {e}", file=sys.stderr)
+            print(f"[collect] 네이버 검색 최종 실패 ({kw}): {e}", file=sys.stderr)
             continue
 
         for item in r.json().get("items", []):
@@ -154,5 +174,5 @@ if __name__ == "__main__":
     items = collect(cfg)
     print(f"수집 {len(items)}건\n")
     for a in items[:30]:
-        when = a.published_at.strftime("%m-%d %H:%M") if a.published_at else "  -  "
+        when = a.published_at.astimezone(KST).strftime("%m-%d %H:%M") if a.published_at else "  -  "
         print(f"[{a.source:6}] {when}  {a.title[:60]}")
