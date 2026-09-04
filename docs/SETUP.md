@@ -140,10 +140,15 @@ export THREADS_USER_ID="..."
 2. 이름 아무거나 (예: 스레드자동발행), 워크스페이스 선택
 3. **Internal Integration Secret** 복사 (`ntn_...` 또는 `secret_...`)
 
-### DB 만들기
+### DB — 이미 만들어져 있다
 
-노션에서 새 페이지 → `/데이터베이스` → **표 보기**로 만들고
-아래 속성을 **이름 그대로** 추가한다. 이름이 다르면 코드가 못 찾는다.
+**스레드 자동 발행** DB 를 만들어뒀다.
+https://www.notion.so/bcb85698aaa5474e9c4d5a5f5716dc1f
+
+`NOTION_DB_ID` 는 `bcb85698aaa5474e9c4d5a5f5716dc1f` 다.
+
+직접 다시 만들 일이 생기면 아래 속성을 **이름 그대로** 추가한다.
+이름이 하나라도 다르면 코드가 못 찾는다.
 
 | 속성 이름 | 타입 | 비고 |
 |---|---|---|
@@ -159,21 +164,16 @@ export THREADS_USER_ID="..."
 | 댓글 | 숫자 | 자동으로 채워짐 |
 | 메모 | 텍스트 | **폰에서 적는 곳** |
 
-만든 뒤 DB 페이지 우상단 `⋯` → **연결** → 방금 만든 통합을 추가한다.
-**이걸 빼먹으면 토큰이 맞아도 접근이 안 된다.**
+### 통합을 DB 에 연결하기 ← 빼먹기 쉬움
 
-### DB ID 찾기
+DB 페이지 우상단 `⋯` → 맨 아래 **연결** → 방금 만든 통합 선택.
+**이걸 안 하면 토큰이 맞아도 접근이 거부된다.**
 
-DB 페이지 주소가 이렇게 생겼다.
-
-```
-https://www.notion.so/<워크스페이스>/<32자리 영숫자>?v=...
-                                    ^^^^^^^^^^^^^^^^ 이게 DB ID
-```
+### 확인
 
 ```bash
-export NOTION_TOKEN="..."
-export NOTION_DB_ID="..."
+export NOTION_TOKEN="ntn_..."
+export NOTION_DB_ID="bcb85698aaa5474e9c4d5a5f5716dc1f"
 ./.venv/bin/python tools/check_setup.py
 ```
 
