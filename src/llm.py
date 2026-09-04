@@ -14,6 +14,7 @@ import json
 import os
 import re
 import sys
+import time
 
 import requests
 
@@ -99,9 +100,40 @@ def resolve_gemini_model() -> str:
     return chosen
 
 
-def _ask_gemini(system: str, prompt: str, max_tokens: int) -> str:
+# 일시적인 장애들. 503(과부하)은 무료 등급에서 실제로 자주 난다.
+_RETRYABLE = {429, 500, 502, 503, 504}
+
+
+def _alternate_models(tried: set[str], limit: int = 2) -> list[str]:
+    """과부하일 때 대신 쓸 flash 계열.
+
+    이미 시도한 모델은 제외한다. 안 그러면 같은 모델을 다시 집어와
+    무한히 도는 사고가 난다.
+    """
+    try:
+        models = list_gemini_models()
+    except Exception:
+        return []
+    flash = [m for m in models
+             if "flash" in m and m not in tried and not re.search(r"preview|exp", m)]
+    return sorted(flash, key=_version_score, reverse=True)[:limit]
+
+
+def _gemini_once(model: str, key: str, body: dict) -> requests.Response:
+    return requests.post(
+        f"{GEMINI_API}/models/{model}:generateContent",
+        params={"key": key},
+        json=body,
+        timeout=120,
+    )
+
+
+def _ask_gemini(system: str, prompt: str, max_tokens: int, tries: int = 3) -> str:
+    """과부하·한도 초과는 재시도하고, 그래도 안 되면 다른 flash 모델로 넘어간다.
+
+    하루 한 번 도는 자동화라 한 번의 일시적 실패로 그날을 통째로 잃으면 안 된다.
+    """
     key = os.environ["GEMINI_API_KEY"]
-    model = resolve_gemini_model()
     body = {
         "systemInstruction": {"parts": [{"text": system}]},
         "contents": [{"role": "user", "parts": [{"text": prompt}]}],
@@ -111,26 +143,56 @@ def _ask_gemini(system: str, prompt: str, max_tokens: int) -> str:
             "maxOutputTokens": max_tokens,
         },
     }
-    r = requests.post(
-        f"{GEMINI_API}/models/{model}:generateContent",
-        params={"key": key},
-        json=body,
-        timeout=120,
-    )
-    if r.status_code == 429:
-        raise RuntimeError(
-            "Gemini 무료 등급 한도를 넘었습니다. 잠시 후 다시 시도하세요.\n"
-            f"응답: {r.text[:300]}"
-        )
-    if not r.ok:
-        raise RuntimeError(f"Gemini 호출 실패 ({r.status_code}): {r.text[:400]}")
 
-    data = r.json()
-    candidates = data.get("candidates") or []
-    if not candidates:
-        raise RuntimeError(f"Gemini 응답이 비어 있습니다: {json.dumps(data)[:400]}")
-    parts = candidates[0].get("content", {}).get("parts") or []
-    return "".join(p.get("text", "") for p in parts)
+    primary = resolve_gemini_model()
+    candidates_models = [primary]
+    tried: set[str] = set()
+    fetched_alternates = False
+    last_err = ""
+
+    while candidates_models:
+        model = candidates_models.pop(0)
+        tried.add(model)
+        for attempt in range(1, tries + 1):
+            try:
+                r = _gemini_once(model, key, body)
+            except requests.RequestException as e:
+                last_err = f"연결 실패: {e}"
+                if attempt < tries:
+                    time.sleep(2 ** attempt)
+                    continue
+                break
+
+            if r.ok:
+                data = r.json()
+                cands = data.get("candidates") or []
+                if not cands:
+                    raise RuntimeError(f"Gemini 응답이 비어 있습니다: {json.dumps(data)[:400]}")
+                parts = cands[0].get("content", {}).get("parts") or []
+                return "".join(p.get("text", "") for p in parts)
+
+            last_err = f"HTTP {r.status_code}: {r.text[:250]}"
+            if r.status_code not in _RETRYABLE:
+                raise RuntimeError(f"Gemini 호출 실패 ({model}) — {last_err}")
+
+            if attempt < tries:
+                wait = 2 ** attempt
+                print(f"[llm] {model} 일시 장애({r.status_code}) — {wait}초 후 재시도 "
+                      f"({attempt}/{tries})", file=sys.stderr)
+                time.sleep(wait)
+
+        # 이 모델은 계속 실패했다. 대체 모델을 딱 한 번만 가져와 갈아탄다.
+        if not candidates_models and not fetched_alternates:
+            fetched_alternates = True
+            alts = _alternate_models(tried)
+            if alts:
+                print(f"[llm] {model} 이 계속 실패해 {alts[0]} 로 전환합니다.", file=sys.stderr)
+                candidates_models = alts
+
+    raise RuntimeError(
+        "Gemini 호출이 재시도와 모델 전환에도 실패했습니다.\n"
+        f"마지막 오류 — {last_err}"
+    )
 
 
 # ---------------------------------------------------------------- Claude
