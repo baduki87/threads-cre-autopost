@@ -1,7 +1,12 @@
 """파이프라인 오케스트레이션.
 
-DRY_RUN=1 이면 발행 직전까지만 수행하고 결과물을 out/ 에 남긴다.
-초기 며칠은 이 모드로 돌려 품질을 눈으로 검증한 뒤 자동 발행을 켠다.
+두 단계로 나뉜다.
+
+  MODE=draft   (저녁 7시) 메모/뉴스로 초안을 만들어 노션에 '대기'로 올린다
+  MODE=publish (밤 9시)   노션에서 '승인'된 것만 실제로 발행한다
+
+승인이 없으면 발행하지 않는다. 빈 글이 나가는 것보다 낫다.
+DRY_RUN=1 이면 바깥에 아무것도 쓰지 않고 out/ 에만 남긴다.
 """
 from __future__ import annotations
 
@@ -10,10 +15,12 @@ import sys
 import traceback
 from datetime import datetime, timedelta, timezone
 
+from . import notion
 from . import state as state_mod
 from .card import render
 from .collect import collect, load_config
 from .compose import compose
+from .models import Pick
 from .publish import PublishError, commit_and_push, publish_image_post, raw_url_for
 from .select import select
 
@@ -24,23 +31,37 @@ def _truthy(name: str, default: str = "0") -> bool:
     return os.environ.get(name, default).strip().lower() in {"1", "true", "yes", "on"}
 
 
-def run() -> int:
+def _today() -> str:
+    return datetime.now(KST).strftime("%Y-%m-%d")
+
+
+# ---------------------------------------------------------------- 초안
+
+def run_draft() -> int:
     dry_run = _truthy("DRY_RUN")
     account = os.environ.get("THREADS_ACCOUNT_HANDLE", "")
-    today = datetime.now(KST).strftime("%Y-%m-%d")
-    print(f"=== {today} 실행 (DRY_RUN={dry_run}) ===")
-
-    cfg = load_config()
-    articles = collect(cfg)
-    if not articles:
-        print("[main] 수집 결과 0건 — 백업 콘텐츠로 진행합니다.")
+    today = _today()
+    print(f"=== {today} 초안 생성 (DRY_RUN={dry_run}) ===")
 
     st = state_mod.load()
-    pick = select(articles, st)
-    post = compose(pick)
 
+    # 메모가 있으면 무조건 우선한다. 의견은 메모에서만 나온다.
+    memo = notion.fetch_memo() if notion.enabled() else None
+    if memo:
+        pick = Pick(article=None, score=10, reason="현장 메모", memo=memo)
+        kind = "임장기"
+    else:
+        cfg = load_config()
+        articles = collect(cfg)
+        if not articles:
+            print("[draft] 수집 결과 0건 — 백업 콘텐츠로 진행합니다.")
+        pick = select(articles, st)
+        kind = "뉴스" if not pick.is_fallback else "방법론"
+
+    post = compose(pick, state=st)
     text = post.render_text()
-    print("\n--- 발행 본문 ---")
+
+    print("\n--- 초안 ---")
     print(text)
     print(f"--- ({len(text)}자) ---\n")
 
@@ -48,30 +69,96 @@ def run() -> int:
     render(post, card_path, account=account)
 
     if dry_run:
+        os.makedirs("out", exist_ok=True)
         with open(f"out/{today}.txt", "w", encoding="utf-8") as f:
             f.write(text + "\n")
-        print(f"[main] DRY_RUN — 발행하지 않았습니다. out/{today}.png / .txt 를 확인하세요.")
+        print(f"[draft] DRY_RUN — 노션에 쓰지 않았습니다. out/{today}.* 를 확인하세요.")
         return 0
 
-    # Threads 는 공개 URL 로만 이미지를 받는다. 먼저 커밋해서 URL 을 확보한다.
+    if not notion.enabled():
+        print("[draft] 노션이 설정되지 않아 초안을 저장할 곳이 없습니다.", file=sys.stderr)
+        return 1
+
+    # 카드를 먼저 커밋해야 공개 URL 이 생긴다. 노션에도 그 URL 을 넣는다.
     commit_and_push([card_path], f"card: {today}")
-    image_url = raw_url_for(card_path)
-    print(f"[main] 이미지 URL {image_url}")
+    card_url = raw_url_for(card_path)
 
-    post_id = publish_image_post(text, image_url)
+    page_id = notion.create_draft(
+        title=post.hook or today, text=text, card_url=card_url, kind=kind
+    )
+    if not page_id:
+        print("[draft] 노션 등록 실패 — 카드는 커밋됐으니 수동으로 올려도 됩니다.",
+              file=sys.stderr)
+        return 1
+    if memo:
+        notion.mark_memo_used(memo.page_id)
+    return 0
 
+
+# ---------------------------------------------------------------- 발행
+
+def run_publish() -> int:
+    dry_run = _truthy("DRY_RUN")
+    today = _today()
+    print(f"=== {today} 발행 (DRY_RUN={dry_run}) ===")
+
+    if not notion.enabled():
+        print("[publish] 노션이 설정되지 않았습니다. 승인 흐름에는 노션이 필요합니다.",
+              file=sys.stderr)
+        return 1
+
+    row = notion.fetch_approved()
+    if not row:
+        print("[publish] 승인된 초안이 없습니다. 오늘은 발행하지 않습니다.")
+        return 0
+
+    text, card_url = row["text"], row["card_url"]
+    print("\n--- 발행 본문 ---")
+    print(text)
+    print(f"--- ({len(text)}자) ---\n")
+
+    if len(text) > 500:
+        print(f"[publish] 본문이 {len(text)}자로 500자를 넘습니다. 노션에서 줄여주세요.",
+              file=sys.stderr)
+        return 1
+    if not card_url:
+        print("[publish] 카드 이미지 URL 이 비어 있습니다.", file=sys.stderr)
+        return 1
+
+    if dry_run:
+        print("[publish] DRY_RUN — 실제로 발행하지 않았습니다.")
+        return 0
+
+    post_id = publish_image_post(text, card_url)
+
+    st = state_mod.load()
     state_mod.record(
         st,
-        key=pick.article.key if pick.article else f"fallback-{today}",
-        title=pick.article.title if pick.article else post.hook,
-        url=pick.article.url if pick.article else "",
+        key=f"notion-{row['page_id']}",
+        title=row["title"] or text.split("\n", 1)[0],
+        url="",
         post_id=post_id,
-        kind="fallback" if pick.is_fallback else pick.article.kind,
+        kind="notion",
+        type_=row.get("type", ""),
+        notion_page=row["page_id"],
         dry_run=False,
     )
     state_mod.save(st)
     commit_and_push([state_mod.STATE_PATH], f"state: {today} 발행 기록")
+
+    notion.mark_published(row["page_id"], post_id)
     return 0
+
+
+def run() -> int:
+    mode = os.environ.get("MODE", "draft").strip().lower()
+    if mode == "publish":
+        return run_publish()
+    if mode == "draft":
+        return run_draft()
+    print(f"[main] 알 수 없는 MODE '{mode}' — draft 또는 publish 를 쓰세요.",
+          file=sys.stderr)
+    return 1
 
 
 if __name__ == "__main__":

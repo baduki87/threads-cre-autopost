@@ -140,6 +140,58 @@ def check_threads() -> None:
     report("Threads", True, f"계정 연결 정상 — @{r.json().get('username')}")
 
 
+def check_notion() -> None:
+    """초안 승인과 메모 입력 창구. 없으면 발행 흐름이 돌지 않는다."""
+    from src import notion
+
+    if not notion.enabled():
+        print(f"{SKIP} 노션\n   NOTION_TOKEN / NOTION_DB_ID 미설정 (아직 발급 전)\n")
+        return
+    ok, msg = notion.check()
+    report("노션", ok, msg)
+
+
+def check_insights_scope() -> None:
+    """성과 수집에는 threads_manage_insights 권한이 따로 필요하다."""
+    token = os.environ.get("THREADS_ACCESS_TOKEN")
+    user_id = os.environ.get("THREADS_USER_ID")
+    if not token or not user_id:
+        print(f"{SKIP} 성과 수집 권한\n   Threads 토큰 설정 후 확인할 수 있습니다\n")
+        return
+
+    import requests
+
+    try:
+        r = requests.get(
+            f"https://graph.threads.net/v1.0/{user_id}/threads",
+            params={"fields": "id", "limit": 1, "access_token": token},
+            timeout=20,
+        )
+        if not r.ok:
+            report("성과 수집 권한", False, f"HTTP {r.status_code}: {r.text[:150]}")
+            return
+        items = r.json().get("data", [])
+        if not items:
+            print(f"{SKIP} 성과 수집 권한\n   발행된 글이 없어 확인할 수 없습니다\n")
+            return
+        mid = items[0]["id"]
+        r2 = requests.get(
+            f"https://graph.threads.net/v1.0/{mid}/insights",
+            params={"metric": "views,likes,replies", "access_token": token},
+            timeout=20,
+        )
+    except requests.RequestException as e:
+        report("성과 수집 권한", False, f"연결 실패: {e}")
+        return
+
+    if not r2.ok:
+        report("성과 수집 권한", False,
+               "threads_manage_insights 권한이 없습니다. 토큰을 다시 발급하세요.\n"
+               f"   {r2.text[:150]}")
+        return
+    report("성과 수집 권한", True, "insights 조회 정상")
+
+
 def check_font() -> None:
     from src.card import _load
 
@@ -178,6 +230,8 @@ if __name__ == "__main__":
     check_naver()
     check_llm()
     check_threads()
+    check_notion()
+    check_insights_scope()
     check_image_host()
 
     failed = [n for n, ok in results if not ok]

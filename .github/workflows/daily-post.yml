@@ -1,18 +1,20 @@
-name: 매일 스레드 발행
+name: 밤 9시 발행
 
+# 독자 활동 시간이 밤 21~24시라는 인사이트 데이터에 맞췄다.
+# 노션에서 '승인'된 초안만 올린다. 승인이 없으면 아무것도 하지 않는다.
 on:
   schedule:
-    # KST 08:00 = UTC 23:00 (전날). Actions cron 은 UTC 기준이다.
-    - cron: "0 23 * * *"
+    # KST 21:00 = UTC 12:00. Actions cron 은 UTC 기준이다.
+    - cron: "0 12 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "발행하지 않고 결과물만 생성"
+        description: "실제로 발행하지 않고 확인만"
         type: boolean
         default: true
 
 concurrency:
-  group: daily-post
+  group: threads-pipeline
   cancel-in-progress: false
 
 permissions:
@@ -29,10 +31,6 @@ jobs:
           python-version: "3.11"
           cache: pip
 
-      - name: 한글 폰트 설치
-        # 러너에는 한글 폰트가 없어 카드가 두부(□□□)로 렌더링된다
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq fonts-nanum
-
       - name: 의존성 설치
         run: pip install -q -r requirements.txt
 
@@ -41,26 +39,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: 파이프라인 실행
+      - name: 승인된 초안 발행
         env:
+          MODE: publish
           # 수동 실행이면 입력값을, 스케줄 실행이면 0(=실제 발행)을 쓴다.
           DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '1' || '0' }}
-          # 둘 중 등록된 키가 쓰인다 (Gemini = 무료, Anthropic = 유료)
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          LLM_PROVIDER: ${{ vars.LLM_PROVIDER || 'auto' }}
-          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
-          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
           THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
-          THREADS_ACCOUNT_HANDLE: ${{ vars.THREADS_ACCOUNT_HANDLE }}
         run: python -m src.main
 
-      - name: 결과물 업로드 (DRY_RUN 검증용)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: post-output
-          path: out/
-          if-no-files-found: ignore
-          retention-days: 14

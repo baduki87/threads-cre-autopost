@@ -51,7 +51,8 @@ def is_near_duplicate(title: str, previous: list[str], threshold: float = 0.72) 
 
 
 def record(state: dict, *, key: str, title: str, url: str, post_id: str | None,
-           kind: str, dry_run: bool) -> dict:
+           kind: str, dry_run: bool, type_: str = "", notion_page: str = "") -> dict:
+    """발행 기록 한 줄. 성과(views/likes/replies)는 며칠 뒤 insights 가 채운다."""
     state.setdefault("posts", []).append(
         {
             "date": datetime.now(KST).isoformat(timespec="seconds"),
@@ -60,7 +61,39 @@ def record(state: dict, *, key: str, title: str, url: str, post_id: str | None,
             "url": url,
             "post_id": post_id,
             "kind": kind,
+            "type": type_,
+            "notion_page": notion_page,
             "dry_run": dry_run,
+            "views": None,
+            "likes": None,
+            "replies": None,
         }
     )
     return state
+
+
+def pending_metrics(state: dict, days_min: int = 3) -> list[dict]:
+    """성과를 아직 안 걷은 발행 글. 발행 후 days_min 일이 지난 것만."""
+    cutoff = datetime.now(KST) - timedelta(days=days_min)
+    out = []
+    for p in state.get("posts", []):
+        if p.get("dry_run") or not p.get("post_id") or p.get("views") is not None:
+            continue
+        try:
+            when = datetime.fromisoformat(p["date"])
+        except (KeyError, ValueError):
+            continue
+        if when.tzinfo is None:
+            when = when.replace(tzinfo=KST)
+        if when <= cutoff:
+            out.append(p)
+    return out
+
+
+def apply_metrics(state: dict, post_id: str, *, views: int, likes: int,
+                  replies: int) -> bool:
+    for p in state.get("posts", []):
+        if p.get("post_id") == post_id:
+            p["views"], p["likes"], p["replies"] = views, likes, replies
+            return True
+    return False

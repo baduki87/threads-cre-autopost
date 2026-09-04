@@ -12,10 +12,12 @@
 | 파일 | 역할 |
 |---|---|
 | `src/collect.py` | 국토부 보도자료 RSS + 네이버 뉴스 검색 API 수집 |
-| `src/select.py` | 중복 제거 후 AI 로 투자자 관점 스코어링, 상위 1건 선정 |
+| `src/select.py` | 중복 제거 후 AI 로 스코어링, 상위 1건 선정 |
 | `src/compose.py` | `config/voice.md` 를 주입해 훅·본문·관점 생성 |
 | `src/card.py` | 1080×1350 카드 PNG 렌더링 (Pillow) |
 | `src/llm.py` | LLM 호출 래퍼. Gemini(무료) / Claude(유료) 전환 가능 |
+| `src/notion.py` | 초안 승인·메모 입력 창구. 실패해도 발행을 막지 않는다 |
+| `src/insights.py` | 발행 3일 뒤 조회수 수집 — 학습 루프를 닫는 조각 |
 | `src/publish.py` | Threads 발행 (컨테이너 생성 → 대기 → 발행), 토큰 갱신 |
 | `src/main.py` | 파이프라인 오케스트레이션 |
 | `config/voice.md` | **톤·관점 지침. 품질의 대부분을 여기가 결정한다** |
