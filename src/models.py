@@ -35,41 +35,86 @@ class Article:
 
 
 @dataclass
+class Memo:
+    """노션에 직접 넣은 현장 메모.
+
+    이 시스템에서 '의견'의 유일한 출처다. 메모가 없으면 판단을 쓰지 않는다.
+    """
+    page_id: str
+    title: str
+    text: str
+
+
+@dataclass
 class Pick:
-    """선별 단계의 결과. article 이 None 이면 백업 콘텐츠로 전환한다."""
+    """선별 단계의 결과.
+
+    memo 가 있으면 최우선. 없고 article 도 None 이면 백업 콘텐츠로 전환한다.
+    """
     article: Article | None
     score: int
     reason: str
     fallback_topic: str | None = None
+    memo: Memo | None = None
+
+    @property
+    def is_memo(self) -> bool:
+        return self.memo is not None
 
     @property
     def is_fallback(self) -> bool:
-        return self.article is None
+        return self.article is None and self.memo is None
 
 
 @dataclass
 class Post:
-    """발행 직전의 완성된 콘텐츠."""
+    """발행 직전의 완성된 콘텐츠.
+
+    opinion 과 question 이 반응을 가른다 (docs/account-analysis.md 참고).
+    opinion 은 메모가 있을 때만 채운다 — 없는 날 지어내면 안 된다.
+    """
     hook: str
     body: str
-    takeaway: str
     card_label: str
     card_number: str
     card_headline: str
     source_line: str
+    opinion: str = ""      # 본인 판단 한 줄. 메모에서만 나온다
+    question: str = ""     # 답하기 쉬운 질문 한 줄
     tags: list[str] = field(default_factory=list)
 
     def render_text(self, limit: int = 500) -> str:
-        """스레드 본문 조립. limit 자를 넘기지 않도록 뒤에서부터 줄인다."""
+        """스레드 본문 조립. limit 자를 넘기지 않도록 덜 중요한 것부터 덜어낸다.
+
+        질문은 댓글을 만드는 장치라 마지막까지 지킨다.
+        태그는 실제 계정이 쓰지 않으므로 보통 비어 있다.
+        """
         tag_line = " ".join(f"#{t.lstrip('#')}" for t in self.tags)
-        blocks = [self.hook, self.body, self.takeaway, self.source_line, tag_line]
-        text = "\n\n".join(b.strip() for b in blocks if b and b.strip())
+        blocks = [self.hook, self.body, self.opinion, self.question,
+                  self.source_line, tag_line]
+
+        def assemble(bs: list[str]) -> str:
+            return "\n\n".join(b.strip() for b in bs if b and b.strip())
+
+        text = assemble(blocks)
         if len(text) <= limit:
             return text
-        # 태그 -> 출처 순으로 덜어내고, 그래도 넘치면 본문을 자른다.
-        for drop in (4, 3):
+
+        # 태그 → 출처 순으로 덜어낸다. 의견과 질문은 남긴다.
+        for drop in (5, 4):
             blocks[drop] = ""
-            text = "\n\n".join(b.strip() for b in blocks if b and b.strip())
+            text = assemble(blocks)
             if len(text) <= limit:
                 return text
-        return text[: limit - 1].rstrip() + "…"
+
+        # 그래도 넘치면 본문만 줄인다. 의견·질문은 끝까지 지킨다.
+        # 남는 자리 = 제한 - (지킬 블록들 + 그 사이 구분자 "\n\n")
+        keep = [b.strip() for b in (self.hook, self.opinion, self.question) if b and b.strip()]
+        room = limit - sum(len(b) for b in keep) - 2 * len(keep)
+        if room > 40:
+            blocks[1] = self.body[: room - 1].rstrip() + "…"
+            text = assemble(blocks)
+            if len(text) <= limit:
+                return text
+
+        return assemble(blocks)[: limit - 1].rstrip() + "…"

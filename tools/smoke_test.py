@@ -24,14 +24,16 @@ def fake_ask_json(system: str, prompt: str, **kwargs) -> dict:
         return {"index": 0, "score": 8, "reason": "테스트용 선별 사유입니다."}
     CALLS.append("compose")
     return {
-        "hook": "서울 A급 오피스 공실률이 2.4%로 내려왔습니다.",
-        "body": "3분기 연속 하락이고 강남권은 1%대입니다. 신규 공급은 2027년까지 제한적입니다.",
-        "takeaway": "임대인 우위 국면이 이어지는 만큼, 재계약 시점이 몰린 자산일수록 임대료 반영이 빠를 여지가 있습니다.",
-        "card_label": "오피스",
-        "card_number": "2.4%",
-        "card_headline": "서울 A급 오피스 공실률 3분기 연속 하락",
+        "hook": "1주택자 갈아타기 대출 규제 바뀜",
+        "body": "수도권 주담대 한도 조정\n실행일 기준으로 적용\n기존 계약분은 종전 기준 유지",
+        # 메모가 없는 날이라 의견을 넣어봤지만 compose 가 걸러내야 한다 (안전장치 회귀 테스트)
+        "opinion": "지금이 매수 기회로 보임",
+        "question": "스친들은 이번 규제로 계획 바뀐 거 있어?",
+        "card_label": "정책",
+        "card_number": "주담대",
+        "card_headline": "1주택자 갈아타기 대출 한도 조정",
         "source_line": "출처: 국토교통부",
-        "tags": ["상업용부동산", "오피스"],
+        "tags": [],
     }
 
 
@@ -40,7 +42,7 @@ select_mod.ask_json = fake_ask_json
 compose_mod.ask_json = fake_ask_json
 
 os.environ["DRY_RUN"] = "1"
-os.environ.setdefault("THREADS_ACCOUNT_HANDLE", "@commercial.re")
+os.environ.setdefault("THREADS_ACCOUNT_HANDLE", "@pro_konwoo")
 
 from src.main import run  # noqa: E402  (스텁 주입 후에 임포트해야 한다)
 
@@ -52,7 +54,8 @@ print(f"\nLLM 호출 순서: {CALLS}")
 long_post = Post(
     hook="가" * 100,
     body="나" * 300,
-    takeaway="다" * 200,
+    opinion="다" * 120,
+    question="라" * 80,
     card_label="테스트",
     card_number="1",
     card_headline="테스트",
@@ -61,6 +64,14 @@ long_post = Post(
 )
 rendered = long_post.render_text()
 assert len(rendered) <= 500, f"500자 제한 위반: {len(rendered)}자"
-print(f"길이 제한 테스트 통과: {len(rendered)}자")
+assert "라" * 80 in rendered, "질문은 잘리지 않고 끝까지 남아야 한다"
+print(f"길이 제한 테스트 통과: {len(rendered)}자 (질문 보존 확인)")
+
+# 메모 기반 글은 의견이 살아있어야 한다
+from src.models import Memo, Pick  # noqa: E402
+memo_pick = Pick(article=None, score=0, reason="",
+                 memo=Memo(page_id="x", title="은마 임장", text="재건축 속도 빠름"))
+assert memo_pick.is_memo and not memo_pick.is_fallback, "메모 판정 오류"
+print("메모 판정 테스트 통과")
 
 sys.exit(code)
