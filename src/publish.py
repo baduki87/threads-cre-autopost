@@ -114,6 +114,46 @@ def publish_image_post(text: str, image_url: str) -> str:
     return post_id
 
 
+def publish_reply(text: str, reply_to_id: str) -> str:
+    """자기 글에 첫 댓글을 단다.
+
+    본문 3줄에 안 들어간 현장 정보가 여기 들어간다. 상위 계정들이 쓰는 방식이고,
+    댓글까지 읽은 사람이 상담으로 이어질 확률이 높다.
+
+    본문 발행과 같은 2단계 흐름이다. 차이는 media_type=TEXT 와 reply_to_id 뿐.
+    """
+    token, user_id = _creds()
+
+    r = requests.post(
+        f"{API}/{user_id}/threads",
+        data={
+            "media_type": "TEXT",
+            "text": text,
+            "reply_to_id": reply_to_id,
+            "access_token": token,
+        },
+        timeout=30,
+    )
+    if not r.ok:
+        raise PublishError(f"댓글 컨테이너 생성 실패 ({r.status_code}): {r.text}")
+    container_id = r.json().get("id")
+    if not container_id:
+        raise PublishError(f"댓글 컨테이너 ID 를 받지 못했습니다: {r.text}")
+
+    _wait_ready(container_id, token)
+
+    r = requests.post(
+        f"{API}/{user_id}/threads_publish",
+        data={"creation_id": container_id, "access_token": token},
+        timeout=30,
+    )
+    if not r.ok:
+        raise PublishError(f"댓글 발행 실패 ({r.status_code}): {r.text}")
+    reply_id = r.json().get("id")
+    print(f"[publish] 첫 댓글 발행 완료 reply_id={reply_id}")
+    return reply_id
+
+
 def refresh_token() -> str:
     """장기 토큰 갱신. 방치하면 60일 뒤 파이프라인이 조용히 죽는다."""
     token, _ = _creds()

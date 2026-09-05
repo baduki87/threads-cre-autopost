@@ -21,7 +21,8 @@ from .card import render
 from .collect import collect, load_config
 from .compose import compose
 from .models import Pick
-from .publish import PublishError, commit_and_push, publish_image_post, raw_url_for
+from .publish import (PublishError, commit_and_push, publish_image_post,
+                      publish_reply, raw_url_for)
 from .select import select
 
 KST = timezone(timedelta(hours=9))
@@ -72,6 +73,11 @@ def run_draft() -> int:
         os.makedirs("out", exist_ok=True)
         with open(f"out/{today}.txt", "w", encoding="utf-8") as f:
             f.write(text + "\n")
+        detail = post.render_detail()
+        if detail:
+            with open(f"out/{today}-댓글.txt", "w", encoding="utf-8") as f:
+                f.write(detail + "\n")
+            print(f"\n--- 첫 댓글 ---\n{detail}\n--- ({len(detail)}자) ---")
         print(f"[draft] DRY_RUN — 노션에 쓰지 않았습니다. out/{today}.* 를 확인하세요.")
         return 0
 
@@ -84,7 +90,8 @@ def run_draft() -> int:
     card_url = raw_url_for(card_path)
 
     page_id = notion.create_draft(
-        title=post.hook or today, text=text, card_url=card_url, kind=kind
+        title=post.hook or today, text=text, card_url=card_url, kind=kind,
+        detail=post.render_detail(),
     )
     if not page_id:
         print("[draft] 노션 등록 실패 — 카드는 커밋됐으니 수동으로 올려도 됩니다.",
@@ -130,6 +137,17 @@ def run_publish() -> int:
         return 0
 
     post_id = publish_image_post(text, card_url)
+
+    # 첫 댓글은 부가 기능이다. 실패해도 이미 올라간 본문을 되돌릴 수 없으니
+    # 예외를 격리하고 기록만 남긴다.
+    detail = row.get("detail", "").strip()
+    if detail:
+        try:
+            publish_reply(detail[:500], post_id)
+        except Exception as e:
+            print(f"[publish] 첫 댓글 실패 (본문은 정상 발행됨): {e}", file=sys.stderr)
+    else:
+        print("[publish] 상세가 비어 있어 첫 댓글은 달지 않습니다.")
 
     st = state_mod.load()
     state_mod.record(

@@ -11,10 +11,11 @@ from .models import Memo, Pick, Post
 
 # 공통 출력 형식. opinion 만 분기별로 지시가 다르다.
 _FIELDS = """{{
-  "hook": "<제목 한 줄. 지역명+단지명 또는 사안. 40자 이내>",
-  "body": "<관찰·사실. 한 줄에 하나씩, 줄바꿈으로 구분. 5~8줄. 개조식(~함/~다수/~용이)>",
+  "hook": "<제목 한 줄. 지역명+단지명 또는 사안. 존댓말. 40자 이내>",
+  "body": "<본문. **정확히 3줄**. 줄바꿈으로 구분. 각 줄은 존댓말 '~합니다' 로 끝냄>",
   "opinion": {opinion_spec},
-  "question": "<답하기 쉬운 질문 한 줄. 객관식이거나 한 단어로 답할 수 있어야 함>",
+  "question": "<답하기 쉬운 질문 한 줄. 존댓말. 둘 중 택일이거나 한 단어로 답할 수 있어야 함>",
+  "detail": {detail_spec},
   "card_label": "<카드 상단 분류. 예: 임장 / 정책 / 재건축. 6자 이내>",
   "card_number": "<카드에 크게 박을 핵심 수치나 키워드. 예: 3천세대 / 사업시행인가. 없으면 빈 문자열>",
   "card_headline": "<카드 본문 문구. 30자 이내>",
@@ -22,7 +23,12 @@ _FIELDS = """{{
   "tags": []
 }}
 
-전체 500자를 넘기지 마세요. tags 는 항상 빈 배열입니다 — 이 계정은 해시태그를 쓰지 않습니다."""
+지켜야 할 것:
+- 모든 문장은 존댓말 '~합니다' 입니다
+- **'~인 것 같습니다', '~인 듯합니다', '~로 보여집니다' 는 절대 쓰지 마세요.** 힘이 빠집니다
+- body 는 반드시 3줄입니다. 더 쓰지 마세요
+- hook + body + opinion + question 합쳐 300자를 넘기지 마세요
+- tags 는 항상 빈 배열입니다 — 이 계정은 해시태그를 쓰지 않습니다"""
 
 MEMO_PROMPT = """아래는 작성자가 현장에서 직접 남긴 메모입니다.
 이걸 스레드 게시물로 다듬으세요.
@@ -35,7 +41,8 @@ MEMO_PROMPT = """아래는 작성자가 현장에서 직접 남긴 메모입니�
 - 메모에 있는 사실만 쓰세요. 없는 정보를 채워 넣지 마세요
 - opinion 은 **메모에 담긴 작성자의 판단을 옮기는 것**입니다.
   메모에 판단이 없으면 opinion 을 빈 문자열로 두세요
-- 전해 들은 내용은 "~라고 함" 으로 표시하세요
+- 전해 들은 내용은 "~라고 합니다" 로 표시하세요
+- 메모 내용이 많으면 **가장 중요한 3가지만 body 에 넣고 나머지는 detail 로** 보내세요
 
 {spec}"""
 
@@ -87,14 +94,21 @@ def _voice(path: str = "config/voice.md") -> str:
         return f.read()
 
 
-def _spec(*, allow_opinion: bool, with_source: bool) -> str:
+def _spec(*, allow_opinion: bool, with_source: bool, detail_from: str) -> str:
+    """detail_from: 첫 댓글에 무엇을 담을지. 소재 종류마다 다르다."""
     opinion_spec = (
-        '"<메모에 담긴 작성자의 판단 한 줄. 개조식. 메모에 판단이 없으면 빈 문자열>"'
+        '"<메모에 담긴 작성자의 판단 한 줄. 존댓말 단정형(~합니다 / ~로 봅니다). '
+        '메모에 판단이 없으면 빈 문자열>"'
         if allow_opinion
         else '""'
     )
     source_spec = '"<출처 표기 한 줄>"' if with_source else '""'
-    return _FIELDS.format(opinion_spec=opinion_spec, source_spec=source_spec)
+    detail_spec = (
+        f'"<첫 댓글에 붙일 상세. {detail_from} '
+        '본문 3줄과 중복되지 않게 씁니다. 존댓말. 500자 이내. 없으면 빈 문자열>"'
+    )
+    return _FIELDS.format(opinion_spec=opinion_spec, source_spec=source_spec,
+                          detail_spec=detail_spec)
 
 
 def performance_context(state: dict, n: int = 5) -> str:
@@ -131,13 +145,15 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
         prompt = MEMO_PROMPT.format(
             title=m.title or "(제목 없음)",
             text=m.text,
-            spec=_spec(allow_opinion=True, with_source=False),
+            spec=_spec(allow_opinion=True, with_source=False,
+                       detail_from="메모에 있지만 본문 3줄에 못 담은 현장 정보를 옮깁니다."),
         )
     elif pick.is_fallback:
         label, topic = (pick.fallback_topic or "관점|").split("|", 1)
         prompt = FALLBACK_PROMPT.format(
             label=label, topic=topic.strip(),
-            spec=_spec(allow_opinion=False, with_source=False),
+            spec=_spec(allow_opinion=False, with_source=False,
+                       detail_from="본문에서 다 못 쓴 배경이나 구체적인 방법을 덧붙입니다."),
         )
     else:
         a = pick.article
@@ -147,7 +163,8 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
             url=a.url,
             snippet=a.snippet or "(요약 없음 — 제목만으로 판단하세요)",
             reason=pick.reason,
-            spec=_spec(allow_opinion=False, with_source=True),
+            spec=_spec(allow_opinion=False, with_source=True,
+                       detail_from="기사에 있는 구체적 조건·일정·적용 범위를 정리합니다."),
         )
 
     d = ask_json(system, prompt, effort="high")
@@ -163,6 +180,7 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
         body=str(d.get("body", "")).strip(),
         opinion=opinion,
         question=str(d.get("question", "")).strip(),
+        detail=str(d.get("detail", "")).strip(),
         card_label=str(d.get("card_label", "")).strip()[:6],
         card_number=str(d.get("card_number", "")).strip(),
         card_headline=str(d.get("card_headline", "")).strip(),
@@ -171,8 +189,10 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
     )
 
     text = post.render_text()
+    detail = post.render_detail()
     print(
         f"[compose] 본문 {len(text)}자 / 의견 {'있음' if post.opinion else '없음'}"
         f" / 질문 {'있음' if post.question else '없음'}"
+        f" / 첫 댓글 {f'{len(detail)}자' if detail else '없음'}"
     )
     return post

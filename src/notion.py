@@ -6,7 +6,7 @@
 노션이 멈춰도 발행은 계속돼야 한다.
 
 DB 속성 (docs/SETUP.md 에 만드는 법이 있다):
-  제목(Title) / 상태(Select) / 본문(Text) / 유형(Select) / 카드(URL)
+  제목(Title) / 상태(Select) / 본문(Text) / 상세(Text) / 유형(Select) / 카드(URL)
   발행일(Date) / post_id(Text) / 조회수·좋아요·댓글(Number) / 메모(Text)
 """
 from __future__ import annotations
@@ -144,6 +144,7 @@ def fetch_approved() -> dict | None:
         "page_id": page["id"],
         "title": _plain(props.get("제목")),
         "text": body,
+        "detail": _plain(props.get("상세")),
         "card_url": (props.get("카드") or {}).get("url") or "",
         "type": _select(props.get("유형")),
     }
@@ -178,8 +179,12 @@ def published_pages(days_min: int = 3, limit: int = 50) -> list[dict]:
 
 # ---------------------------------------------------------------- 쓰기
 
-def create_draft(*, title: str, text: str, card_url: str, kind: str) -> str | None:
-    """초안을 '대기' 상태로 올린다. 회원님이 승인하면 발행된다."""
+def create_draft(*, title: str, text: str, card_url: str, kind: str,
+                 detail: str = "") -> str | None:
+    """초안을 '대기' 상태로 올린다. 회원님이 승인하면 발행된다.
+
+    detail 은 발행 직후 첫 댓글로 붙는다. 노션에서 직접 고칠 수 있다.
+    """
     data = _call(
         "POST", "/pages",
         json={
@@ -188,6 +193,7 @@ def create_draft(*, title: str, text: str, card_url: str, kind: str) -> str | No
                 "제목": {"title": _rich(title or "(제목 없음)")},
                 "상태": {"select": {"name": WAITING}},
                 "본문": {"rich_text": _rich(text)},
+                "상세": {"rich_text": _rich(detail)},
                 "유형": {"select": {"name": kind}},
                 **({"카드": {"url": card_url}} if card_url else {}),
             },
@@ -240,7 +246,7 @@ def check() -> tuple[bool, str]:
         return False, "DB 조회 실패 — 토큰이 맞는지, DB 에 통합을 연결했는지 확인하세요"
 
     have = set(data.get("properties", {}).keys())
-    need = {"제목", "상태", "본문", "유형", "카드", "발행일", "post_id",
+    need = {"제목", "상태", "본문", "상세", "유형", "카드", "발행일", "post_id",
             "조회수", "좋아요", "댓글", "메모"}
     missing = need - have
     if missing:

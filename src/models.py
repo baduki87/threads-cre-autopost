@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import re
+import sys
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from typing import Any
@@ -66,12 +67,16 @@ class Pick:
         return self.article is None and self.memo is None
 
 
+BODY_LINES = 3      # 본문 줄 수. 짧을수록 반응이 좋았다 (docs/account-analysis.md)
+
+
 @dataclass
 class Post:
     """발행 직전의 완성된 콘텐츠.
 
     opinion 과 question 이 반응을 가른다 (docs/account-analysis.md 참고).
     opinion 은 메모가 있을 때만 채운다 — 없는 날 지어내면 안 된다.
+    detail 은 본문에 안 들어간 현장 정보로, 발행 직후 첫 댓글로 붙는다.
     """
     hook: str
     body: str
@@ -81,7 +86,18 @@ class Post:
     source_line: str
     opinion: str = ""      # 본인 판단 한 줄. 메모에서만 나온다
     question: str = ""     # 답하기 쉬운 질문 한 줄
+    detail: str = ""       # 첫 댓글에 붙는 상세. 본문과 중복되지 않는다
     tags: list[str] = field(default_factory=list)
+
+    def __post_init__(self) -> None:
+        # 프롬프트로 "3줄"을 지시해도 모델이 더 뱉는 경우가 있다.
+        # 본문 길이는 이 계정 성과와 직결되므로 코드에서 강제한다.
+        lines = [ln.strip() for ln in self.body.splitlines() if ln.strip()]
+        if len(lines) > BODY_LINES:
+            print(f"[post] 본문이 {len(lines)}줄이라 앞 {BODY_LINES}줄만 씁니다.",
+                  file=sys.stderr)
+            lines = lines[:BODY_LINES]
+        self.body = "\n".join(lines)
 
     def render_text(self, limit: int = 500) -> str:
         """스레드 본문 조립. limit 자를 넘기지 않도록 덜 중요한 것부터 덜어낸다.
@@ -118,3 +134,10 @@ class Post:
                 return text
 
         return assemble(blocks)[: limit - 1].rstrip() + "…"
+
+    def render_detail(self, limit: int = 500) -> str:
+        """첫 댓글 본문. 비어 있으면 빈 문자열 — 그러면 댓글을 달지 않는다."""
+        text = (self.detail or "").strip()
+        if len(text) <= limit:
+            return text
+        return text[: limit - 1].rstrip() + "…"
