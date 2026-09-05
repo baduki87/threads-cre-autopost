@@ -20,6 +20,9 @@ import webbrowser
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# src 를 먼저 임포트해야 .env 가 환경변수로 올라온다 (src/__init__.py).
+# 이게 없으면 이미 저장해둔 REST 키를 못 찾아 다시 물어보게 된다.
+import src  # noqa: E402,F401
 import requests  # noqa: E402
 
 PORT = 8765
