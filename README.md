@@ -18,6 +18,7 @@
 | `src/llm.py` | LLM 호출 래퍼. Gemini(무료) / Claude(유료) 전환 가능 |
 | `src/notion.py` | 초안 승인·메모 입력 창구. 실패해도 발행을 막지 않는다 |
 | `src/insights.py` | 발행 3일 뒤 조회수 수집 — 학습 루프를 닫는 조각 |
+| `src/notify.py` | 카카오톡 알림. 실패해도 파이프라인을 멈추지 않는다 |
 | `src/publish.py` | Threads 발행 (컨테이너 생성 → 대기 → 발행), 토큰 갱신 |
 | `src/main.py` | 파이프라인 오케스트레이션 |
 | `config/voice.md` | **톤·관점 지침. 품질의 대부분을 여기가 결정한다** |

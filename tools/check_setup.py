@@ -151,6 +151,19 @@ def check_notion() -> None:
     report("노션", ok, msg)
 
 
+def check_kakao() -> None:
+    """실패해도 조용히 지나가지 않게 해주는 장치. 없으면 놓치기 쉽다."""
+    from src import notify
+
+    if not notify.enabled():
+        print(f"{SKIP} 카카오톡 알림\n"
+              "   KAKAO_REST_API_KEY / KAKAO_REFRESH_TOKEN 미설정\n"
+              "   설정하려면: ./.venv/bin/python tools/kakao_setup.py\n")
+        return
+    ok, msg = notify.check()
+    report("카카오톡 알림", ok, msg)
+
+
 def check_insights_scope() -> None:
     """성과 수집에는 threads_manage_insights 권한이 따로 필요하다."""
     token = os.environ.get("THREADS_ACCESS_TOKEN")
@@ -231,6 +244,7 @@ if __name__ == "__main__":
     check_llm()
     check_threads()
     check_notion()
+    check_kakao()
     check_insights_scope()
     check_image_host()
 

@@ -190,6 +190,38 @@ export NOTION_DB_ID="bcb85698aaa5474e9c4d5a5f5716dc1f"
 
 ---
 
+## 3.7 카카오톡 알림 (선택이지만 강력히 권함)
+
+이게 없으면 **실패해도 조용히 지나가고, 승인도 깜빡하게 된다.**
+저녁 7시에 "초안 나왔습니다" 가 폰으로 오고, 어딘가 실패하면 바로 알려준다.
+
+카카오는 절차가 번거로워서 도우미 스크립트를 만들어뒀다.
+
+```bash
+./.venv/bin/python tools/kakao_setup.py
+```
+
+화면 안내를 따라가면 된다. 요약하면:
+
+1. https://developers.kakao.com/console/app → 앱 만들기
+2. **REST API 키** 복사
+3. [카카오 로그인] 활성화 ON + Redirect URI 에 `https://example.com/oauth` 등록
+4. [동의항목] → **카카오톡 메시지 전송** 을 선택 동의로
+5. 스크립트가 준 주소를 브라우저에 붙여넣고 동의 → **주소창 전체를 복사해서 붙여넣기**
+
+끝나면 `.env` 에 넣을 두 줄을 알려준다.
+
+```bash
+./.venv/bin/python -m src.notify
+```
+
+카카오톡 '나와의 채팅' 에 테스트 메시지가 오면 성공이다.
+
+> refresh_token 은 약 2개월마다 갱신된다. 새 토큰이 발급되면 로그에
+> "KAKAO_REFRESH_TOKEN 시크릿을 갱신하세요" 가 뜬다.
+
+---
+
 ## 4. GitHub 리포지토리
 
 Actions 로 매일 자동 실행하고, 카드 이미지를 인터넷에 공개하는 역할을 한다.
@@ -214,6 +246,8 @@ gh secret set THREADS_ACCESS_TOKEN
 gh secret set THREADS_USER_ID
 gh secret set NOTION_TOKEN
 gh secret set NOTION_DB_ID
+gh secret set KAKAO_REST_API_KEY
+gh secret set KAKAO_REFRESH_TOKEN
 ```
 
 각 명령을 치면 값을 입력하라고 나온다. 붙여넣고 엔터.

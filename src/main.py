@@ -15,6 +15,7 @@ import sys
 import traceback
 from datetime import datetime, timedelta, timezone
 
+from . import notify
 from . import notion
 from . import state as state_mod
 from .card import render
@@ -26,6 +27,10 @@ from .publish import (PublishError, commit_and_push, publish_image_post,
 from .select import select
 
 KST = timezone(timedelta(hours=9))
+NOTION_PAGE_URL = os.environ.get(
+    "NOTION_PAGE_URL",
+    "https://www.notion.so/bcb85698aaa5474e9c4d5a5f5716dc1f",
+)
 
 
 def _truthy(name: str, default: str = "0") -> bool:
@@ -96,9 +101,12 @@ def run_draft() -> int:
     if not page_id:
         print("[draft] 노션 등록 실패 — 카드는 커밋됐으니 수동으로 올려도 됩니다.",
               file=sys.stderr)
+        notify.failed("초안", "노션에 초안을 저장하지 못했습니다.")
         return 1
     if memo:
         notion.mark_memo_used(memo.page_id)
+
+    notify.draft_ready(post.hook or today, text, NOTION_PAGE_URL)
     return 0
 
 
@@ -117,6 +125,8 @@ def run_publish() -> int:
     row = notion.fetch_approved()
     if not row:
         print("[publish] 승인된 초안이 없습니다. 오늘은 발행하지 않습니다.")
+        notify.send("승인된 초안이 없어 오늘은 발행하지 않았습니다.",
+                    NOTION_PAGE_URL, "노션 열기")
         return 0
 
     text, card_url = row["text"], row["card_url"]
@@ -165,6 +175,7 @@ def run_publish() -> int:
     commit_and_push([state_mod.STATE_PATH], f"state: {today} 발행 기록")
 
     notion.mark_published(row["page_id"], post_id)
+    notify.published(row["title"] or today, post_id, with_reply=bool(detail))
     return 0
 
 
@@ -184,7 +195,9 @@ if __name__ == "__main__":
         sys.exit(run())
     except PublishError as e:
         print(f"[main] 발행 오류: {e}", file=sys.stderr)
+        notify.failed(os.environ.get("MODE", "draft"), str(e))
         sys.exit(1)
-    except Exception:
+    except Exception as e:
         traceback.print_exc()
+        notify.failed(os.environ.get("MODE", "draft"), f"{type(e).__name__}: {e}")
         sys.exit(1)
