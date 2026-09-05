@@ -35,15 +35,18 @@ def _access_token() -> tuple[str | None, str | None]:
     카카오는 refresh_token 만료가 1개월 미만으로 남았을 때만 새 것을 준다.
     새로 받으면 시크릿을 갈아줘야 하므로 함께 돌려준다.
     """
-    r = requests.post(
-        AUTH,
-        data={
-            "grant_type": "refresh_token",
-            "client_id": os.environ["KAKAO_REST_API_KEY"],
-            "refresh_token": os.environ["KAKAO_REFRESH_TOKEN"],
-        },
-        timeout=20,
-    )
+    data = {
+        "grant_type": "refresh_token",
+        "client_id": os.environ["KAKAO_REST_API_KEY"],
+        "refresh_token": os.environ["KAKAO_REFRESH_TOKEN"],
+    }
+    # 카카오는 REST 키 발급 시 클라이언트 시크릿을 기본 활성화한다.
+    # 켜져 있으면 이 값 없이는 토큰이 발급되지 않는다.
+    secret = os.environ.get("KAKAO_CLIENT_SECRET")
+    if secret:
+        data["client_secret"] = secret
+
+    r = requests.post(AUTH, data=data, timeout=20)
     if not r.ok:
         print(f"[notify] 토큰 갱신 실패 ({r.status_code}): {r.text[:200]}", file=sys.stderr)
         return None, None

@@ -49,8 +49,12 @@ GUIDE = f"""
  4) 왼쪽 [카카오 로그인]
        활성화 설정을 ON
        Redirect URI 에 아래 주소를 **그대로** 등록하세요
+       ([앱 > 플랫폼 키] > REST API 키 [더보기] > [수정] 안에 있습니다)
 
            {REDIRECT_URI}
+
+       같은 화면의 '클라이언트 시크릿'이 ON 이면 그 코드도 필요합니다.
+       .env 의 KAKAO_CLIENT_SECRET 에 넣어두세요.
 
  5) 왼쪽 [카카오 로그인] → [동의항목]
        '카카오톡 메시지 전송' 을 찾아 [설정] → 선택 동의
@@ -129,6 +133,7 @@ def main() -> int:
               "다른 프로그램을 끄고 다시 실행하거나, 저에게 알려주세요.")
         return 1
 
+    client_secret = (os.environ.get("KAKAO_CLIENT_SECRET") or "").strip()
     rest_key = (os.environ.get("KAKAO_REST_API_KEY") or "").strip()
     if rest_key:
         print(f"이미 저장된 REST API 키를 씁니다 ({rest_key[:6]}…)")
@@ -183,16 +188,16 @@ def main() -> int:
         return 1
 
     print("동의를 확인했습니다. 토큰을 받는 중…")
-    r = requests.post(
-        TOKEN_URL,
-        data={
-            "grant_type": "authorization_code",
-            "client_id": rest_key,
-            "redirect_uri": REDIRECT_URI,
-            "code": _Catcher.code,
-        },
-        timeout=20,
-    )
+    payload = {
+        "grant_type": "authorization_code",
+        "client_id": rest_key,
+        "redirect_uri": REDIRECT_URI,
+        "code": _Catcher.code,
+    }
+    if client_secret:
+        payload["client_secret"] = client_secret
+
+    r = requests.post(TOKEN_URL, data=payload, timeout=20)
     if not r.ok:
         print(f"\n토큰 발급 실패 ({r.status_code}): {r.text[:300]}")
         print("\n4번 Redirect URI 가 아래와 정확히 같은지 확인해주세요.")
@@ -204,10 +209,10 @@ def main() -> int:
         print(f"\n응답에 refresh_token 이 없습니다: {r.text[:300]}")
         return 1
 
-    saved = _save_env({
-        "KAKAO_REST_API_KEY": rest_key,
-        "KAKAO_REFRESH_TOKEN": refresh,
-    })
+    pairs = {"KAKAO_REST_API_KEY": rest_key, "KAKAO_REFRESH_TOKEN": refresh}
+    if client_secret:
+        pairs["KAKAO_CLIENT_SECRET"] = client_secret
+    saved = _save_env(pairs)
 
     print("\n" + "=" * 60)
     if saved:
