@@ -12,6 +12,10 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# src 를 임포트해야 .env 가 환경변수로 올라온다 (src/__init__.py).
+# 아래 점검들이 os.environ 을 바로 읽으므로 여기서 먼저 불러야 한다.
+import src  # noqa: E402,F401
+
 OK = "✅"
 NO = "❌"
 SKIP = "⏭️"
@@ -233,10 +237,44 @@ def check_image_host() -> None:
     )
 
 
+def check_misplaced_keys() -> None:
+    """키를 엉뚱한 칸에 넣는 실수를 잡는다.
+
+    .env 의 항목들이 붙어 있어서 실제로 자주 헷갈린다.
+    토큰마다 접두사가 달라 형식으로 구분할 수 있다.
+    """
+    # 각 서비스 토큰을 알아보는 표식.
+    # "이 칸에 이게 있어야 한다"가 아니라 "이건 저 서비스 것이다"로만 쓴다.
+    # 형식은 서비스가 언제든 바꾸므로(Gemini 는 AIza → AQ. 로 바뀌었다)
+    # 잘못된 자리에 있는 게 확실할 때만 지적한다.
+    signatures = {
+        "NOTION_TOKEN": ("ntn_", "secret_"),
+        "ANTHROPIC_API_KEY": ("sk-ant-",),
+        "GEMINI_API_KEY": ("AIza", "AQ."),
+    }
+    problems = []
+    for slot in ("NOTION_TOKEN", "ANTHROPIC_API_KEY", "GEMINI_API_KEY",
+                 "THREADS_ACCESS_TOKEN", "KAKAO_REFRESH_TOKEN"):
+        value = os.environ.get(slot, "")
+        if not value:
+            continue
+        for owner, marks in signatures.items():
+            if owner != slot and value.startswith(marks):
+                problems.append(f"{slot} 에 {owner} 값이 들어가 있습니다")
+                break
+
+    if problems:
+        report("키 배치", False, "\n   ".join(problems) + "\n   .env 를 열어 바로잡으세요")
+    elif any(os.environ.get(k) for k in signatures):
+        report("키 배치", True, "각 키가 알맞은 칸에 있습니다")
+
+
 if __name__ == "__main__":
     print("=" * 56)
     print(" 준비 상태 점검")
     print("=" * 56 + "\n")
+
+    check_misplaced_keys()
 
     check_font()
     check_molit()
