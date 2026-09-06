@@ -1,14 +1,16 @@
 name: 성과 수집
 
-# KST 08:00 = UTC 23:00. 발행 후 3일 지난 글의 조회수를 걷어
+# KST 07:00 = UTC 22:00. 발행 후 3일 지난 글의 조회수를 걷어
 # state/published.json 과 노션에 채운다. 다음 초안이 이걸 보고 배운다.
 on:
   schedule:
-    - cron: "0 23 * * *"
+    - cron: "0 22 * * *"   # KST 07:00 — 08시 발행과 커밋이 겹치지 않게
   workflow_dispatch:
 
+# 발행 워크플로와 같은 그룹. 둘 다 state/published.json 을 고쳐 커밋하므로
+# 겹치면 rebase 가 충돌한다. 한 시간 차이지만 실행이 밀리면 만난다.
 concurrency:
-  group: threads-insights
+  group: threads-pipeline
   cancel-in-progress: false
 
 permissions:

@@ -1,0 +1,89 @@
+name: 자동 발행 (08시 · 17시)
+
+# 하루 3건 중 승인 없이 나가는 두 슬롯.
+# 주력인 21시만 승인을 거친다 — 하루 세 번 승인은 지속이 어렵다.
+# 메모가 담긴 글은 21시가 가져가므로 여기서는 뉴스·백업만 쓴다.
+on:
+  schedule:
+    - cron: "0 23 * * *"   # KST 08:00 (전날 UTC 23시)
+    - cron: "0 8 * * *"    # KST 17:00
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: "슬롯 (08 또는 17)"
+        type: choice
+        options: ["08", "17"]
+        default: "08"
+      dry_run:
+        description: "발행하지 않고 결과물만 생성"
+        type: boolean
+        default: true
+
+concurrency:
+  group: threads-pipeline
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: 한글 폰트 설치
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq fonts-nanum
+
+      - name: 의존성 설치
+        run: pip install -q -r requirements.txt
+
+      - name: 커밋 사용자 설정
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: 슬롯 결정
+        id: slot
+        run: |
+          if [ -n "${{ inputs.slot }}" ]; then
+            echo "value=${{ inputs.slot }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "0 23 * * *" ]; then
+            echo "value=08" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=17" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 생성 후 발행
+        env:
+          MODE: auto
+          SLOT: ${{ steps.slot.outputs.value }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '1' || '0' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          LLM_PROVIDER: ${{ vars.LLM_PROVIDER || 'auto' }}
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          THREADS_ACCOUNT_HANDLE: ${{ vars.THREADS_ACCOUNT_HANDLE }}
+        run: python -m src.main
+
+      - name: 결과물 업로드 (DRY_RUN 검증용)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auto-output-${{ steps.slot.outputs.value }}
+          path: out/
+          if-no-files-found: ignore
+          retention-days: 14

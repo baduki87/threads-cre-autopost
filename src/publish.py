@@ -68,14 +68,30 @@ def raw_url_for(path: str) -> str:
 
 
 def commit_and_push(paths: list[str], message: str) -> None:
-    """카드 이미지와 상태 파일을 커밋한다. 발행 전에 이미지가 공개돼 있어야 한다."""
+    """카드 이미지와 상태 파일을 커밋한다. 발행 전에 이미지가 공개돼 있어야 한다.
+
+    하루 여러 번(발행 3 + 성과 1) 커밋하므로 원격이 앞서 있을 수 있다.
+    push 가 막히면 rebase 로 따라잡고 한 번 더 시도한다.
+    """
     subprocess.run(["git", "add", "--", *paths], check=True)
     result = subprocess.run(["git", "diff", "--cached", "--quiet"])
     if result.returncode == 0:
         print("[publish] 커밋할 변경 없음")
         return
     subprocess.run(["git", "commit", "-m", message], check=True)
-    subprocess.run(["git", "push"], check=True)
+
+    push = subprocess.run(["git", "push"], capture_output=True, text=True)
+    if push.returncode != 0:
+        print("[publish] push 거부됨 — 원격을 가져와 다시 시도합니다", file=sys.stderr)
+        pull = subprocess.run(["git", "pull", "--rebase"], capture_output=True, text=True)
+        if pull.returncode != 0:
+            raise PublishError(
+                f"rebase 실패로 푸시하지 못했습니다:\n{pull.stderr[:400]}"
+            )
+        push = subprocess.run(["git", "push"], capture_output=True, text=True)
+        if push.returncode != 0:
+            raise PublishError(f"재시도에도 푸시 실패:\n{push.stderr[:400]}")
+
     print(f"[publish] 커밋·푸시 완료: {', '.join(paths)}")
 
 

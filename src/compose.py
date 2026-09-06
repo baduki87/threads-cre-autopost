@@ -124,8 +124,9 @@ def performance_context(state: dict, n: int = 5) -> str:
         return ""
 
     def line(p: dict) -> str:
+        slot = f"{p['slot']}시 " if p.get("slot") else ""
         return (
-            f"- [{p.get('type') or p.get('kind', '?')}] {p['title'][:50]} "
+            f"- {slot}[{p.get('type') or p.get('kind', '?')}] {p['title'][:50]} "
             f"(조회 {p.get('views', 0)} / 좋아요 {p.get('likes', 0)} / 댓글 {p.get('replies', 0)})"
         )
 

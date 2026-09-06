@@ -51,11 +51,28 @@ def _format_candidates(articles: list[Article]) -> str:
     return "\n".join(lines)
 
 
-def pick_fallback(path: str = "config/fallback.yaml") -> Pick:
-    """요일로 백업 주제를 고른다. 같은 주에 같은 주제가 반복되지 않는다."""
+def pick_fallback(path: str = "config/fallback.yaml",
+                  st: dict | None = None) -> Pick:
+    """백업 주제 하나. 최근에 쓴 주제를 피한다.
+
+    예전에는 요일로 골랐는데 주제가 5개뿐이라 매주 같은 요일에 같은 주제가
+    돌아왔다. 하루 3건이면 이틀에 한 바퀴라 더 빨리 뻔해진다.
+
+    최근 제목에서 주제를 알아보려면 이력에 label 이 남아 있어야 한다.
+    main._source_id 가 백업 글을 "[임장준비] ..." 형태로 기록하는 이유다.
+    """
     with open(path, encoding="utf-8") as f:
         topics = yaml.safe_load(f)["topics"]
-    topic = topics[datetime.now(KST).weekday() % len(topics)]
+
+    recent = set()
+    if st:
+        # 최근 발행 제목에 들어간 분류를 훑어 같은 주제를 연달아 쓰지 않는다.
+        recent = {t for t in state_mod.recent_titles(st, days=10)}
+
+    unseen = [t for t in topics if not any(t["label"] in r for r in recent)]
+    pool = unseen or topics
+    topic = pool[datetime.now(KST).timetuple().tm_yday % len(pool)]
+
     return Pick(
         article=None,
         score=0,
@@ -65,6 +82,13 @@ def pick_fallback(path: str = "config/fallback.yaml") -> Pick:
 
 
 def select(articles: list[Article], st: dict) -> Pick:
+    """오늘 쓸 소재 하나.
+
+    하루 3건이지만 슬롯마다 별도 프로세스가 몇 시간 간격으로 돌고, 앞 슬롯이
+    발행 직후 이력을 커밋한다. 그래서 '같은 배치 안의 중복' 을 따로 볼 필요가
+    없다 — 앞 글의 기사 키와 제목이 이미 이력에 들어와 있다.
+    다만 그러려면 이력에 **원본 기사**의 키·제목이 들어가야 한다(main._source_id).
+    """
     seen = state_mod.seen_keys(st)
     previous = state_mod.recent_titles(st)
 
@@ -75,7 +99,7 @@ def select(articles: list[Article], st: dict) -> Pick:
     print(f"[select] 후보 {len(articles)}건 → 중복 제거 후 {len(fresh)}건")
 
     if not fresh:
-        return pick_fallback()
+        return pick_fallback(st=st)
 
     result = ask_json(SYSTEM, PROMPT.format(candidates=_format_candidates(fresh)), effort="medium")
     idx = int(result.get("index", -1))
@@ -84,7 +108,7 @@ def select(articles: list[Article], st: dict) -> Pick:
 
     if idx < 0 or idx >= len(fresh) or score < SCORE_THRESHOLD:
         print(f"[select] 최고 점수 {score} < 임계값 {SCORE_THRESHOLD} → 백업 콘텐츠")
-        return pick_fallback()
+        return pick_fallback(st=st)
 
     chosen = fresh[idx]
     print(f"[select] 선정({score}점): {chosen.title[:60]}")

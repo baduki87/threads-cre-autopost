@@ -205,6 +205,32 @@ def create_draft(*, title: str, text: str, card_url: str, kind: str,
     return data.get("id")
 
 
+def create_published(*, title: str, text: str, detail: str, kind: str,
+                     post_id: str, card_url: str = "") -> str | None:
+    """자동 발행분을 '발행됨' 으로 바로 기록한다.
+
+    승인을 거치지 않는 08·17시 슬롯용. 성과 수집이 post_id 로 찾아가므로
+    노션에도 남겨야 조회수가 채워진다.
+    """
+    data = _call(
+        "POST", "/pages",
+        json={
+            "parent": {"database_id": os.environ.get("NOTION_DB_ID", "")},
+            "properties": {
+                "제목": {"title": _rich(title or "(제목 없음)")},
+                "상태": {"select": {"name": PUBLISHED}},
+                "본문": {"rich_text": _rich(text)},
+                "상세": {"rich_text": _rich(detail)},
+                "유형": {"select": {"name": kind}},
+                "post_id": {"rich_text": _rich(post_id)},
+                "발행일": {"date": {"start": datetime.now(KST).date().isoformat()}},
+                **({"카드": {"url": card_url}} if card_url else {}),
+            },
+        },
+    )
+    return data.get("id") if data else None
+
+
 def mark_published(page_id: str, post_id: str) -> None:
     _call(
         "PATCH", f"/pages/{page_id}",

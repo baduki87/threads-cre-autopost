@@ -93,4 +93,48 @@ four = Post(hook="h", body="1\n2\n3\n4\n5", card_label="l",
 assert four.body.count("\n") == BODY_LINES - 1, four.body
 print(f"본문 {BODY_LINES}줄 강제 통과")
 
+
+# 슬롯 사이 중복 회귀 테스트
+#   08시에 발행한 기사가 17시에 다시 뽑히면 안 된다. 그러려면 이력에 남는 키와
+#   제목이 AI 가 다시 쓴 것이 아니라 **원본 기사**의 것이어야 한다.
+from datetime import datetime, timezone, timedelta  # noqa: E402
+from src import state as state_mod  # noqa: E402
+from src.main import _source_id  # noqa: E402
+from src.models import Article  # noqa: E402
+
+원본 = Article(title="용적률 1.2배 높이면 성산시영 분담금 1억 뚝",
+               url="https://example.com/news/1", source="매일경제", kind="news")
+아침글 = Post(hook="마포 성산시영 용적률 완화 시뮬레이션 결과가 나왔습니다",
+              body="1\n2\n3", card_label="", card_number="",
+              card_headline="", source_line="")
+
+key, title = _source_id(Pick(article=원본, score=8, reason=""), 아침글, "2026-09-06", "08")
+assert key == 원본.key, f"기사 키가 아니라 {key} 가 기록됐다"
+assert title == 원본.title, f"AI 제목이 기록됐다: {title}"
+
+st = state_mod.record({}, key=key, title=title, url=원본.url, post_id="1",
+                      kind="auto", type_="뉴스", slot="08", dry_run=False)
+
+# 같은 기사 → 키로 걸린다
+같은기사 = Article(title=원본.title, url=원본.url, source="매일경제", kind="news")
+# 같은 사건, 다른 매체 → 제목 겹침으로 걸린다
+다른매체 = Article(title="성산시영 용적률 완화, 분담금 1억 줄어",
+                  url="https://example.com/news/2", source="뉴시스", kind="news")
+무관 = Article(title="강남 재건축 조합 설립 인가 신청",
+              url="https://example.com/news/3", source="조선비즈", kind="news")
+
+seen = state_mod.seen_keys(st)
+prev = state_mod.recent_titles(st)
+통과 = [a for a in (같은기사, 다른매체, 무관)
+        if a.key not in seen and not state_mod.is_near_duplicate(a.title, prev)]
+assert [a.title for a in 통과] == [무관.title], [a.title for a in 통과]
+print("슬롯 사이 중복 차단 통과: 같은 기사·같은 사건 제외, 무관 기사 통과")
+
+# 백업 주제는 label 을 제목에 남겨야 다음 슬롯이 회전할 수 있다
+fb_key, fb_title = _source_id(
+    Pick(article=None, score=0, reason="", fallback_topic="임장준비|..."),
+    아침글, "2026-09-06", "08")
+assert fb_title.startswith("[임장준비]"), fb_title
+print("백업 주제 회전 근거 기록 통과")
+
 sys.exit(code)

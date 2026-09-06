@@ -2,9 +2,9 @@
   "posts": [
     {
       "date": "2026-09-06T21:32:32+09:00",
-      "key": "notion-3d381007-7564-8165-8376-e9bc58f6e6b3",
-      "title": "마포 성산시영 용적률 완화 시뮬레이션 결과가 나왔습니다",
-      "url": "",
+      "key": "68ca6062a2a75daf",
+      "title": "용적률 1.2배 높이면 성산시영 분담금 1억 뚝",
+      "url": "https://www.mk.co.kr/news/realestate/12145460",
       "post_id": "18072775856547499",
       "kind": "notion",
       "type": "뉴스",
@@ -12,7 +12,8 @@
       "dry_run": false,
       "views": null,
       "likes": null,
-      "replies": null
+      "replies": null,
+      "slot": "21"
     }
   ]
 }
