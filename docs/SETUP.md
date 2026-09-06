@@ -84,13 +84,16 @@ export LLM_PROVIDER=gemini   # 또는 claude
 4. **환경 추가**: `WEB 설정` 선택 → 서비스 URL 에 `http://localhost` 입력
 5. 등록하면 **Client ID** 와 **Client Secret** 이 나온다
 
+받은 키는 아래 도우미로 저장한다. `.env` 를 열 필요가 없고,
+저장 전에 실제로 검색이 되는지 확인해준다.
+
 ```bash
-export NAVER_CLIENT_ID="..."
-export NAVER_CLIENT_SECRET="..."
-./.venv/bin/python tools/check_setup.py
+./.venv/bin/python tools/save_naver_keys.py
 ```
 
 이게 없어도 국토부 보도자료만으로 돌아가지만, 소재가 훨씬 적어진다.
+실제로 국토부 보도자료는 장관 동정·행사 공지가 대부분이라
+선별 임계값을 못 넘고 백업 콘텐츠로 빠지는 날이 많다.
 
 ---
 
