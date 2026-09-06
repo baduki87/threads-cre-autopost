@@ -24,6 +24,8 @@ class Article:
     kind: str            # "policy" | "news"
     published_at: datetime | None = None
     snippet: str = ""
+    # 경제 전반 피드에서 온 기사인가. True 면 부동산 주제 필터를 거친다.
+    needs_topic_check: bool = False
 
     @property
     def key(self) -> str:
