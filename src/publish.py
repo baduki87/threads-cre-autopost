@@ -8,6 +8,7 @@ Threads API 는 로컬 파일 업로드를 받지 않는다. 이미지를 공개
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import sys
 import time
@@ -29,19 +30,40 @@ def _creds() -> tuple[str, str]:
     return token, user_id
 
 
+def _repo_from_git_remote() -> str | None:
+    """origin 주소에서 'owner/repo' 를 뽑는다.
+
+    GITHUB_REPOSITORY 는 Actions 에서만 자동으로 채워진다.
+    로컬에서 시험 삼아 돌릴 때도 동작해야 하므로 git 에서 알아낸다.
+    """
+    try:
+        url = subprocess.run(
+            ["git", "remote", "get-url", "origin"],
+            capture_output=True, text=True, timeout=10,
+        ).stdout.strip()
+    except (subprocess.SubprocessError, OSError):
+        return None
+    if not url:
+        return None
+    # https://github.com/owner/repo.git  또는  git@github.com:owner/repo.git
+    m = re.search(r"github\.com[:/](?P<repo>[^/]+/[^/]+?)(?:\.git)?$", url)
+    return m.group("repo") if m else None
+
+
 def raw_url_for(path: str) -> str:
-    """리포에 커밋된 파일의 공개 raw URL. Actions 환경변수를 쓴다."""
-    repo = os.environ.get("GITHUB_REPOSITORY")
-    branch = os.environ.get("GITHUB_REF_NAME", "main")
+    """리포에 커밋된 파일의 공개 raw URL."""
     base = os.environ.get("PUBLIC_IMAGE_BASE")
     rel = path.lstrip("./")
     if base:
         return f"{base.rstrip('/')}/{rel}"
+
+    repo = os.environ.get("GITHUB_REPOSITORY") or _repo_from_git_remote()
     if not repo:
         raise PublishError(
-            "이미지 공개 URL 을 만들 수 없습니다. GITHUB_REPOSITORY 또는 "
-            "PUBLIC_IMAGE_BASE 를 설정하세요."
+            "이미지 공개 URL 을 만들 수 없습니다. git 원격(origin)이 없고 "
+            "GITHUB_REPOSITORY / PUBLIC_IMAGE_BASE 도 설정돼 있지 않습니다."
         )
+    branch = os.environ.get("GITHUB_REF_NAME", "main")
     return f"https://raw.githubusercontent.com/{repo}/{branch}/{rel}"
 
 
