@@ -1,0 +1,70 @@
+name: 댓글 답글
+
+# 하루 두 번 댓글을 확인한다.
+# 인사·사실질문에만 자동으로 답하고, 상담성 질문은 회원님께 넘긴다.
+# 상담 질문이 상담 유입의 출발점이라 AI 가 먼저 답해버리면 손해다.
+#
+# 자동 답글은 리포 변수 REPLY_AUTO 가 1 일 때만 나간다.
+# 그전에는 "이렇게 답할 참이었습니다" 를 카카오톡으로만 보낸다.
+on:
+  schedule:
+    - cron: "0 3 * * *"    # KST 12:00 — 아침 글 반응
+    - cron: "0 11 * * *"   # KST 20:00 — 오후 글 반응
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "답글을 달지 않고 분류 결과만 본다"
+        type: boolean
+        default: true
+
+# 발행 워크플로와 같은 그룹. state/ 를 함께 커밋하므로 겹치면 충돌한다.
+concurrency:
+  group: threads-pipeline
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  replies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: 의존성 설치
+        run: pip install -q -r requirements.txt
+
+      - name: 커밋 사용자 설정
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: 댓글 확인 및 답글
+        env:
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '1' || '0' }}
+          REPLY_AUTO: ${{ vars.REPLY_AUTO || '0' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          LLM_PROVIDER: ${{ vars.LLM_PROVIDER || 'auto' }}
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+        run: python -m src.replies
+
+      - name: 처리 이력 커밋
+        if: github.event_name != 'workflow_dispatch' || !inputs.dry_run
+        run: |
+          git add -- state/replies.json
+          if git diff --cached --quiet; then
+            echo "새로 처리한 댓글 없음"
+          else
+            git commit -m "state: 댓글 처리 이력"
+            git pull --rebase && git push
+          fi

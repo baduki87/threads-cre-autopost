@@ -116,6 +116,37 @@ def published(title: str, post_id: str, with_reply: bool) -> None:
     send(body, "https://www.threads.com/@pro_konwoo", "스레드에서 보기")
 
 
+def needs_you(items: list[tuple[str, str, str]]) -> None:
+    """회원님이 직접 답해야 할 댓글. (작성자, 내용, 분류)
+
+    상담성 질문이 상담 유입의 출발점이다. AI 가 먼저 답해버리면 그 기회가
+    사라지므로 여기로 넘긴다. 여러 건을 한 번에 묶어 보낸다 — 댓글마다
+    알림이 오면 며칠 못 간다.
+    """
+    if not items:
+        return
+    줄 = []
+    for who, text, kind in items[:5]:
+        표시 = "상담 문의" if kind == "상담" else "부정적인 댓글"
+        줄.append(f"· @{who} ({표시})\n  {text[:70]}{'…' if len(text) > 70 else ''}")
+    더 = f"\n\n외 {len(items) - 5}건이 더 있습니다." if len(items) > 5 else ""
+    send(f"직접 답하실 댓글이 {len(items)}건 있습니다.\n\n" + "\n\n".join(줄) + 더,
+         "https://www.threads.com/@pro_konwoo", "스레드에서 답하기")
+
+
+def reply_drafts(items: list[tuple[str, str, str]]) -> None:
+    """자동 답글이 꺼져 있을 때 '이렇게 답했을 것' 을 보여준다.
+
+    며칠 보고 납득되면 자동으로 전환한다. 처음부터 자동으로 내보내지 않는다.
+    """
+    if not items:
+        return
+    줄 = [f"· @{who}: {text[:45]}\n  → {draft}" for who, text, draft in items[:4]]
+    더 = f"\n\n외 {len(items) - 4}건." if len(items) > 4 else ""
+    send(f"이렇게 답할 참이었습니다 (아직 자동 답글은 꺼져 있습니다).\n\n"
+         + "\n\n".join(줄) + 더)
+
+
 def failed(stage: str, detail: str) -> None:
     send(f"[{stage}] 단계에서 실패했습니다.\n\n{detail[:250]}\n\n"
          "오늘은 자동으로 올라가지 않습니다.")

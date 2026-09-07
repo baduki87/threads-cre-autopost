@@ -166,3 +166,41 @@ def recall_draft(page_id: str, path: str = DRAFTS_PATH) -> dict | None:
             return json.load(f).get(page_id)
     except (OSError, json.JSONDecodeError):
         return None
+
+
+# ------------------------------------------------------------- 댓글 처리 이력
+
+REPLIES_PATH = "state/replies.json"
+
+
+def load_replies(path: str = REPLIES_PATH) -> dict:
+    """이미 처리한 댓글. 같은 댓글에 두 번 답하지 않기 위한 것이다."""
+    if not os.path.exists(path):
+        return {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def mark_reply(data: dict, reply_id: str, *, kind: str, action: str) -> dict:
+    """action: '자동답글' | '사람에게'.
+
+    사람이 답할 댓글도 적어둔다. 안 적으면 다음 실행이 같은 댓글을 또 알린다.
+    """
+    data[reply_id] = {
+        "date": datetime.now(KST).isoformat(timespec="seconds"),
+        "kind": kind,
+        "action": action,
+    }
+    # 90일 지난 것은 버린다. 그때까지 안 온 답글은 앞으로도 안 온다.
+    cutoff = datetime.now(KST) - timedelta(days=90)
+    return {k: v for k, v in data.items()
+            if (_when(v) or datetime.now(KST)) >= cutoff}
+
+
+def save_replies(data: dict, path: str = REPLIES_PATH) -> None:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)

@@ -137,4 +137,26 @@ fb_key, fb_title = _source_id(
 assert fb_title.startswith("[임장준비]"), fb_title
 print("백업 주제 회전 근거 기록 통과")
 
+
+# 댓글 분류의 안전장치
+#   자동 답글의 기본값은 '안 함' 이어야 한다. AI 응답이 어떻게 망가지든
+#   상담·부정으로 새면 사람에게 가고, 답글은 비어야 한다.
+from src import replies as replies_mod  # noqa: E402
+
+def 분류시험(응답: dict) -> dict:
+    replies_mod.ask_json = lambda *a, **k: 응답
+    return replies_mod.classify({"username": "t", "text": "아무거나"}, "원글")
+
+r = 분류시험({"kind": "상담", "reply": "지금이 매수 기회입니다", "why": ""})
+assert r["kind"] == "상담" and r["reply"] == "", r
+r = 분류시험({"kind": "부정", "reply": "그건 틀렸습니다", "why": ""})
+assert r["reply"] == "", r
+r = 분류시험({"kind": "사실질문", "reply": "", "why": "근거 없음"})
+assert r["kind"] == "상담", f"근거 없는 사실질문은 사람에게 가야 한다: {r}"
+r = 분류시험({"kind": "뭔가이상한값", "reply": "아무말", "why": ""})
+assert r["kind"] == "상담" and r["reply"] == "", f"모르는 분류는 사람에게: {r}"
+r = 분류시험({"kind": "인사", "reply": "읽어주셔서 감사합니다.", "why": ""})
+assert r["kind"] == "인사" and r["reply"], r
+print("댓글 자동답글 안전장치 통과: 상담·부정·불명은 답글 없음, 인사만 통과")
+
 sys.exit(code)

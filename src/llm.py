@@ -104,7 +104,17 @@ def resolve_gemini_model() -> str:
 _RETRYABLE = {429, 500, 502, 503, 504}
 
 
-def _alternate_models(tried: set[str], limit: int = 2) -> list[str]:
+def _is_daily_quota(body: str) -> bool:
+    """하루 한도를 다 쓴 429 인가.
+
+    무료 등급의 한도는 **모델별로 따로** 걸린다("PerProjectPerModel").
+    그래서 같은 모델을 몇 초 뒤에 다시 불러봐야 소용이 없고, 다른 모델로
+    갈아타면 살아난다. 일시적 과부하(503)와는 대응이 정반대다.
+    """
+    return "PerDay" in body or "RequestsPerDay" in body
+
+
+def _alternate_models(tried: set[str], limit: int = 4) -> list[str]:
     """과부하일 때 대신 쓸 flash 계열.
 
     이미 시도한 모델은 제외한다. 안 그러면 같은 모델을 다시 집어와
@@ -174,6 +184,11 @@ def _ask_gemini(system: str, prompt: str, max_tokens: int, tries: int = 3) -> st
             last_err = f"HTTP {r.status_code}: {r.text[:250]}"
             if r.status_code not in _RETRYABLE:
                 raise RuntimeError(f"Gemini 호출 실패 ({model}) — {last_err}")
+
+            if r.status_code == 429 and _is_daily_quota(r.text):
+                print(f"[llm] {model} 은 오늘 무료 한도를 다 썼습니다 — "
+                      "재시도하지 않고 다른 모델로 넘어갑니다", file=sys.stderr)
+                break
 
             if attempt < tries:
                 wait = 2 ** attempt
