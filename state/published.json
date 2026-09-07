@@ -14,6 +14,21 @@
       "likes": null,
       "replies": null,
       "slot": "21"
+    },
+    {
+      "date": "2026-09-07T09:40:37+09:00",
+      "key": "2f54652c9125047c",
+      "title": "“3억은 올려주셔야”…서울 아파트 전세 갱신 10건 중 9건 보증금 인상",
+      "url": "https://www.mk.co.kr/news/realestate/12145283",
+      "post_id": "17908015218521575",
+      "kind": "auto",
+      "type": "뉴스",
+      "slot": "08",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
