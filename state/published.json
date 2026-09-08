@@ -44,6 +44,21 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-08T09:58:53+09:00",
+      "key": "5e44ad931fd0a48c",
+      "title": "“매각 늦어지면 조합도 부담”…청담르엘 펜트하우스 두달 만에 10억 낮췄다",
+      "url": "https://www.mk.co.kr/news/realestate/12146132",
+      "post_id": "18046037723817048",
+      "kind": "auto",
+      "type": "뉴스",
+      "slot": "08",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
