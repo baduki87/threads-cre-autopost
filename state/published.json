@@ -59,6 +59,21 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-08T21:47:57+09:00",
+      "key": "d457c302f31be8c4",
+      "title": "반포동 래미안원베일리 133㎡ 90억·압구정동 신현대12차 156㎡ 80억 거래",
+      "url": "https://www.mk.co.kr/news/realestate/12146755",
+      "post_id": "18172555459452852",
+      "kind": "auto",
+      "type": "뉴스",
+      "slot": "17",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
