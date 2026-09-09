@@ -263,11 +263,30 @@ def run_publish() -> int:
         return 1
 
     row = notion.fetch_approved()
+    승인받음 = row is not None
+
     if not row:
-        print("[publish] 승인된 초안이 없습니다. 오늘은 발행하지 않습니다.")
-        notify.send("승인된 초안이 없어 오늘은 발행하지 않았습니다.",
-                    NOTION_PAGE_URL, "노션 열기")
-        return 0
+        # 승인이 없다고 21시를 통째로 비우지 않는다. 실제로 6건 연속 비었고,
+        # 이 계정에서 반응이 가장 좋은 시간대가 그 자리였다.
+        #
+        # 단, **판단이 담긴 글은 자동으로 내보내지 않는다.** 임장기는 회원님
+        # 메모에서 나온 판단이 들어 있어 확인 없이 나가면 안 된다.
+        대기 = notion.fetch_waiting()
+        if 대기 and 대기.get("type") == "임장기":
+            print("[publish] 대기 중인 글이 임장기라 자동 발행하지 않습니다. "
+                  "판단이 담긴 글은 승인이 필요합니다.")
+            notify.send("메모로 만든 초안이 승인을 기다리고 있습니다.\n"
+                        "판단이 담긴 글이라 자동으로 내보내지 않았습니다.",
+                        NOTION_PAGE_URL, "노션에서 승인")
+            return 0
+        if not 대기:
+            print("[publish] 승인된 초안도 대기 중인 초안도 없습니다.")
+            notify.send("올릴 초안이 없어 밤 9시 발행을 건너뛰었습니다.",
+                        NOTION_PAGE_URL, "노션 열기")
+            return 0
+        print(f"[publish] 승인이 없어 대기 중인 '{대기.get('type') or '뉴스'}' 글을 "
+              "자동으로 발행합니다.")
+        row = 대기
 
     text, card_url = row["text"], row["card_url"]
     print("\n--- 발행 본문 ---")
@@ -318,7 +337,12 @@ def run_publish() -> int:
     commit_and_push([state_mod.STATE_PATH], f"state: {today} 발행 기록")
 
     notion.mark_published(row["page_id"], post_id)
-    notify.published(row["title"] or today, post_id, with_reply=bool(detail))
+    if 승인받음:
+        notify.published(row["title"] or today, post_id, with_reply=bool(detail))
+    else:
+        notify.send(f"승인이 없어 대기 중이던 글을 자동으로 올렸습니다.\n\n"
+                    f"[{row['title'] or today}]",
+                    f"https://www.threads.com/@pro_konwoo", "스레드에서 보기")
     return 0
 
 

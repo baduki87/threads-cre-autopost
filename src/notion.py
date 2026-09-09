@@ -117,29 +117,12 @@ def fetch_memo() -> Memo | None:
     return memo
 
 
-def fetch_approved() -> dict | None:
-    """상태가 '승인'인 행 하나. 발행 단계가 이것만 올린다.
-
-    반환: {page_id, text, card_url, type, title}
-    """
-    data = _call(
-        "POST", f"/databases/{os.environ.get('NOTION_DB_ID', '')}/query",
-        json={
-            "filter": {"property": "상태", "select": {"equals": APPROVED}},
-            "sorts": [{"timestamp": "created_time", "direction": "ascending"}],
-            "page_size": 1,
-        },
-    )
-    if not data or not data.get("results"):
-        return None
-
-    page = data["results"][0]
+def _row(page: dict) -> dict | None:
     props = page.get("properties", {})
     body = _plain(props.get("본문"))
     if not body:
-        print("[notion] 승인된 행의 본문이 비어 있어 건너뜁니다.", file=sys.stderr)
+        print("[notion] 행의 본문이 비어 있어 건너뜁니다.", file=sys.stderr)
         return None
-
     return {
         "page_id": page["id"],
         "title": _plain(props.get("제목")),
@@ -148,6 +131,40 @@ def fetch_approved() -> dict | None:
         "card_url": (props.get("카드") or {}).get("url") or "",
         "type": _select(props.get("유형")),
     }
+
+
+def _first_with_status(status: str) -> dict | None:
+    data = _call(
+        "POST", f"/databases/{os.environ.get('NOTION_DB_ID', '')}/query",
+        json={
+            "filter": {"property": "상태", "select": {"equals": status}},
+            "sorts": [{"timestamp": "created_time", "direction": "ascending"}],
+            "page_size": 1,
+        },
+    )
+    if not data or not data.get("results"):
+        return None
+    return _row(data["results"][0])
+
+
+def fetch_approved() -> dict | None:
+    """상태가 '승인'인 행 하나.
+
+    반환: {page_id, text, card_url, type, title, detail}
+    """
+    return _first_with_status(APPROVED)
+
+
+def fetch_waiting() -> dict | None:
+    """승인을 못 받고 '대기'로 남아 있는 행 하나.
+
+    승인이 없는 날 21시 슬롯이 통째로 비는 것을 막는다. 실제로 6건 연속으로
+    비었고, 그 시간대가 이 계정에서 반응이 가장 좋은 자리였다.
+
+    다만 **판단이 담긴 글(임장기)은 이걸로 나가면 안 된다.** 호출하는 쪽에서
+    유형을 보고 거른다(src/main.py).
+    """
+    return _first_with_status(WAITING)
 
 
 def published_pages(days_min: int = 3, limit: int = 50) -> list[dict]:

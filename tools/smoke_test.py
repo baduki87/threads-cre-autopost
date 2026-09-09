@@ -161,4 +161,46 @@ r = 분류시험({"kind": "인사", "reply": "읽어주셔서 감사합니다.",
 assert r["kind"] == "인사" and r["reply"], r
 print("댓글 자동답글 안전장치 통과: 상담·부정·불명은 답글 없음, 인사만 통과")
 
+
+# 21시 슬롯: 승인이 없을 때 무엇이 나가고 무엇이 안 나가는지
+#   승인 없이 자동으로 나가도 되는 것은 판단이 없는 글뿐이다.
+#   임장기는 회원님 메모에서 나온 판단이 들어 있어 반드시 승인을 거쳐야 한다.
+from src import main as main_mod  # noqa: E402
+from src import notion as notion_mod  # noqa: E402
+
+def 발행시도(승인, 대기):
+    보낸것 = []
+    notion_mod.enabled = lambda: True
+    notion_mod.fetch_approved = lambda: 승인
+    notion_mod.fetch_waiting = lambda: 대기
+    main_mod.notify.send = lambda *a, **k: 보낸것.append(a[0] if a else "")
+    올린것 = []
+    main_mod.publish_image_post = lambda text, url: (올린것.append(text), "id1")[1]
+    main_mod.publish_reply = lambda *a, **k: "r1"
+    main_mod.state_mod.save = lambda *a, **k: None
+    main_mod.commit_and_push = lambda *a, **k: None
+    notion_mod.mark_published = lambda *a, **k: None
+    os.environ["MODE"] = "publish"
+    os.environ["DRY_RUN"] = "0"      # 이 시험은 발행 분기 자체를 봐야 한다
+    try:
+        main_mod.run_publish()
+    finally:
+        os.environ["DRY_RUN"] = "1"
+    return 올린것, 보낸것
+
+뉴스행 = {"page_id": "p1", "title": "t", "text": "본문", "detail": "",
+          "card_url": "https://example.com/a.png", "type": "뉴스"}
+임장행 = dict(뉴스행, type="임장기")
+
+올림, _ = 발행시도(None, 뉴스행)
+assert 올림, "승인이 없어도 뉴스 글은 나가야 한다"
+올림, 알림 = 발행시도(None, 임장행)
+assert not 올림, "임장기가 승인 없이 나갔다 — 판단이 담긴 글이다"
+assert any("승인" in m for m in 알림), 알림
+올림, _ = 발행시도(None, None)
+assert not 올림, "초안이 없는데 뭔가 올라갔다"
+올림, _ = 발행시도(뉴스행, None)
+assert 올림, "승인된 글은 당연히 나가야 한다"
+print("21시 승인 분기 통과: 임장기는 승인 없이 안 나감, 뉴스는 자동 발행")
+
 sys.exit(code)
