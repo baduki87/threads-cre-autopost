@@ -8,8 +8,8 @@ name: 댓글 답글
 # 그전에는 "이렇게 답할 참이었습니다" 를 카카오톡으로만 보낸다.
 on:
   schedule:
-    - cron: "0 3 * * *"    # KST 12:00 — 아침 글 반응
-    - cron: "0 11 * * *"   # KST 20:00 — 오후 글 반응
+    - cron: "29 3 * * *"    # KST 12:00 — 아침 글 반응
+    - cron: "29 11 * * *"   # KST 20:00 — 오후 글 반응
   workflow_dispatch:
     inputs:
       dry_run:

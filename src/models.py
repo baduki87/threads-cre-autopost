@@ -57,7 +57,8 @@ class Pick:
     article: Article | None
     score: int
     reason: str
-    fallback_topic: str | None = None
+    fallback_topic: str | None = None      # 방법론 주제 "label|prompt"
+    question_topic: str | None = None      # 질문 글 주제 "label|prompt"
     memo: Memo | None = None
 
     @property
@@ -65,11 +66,20 @@ class Pick:
         return self.memo is not None
 
     @property
+    def is_question(self) -> bool:
+        return self.question_topic is not None
+
+    @property
     def is_fallback(self) -> bool:
-        return self.article is None and self.memo is None
+        """방법론 글. 기사도 메모도 질문도 아닐 때."""
+        return (self.article is None and self.memo is None
+                and self.question_topic is None)
 
 
-BODY_LINES = 3      # 본문 줄 수. 짧을수록 반응이 좋았다 (docs/account-analysis.md)
+# 본문 줄 수. 예전엔 3줄로 고정했는데, 6건을 그렇게 냈더니 전부 똑같아 보였다
+# (조회 평균 290, 좋아요 합계 4, 진짜 댓글 1건). 잘 되는 계정들은 한 줄짜리도
+# 올리고 스무 줄짜리도 올린다. 그래서 상한만 두고 소재에 맡긴다.
+BODY_MAX_LINES = 10
 
 
 @dataclass
@@ -82,23 +92,24 @@ class Post:
     """
     hook: str
     body: str
-    card_label: str
-    card_number: str
-    card_headline: str
-    source_line: str
+    card_label: str = ""
+    card_number: str = ""
+    card_headline: str = ""
+    # 출처 표기. 반응 좋은 계정 중 이걸 붙이는 곳이 하나도 없었다.
+    # 기본은 안 붙이고, 필요한 소재에서만 채운다.
+    source_line: str = ""
     opinion: str = ""      # 본인 판단 한 줄. 메모에서만 나온다
     question: str = ""     # 답하기 쉬운 질문 한 줄
     detail: str = ""       # 첫 댓글에 붙는 상세. 본문과 중복되지 않는다
     tags: list[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
-        # 프롬프트로 "3줄"을 지시해도 모델이 더 뱉는 경우가 있다.
-        # 본문 길이는 이 계정 성과와 직결되므로 코드에서 강제한다.
+        # 상한만 막는다. 줄 수를 고정하지 않는 것이 이번 변경의 핵심이다.
         lines = [ln.strip() for ln in self.body.splitlines() if ln.strip()]
-        if len(lines) > BODY_LINES:
-            print(f"[post] 본문이 {len(lines)}줄이라 앞 {BODY_LINES}줄만 씁니다.",
+        if len(lines) > BODY_MAX_LINES:
+            print(f"[post] 본문이 {len(lines)}줄이라 앞 {BODY_MAX_LINES}줄만 씁니다.",
                   file=sys.stderr)
-            lines = lines[:BODY_LINES]
+            lines = lines[:BODY_MAX_LINES]
         self.body = "\n".join(lines)
 
     def render_text(self, limit: int = 500) -> str:

@@ -5,7 +5,7 @@ name: 밤 9시 발행
 on:
   schedule:
     # KST 21:00 = UTC 12:00. Actions cron 은 UTC 기준이다.
-    - cron: "0 12 * * *"
+    - cron: "13 12 * * *"
   workflow_dispatch:
     inputs:
       dry_run:

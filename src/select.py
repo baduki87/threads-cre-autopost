@@ -81,6 +81,31 @@ def pick_fallback(path: str = "config/fallback.yaml",
     )
 
 
+def pick_question(path: str = "config/questions.yaml",
+                  st: dict | None = None) -> Pick:
+    """질문 글 주제 하나. 최근에 쓴 주제를 피한다.
+
+    이 계정에서 댓글이 가장 많이 달리는 유형이고, **판단을 쓰지 않아도 되므로**
+    자동화와 충돌하지 않는다. AI 는 묻기만 하고 답은 독자가 한다.
+    """
+    with open(path, encoding="utf-8") as f:
+        topics = yaml.safe_load(f)["topics"]
+
+    recent = set()
+    if st:
+        recent = {t for t in state_mod.recent_titles(st, days=21)}
+    unseen = [t for t in topics if not any(t["label"] in r for r in recent)]
+    pool = unseen or topics
+    topic = pool[datetime.now(KST).timetuple().tm_yday % len(pool)]
+
+    return Pick(
+        article=None,
+        score=0,
+        reason="질문 글 슬롯입니다.",
+        question_topic=f"{topic['label']}|{topic['prompt']}",
+    )
+
+
 def select(articles: list[Article], st: dict) -> Pick:
     """오늘 쓸 소재 하나.
 

@@ -11,23 +11,23 @@ from .models import Memo, Pick, Post
 
 # 공통 출력 형식. opinion 만 분기별로 지시가 다르다.
 _FIELDS = """{{
-  "hook": "<제목 한 줄. 지역명+단지명 또는 사안. 존댓말. 40자 이내>",
-  "body": "<본문. **정확히 3줄**. 줄바꿈으로 구분. 각 줄은 존댓말 '~합니다' 로 끝냄>",
+  "hook": "<제목 한 줄. 40자 이내. {tone_hint}>",
+  "body": "<본문. **{lines}줄**. 줄바꿈으로 구분. {tone_hint}>",
   "opinion": {opinion_spec},
-  "question": "<답하기 쉬운 질문 한 줄. 존댓말. 둘 중 택일이거나 한 단어로 답할 수 있어야 함>",
+  "question": {question_spec},
   "detail": {detail_spec},
   "card_label": "<카드 상단 분류. 예: 임장 / 정책 / 재건축. 6자 이내>",
-  "card_number": "<카드에 크게 박을 핵심 수치나 키워드. 예: 3천세대 / 사업시행인가. 없으면 빈 문자열>",
+  "card_number": "<카드에 크게 박을 핵심 수치나 키워드. 없으면 빈 문자열>",
   "card_headline": "<카드 본문 문구. 30자 이내>",
-  "source_line": {source_spec},
+  "source_line": "",
   "tags": []
 }}
 
 지켜야 할 것:
-- 모든 문장은 존댓말 '~합니다' 입니다
 - **'~인 것 같습니다', '~인 듯합니다', '~로 보여집니다' 는 절대 쓰지 마세요.** 힘이 빠집니다
-- body 는 반드시 3줄입니다. 더 쓰지 마세요
-- hook + body + opinion + question 합쳐 300자를 넘기지 마세요
+- **출처를 쓰지 마세요.** source_line 은 항상 빈 문자열입니다.
+  반응 좋은 계정 중 출처를 붙이는 곳이 하나도 없습니다
+- 제목을 매번 '~습니다' 로 끝내지 마세요. 명사로 끊거나 수치로 시작해도 됩니다
 - tags 는 항상 빈 배열입니다 — 이 계정은 해시태그를 쓰지 않습니다"""
 
 MEMO_PROMPT = """아래는 작성자가 현장에서 직접 남긴 메모입니다.
@@ -42,7 +42,8 @@ MEMO_PROMPT = """아래는 작성자가 현장에서 직접 남긴 메모입니�
 - opinion 은 **메모에 담긴 작성자의 판단을 옮기는 것**입니다.
   메모에 판단이 없으면 opinion 을 빈 문자열로 두세요
 - 전해 들은 내용은 "~라고 합니다" 로 표시하세요
-- 메모 내용이 많으면 **가장 중요한 3가지만 body 에 넣고 나머지는 detail 로** 보내세요
+- **계정 주인의 원래 말투(평서체)로 쓰세요.** 존댓말로 고치면 남의 글이 됩니다
+- 메모 내용이 많으면 중요한 것만 body 에 넣고 나머지는 detail 로 보내세요
 
 {spec}"""
 
@@ -58,12 +59,13 @@ NEWS_PROMPT = """아래 소재로 스레드 게시물을 작성하세요.
 지침:
 - **opinion 은 반드시 빈 문자열로 두세요.** 작성자의 현장 메모가 없는 날입니다.
   전망이나 판단을 지어내면 안 됩니다
-- 사실 전달 + 질문으로 끝냅니다
 - 원문 표현을 그대로 옮기지 말고 사실만 가져와 새로 쓰세요
+- **질문으로 끝내지 마세요.** 사실만 전하고 끝냅니다.
+  요약 뒤에 습관처럼 붙는 질문은 댓글을 만들지 못했습니다
 
 {spec}"""
 
-FALLBACK_PROMPT = """오늘은 다룰 만한 신규 소재가 없습니다. 아래 주제로 작성하세요.
+FALLBACK_PROMPT = """아래 주제로 방법론 글을 작성하세요.
 
 분류: {label}
 주제: {topic}
@@ -71,7 +73,28 @@ FALLBACK_PROMPT = """오늘은 다룰 만한 신규 소재가 없습니다. 아�
 지침:
 - 시의성 있는 척하지 마세요. 최신 수치를 지어내지 마세요
 - **opinion 은 빈 문자열로 두세요**
-- 확실한 것만 쓰고, 질문으로 끝냅니다
+- **바로 따라 할 수 있게 쓰세요.** 순서가 있으면 번호를 붙입니다
+- **제목에 개수를 쓰려면 본문 항목 수와 반드시 맞추세요.**
+  "4단계" 라고 써놓고 다섯 개를 나열하면 안 됩니다.
+  헷갈리면 제목에 개수를 넣지 마세요
+- 질문으로 끝내지 마세요. 정리로 끝냅니다
+
+{spec}"""
+
+QUESTION_PROMPT = """독자에게 던지는 **질문 글**을 작성하세요.
+이 계정에서 댓글이 가장 많이 달리는 유형입니다.
+
+주제: {label}
+무엇을 물을지: {topic}
+
+지침:
+- **배경은 한두 줄이면 충분합니다.** 길게 설명하면 질문이 죽습니다
+- **계정 주인은 답을 내놓지 않습니다.** 묻기만 합니다.
+  opinion 은 반드시 빈 문자열입니다
+- question 이 이 글의 전부입니다. 둘 중 하나를 고르게 하세요
+- 특정인에게 하는 투자 권유로 읽히지 않게, 일반적인 상황으로 물으세요
+- 최신 수치나 시세를 지어내지 마세요
+- detail 은 빈 문자열로 두세요. 질문 글에 첫 댓글을 달면 답을 유도하게 됩니다
 
 {spec}"""
 
@@ -94,21 +117,33 @@ def _voice(path: str = "config/voice.md") -> str:
         return f.read()
 
 
-def _spec(*, allow_opinion: bool, with_source: bool, detail_from: str) -> str:
-    """detail_from: 첫 댓글에 무엇을 담을지. 소재 종류마다 다르다."""
+# 평서체는 계정 주인이 원래 쓰던 말투다. 존댓말로 고치면 남의 글이 된다.
+TONE_PLAIN = "평서체입니다 ('~다', '~군', '~음'). 명사로 끝내도 됩니다"
+TONE_POLITE = "존댓말 '~합니다' 단정형입니다"
+
+
+def _spec(*, allow_opinion: bool, detail_from: str, tone: str = TONE_POLITE,
+          lines: str = "2~6", want_question: bool = True) -> str:
+    """소재 종류마다 문체·길이·질문 여부가 달라야 한다.
+
+    전부 같은 값으로 6건을 냈더니 기계로 읽혔다. 그래서 인자로 뺐다.
+    """
     opinion_spec = (
-        '"<메모에 담긴 작성자의 판단 한 줄. 존댓말 단정형(~합니다 / ~로 봅니다). '
-        '메모에 판단이 없으면 빈 문자열>"'
+        '"<메모에 담긴 작성자의 판단 한 줄. 메모에 판단이 없으면 빈 문자열>"'
         if allow_opinion
         else '""'
     )
-    source_spec = '"<출처 표기 한 줄>"' if with_source else '""'
+    question_spec = (
+        '"<답하기 쉬운 질문 한 줄. 둘 중 택일이거나 한 단어로 답할 수 있어야 함>"'
+        if want_question
+        else '"<빈 문자열. 이번 글은 질문으로 끝내지 않습니다>"'
+    )
     detail_spec = (
         f'"<첫 댓글에 붙일 상세. {detail_from} '
-        '본문 3줄과 중복되지 않게 씁니다. 존댓말. 500자 이내. 없으면 빈 문자열>"'
+        '본문과 중복되지 않게 씁니다. 500자 이내. 없으면 빈 문자열>"'
     )
-    return _FIELDS.format(opinion_spec=opinion_spec, source_spec=source_spec,
-                          detail_spec=detail_spec)
+    return _FIELDS.format(opinion_spec=opinion_spec, question_spec=question_spec,
+                          detail_spec=detail_spec, tone_hint=tone, lines=lines)
 
 
 def performance_context(state: dict, n: int = 5) -> str:
@@ -146,14 +181,23 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
         prompt = MEMO_PROMPT.format(
             title=m.title or "(제목 없음)",
             text=m.text,
-            spec=_spec(allow_opinion=True, with_source=False,
-                       detail_from="메모에 있지만 본문 3줄에 못 담은 현장 정보를 옮깁니다."),
+            # 임장기는 계정 주인이 원래 쓰던 평서체로 쓴다. 가장 잘 된 글들이 그 말투다.
+            spec=_spec(allow_opinion=True, tone=TONE_PLAIN, lines="3~8",
+                       want_question=True,
+                       detail_from="메모에 있지만 본문에 못 담은 현장 정보를 옮깁니다."),
+        )
+    elif pick.is_question:
+        label, topic = (pick.question_topic or "질문|").split("|", 1)
+        prompt = QUESTION_PROMPT.format(
+            label=label, topic=topic.strip(),
+            spec=_spec(allow_opinion=False, lines="1~3", want_question=True,
+                       detail_from="질문 글에는 첫 댓글을 달지 않습니다. 빈 문자열입니다."),
         )
     elif pick.is_fallback:
         label, topic = (pick.fallback_topic or "관점|").split("|", 1)
         prompt = FALLBACK_PROMPT.format(
             label=label, topic=topic.strip(),
-            spec=_spec(allow_opinion=False, with_source=False,
+            spec=_spec(allow_opinion=False, lines="4~8", want_question=False,
                        detail_from="본문에서 다 못 쓴 배경이나 구체적인 방법을 덧붙입니다."),
         )
     else:
@@ -164,7 +208,7 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
             url=a.url,
             snippet=a.snippet or "(요약 없음 — 제목만으로 판단하세요)",
             reason=pick.reason,
-            spec=_spec(allow_opinion=False, with_source=True,
+            spec=_spec(allow_opinion=False, lines="2~5", want_question=False,
                        detail_from="기사에 있는 구체적 조건·일정·적용 범위를 정리합니다."),
         )
 
@@ -175,6 +219,10 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
         # 안전장치: 메모가 없는데 판단이 나왔으면 버린다.
         print("[compose] 메모 없는 날 opinion 이 생성되어 제거했습니다.")
         opinion = ""
+
+    if pick.is_question:
+        # 질문 글에 첫 댓글을 달면 계정 주인이 답을 유도하는 모양이 된다.
+        d["detail"] = ""
 
     post = Post(
         hook=str(d.get("hook", "")).strip(),

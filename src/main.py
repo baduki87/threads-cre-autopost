@@ -31,8 +31,8 @@ from .collect import collect, load_config
 from .compose import compose
 from .models import Pick
 from .publish import (PublishError, commit_and_push, publish_image_post,
-                      publish_reply, raw_url_for)
-from .select import select
+                      publish_reply, publish_text_post, raw_url_for)
+from .select import pick_fallback, pick_question, select
 
 KST = timezone(timedelta(hours=9))
 NOTION_PAGE_URL = os.environ.get(
@@ -66,7 +66,23 @@ def _card_path(today: str, slot: str, dry_run: bool) -> str:
 
 # ---------------------------------------------------------------- 초안
 
-def _build_post(st: dict, *, allow_memo: bool):
+# 슬롯마다 글 유형을 다르게 간다.
+#
+# 예전에는 세 슬롯 모두 뉴스 요약이었다. 6건을 그렇게 냈더니 조회 평균 290,
+# 좋아요 합계 4, 남이 단 댓글 1건이었다. 뉴스 요약은 스레드에서 가장 안 통하는
+# 유형인데 하루 세 번을 그걸로 채우고 있었다.
+#
+#   08시  방법론  — 경쟁 계정에서 임장기보다 10배 강했던 유형
+#   17시  질문    — 댓글이 가장 많이 달린다. 댓글이 곧 상담 유입이다
+#   21시  메모 있으면 임장기, 없으면 뉴스
+SLOT_KIND = {"08": "방법론", "17": "질문", "21": "뉴스"}
+
+# 카드를 붙이지 않는 유형. 카드로 만들 만한 수치가 없고, 실측으로도
+# AI 카드(평균 291)가 글만 올린 것(535)보다 못했다.
+NO_CARD_KINDS = {"질문", "방법론"}
+
+
+def _build_post(st: dict, *, allow_memo: bool, slot: str = ""):
     """소재를 골라 글 하나를 만든다. (post, kind, memo, pick) 을 돌려준다.
 
     allow_memo=False 인 자동 슬롯은 메모를 건드리지 않는다.
@@ -74,20 +90,26 @@ def _build_post(st: dict, *, allow_memo: bool):
     """
     memo = notion.fetch_memo() if (allow_memo and notion.enabled()) else None
     if memo:
-        pick = Pick(article=None, score=10, reason="현장 메모", memo=memo)
-        kind = "임장기"
+        return compose(Pick(article=None, score=10, reason="현장 메모", memo=memo),
+                       state=st), "임장기", memo, None
+
+    want = SLOT_KIND.get(slot, "뉴스")
+    if want == "방법론":
+        pick, kind = pick_fallback(st=st), "방법론"
+    elif want == "질문":
+        pick, kind = pick_question(st=st), "질문"
     else:
         cfg = load_config()
         articles = collect(cfg)
         if not articles:
-            print("[main] 수집 결과 0건 — 백업 콘텐츠로 진행합니다.")
+            print("[main] 수집 결과 0건 — 방법론으로 진행합니다.")
         pick = select(articles, st)
         kind = "뉴스" if not pick.is_fallback else "방법론"
 
     return compose(pick, state=st), kind, memo, pick
 
 
-def _source_id(pick: Pick, post, today: str, slot: str) -> tuple[str, str]:
+def _source_id(pick: Pick | None, post, today: str, slot: str) -> tuple[str, str]:
     """이력에 남길 (key, title).
 
     key 는 다음 슬롯이 같은 기사를 다시 뽑지 못하게 하는 근거이고,
@@ -95,13 +117,16 @@ def _source_id(pick: Pick, post, today: str, slot: str) -> tuple[str, str]:
     그래서 둘 다 **원본 기사** 것이어야 한다. AI 가 다시 쓴 제목을 넣으면
     어순과 표현이 달라져 비교가 헐거워지고, 같은 소재가 또 나간다.
     """
+    if pick is None:
+        return f"memo-{today}-{slot}", post.hook or today
     if pick.article:
         return pick.article.key, pick.article.title
-    if pick.is_fallback:
-        label = (pick.fallback_topic or "|").split("|", 1)[0]
-        # 백업 주제는 label 을 제목에 남긴다. pick_fallback 이 이걸 보고 회전한다.
-        return f"fallback-{label}-{today}", f"[{label}] {post.hook}"
-    return f"memo-{today}-{slot}", post.hook or today
+    # 주제는 label 을 제목에 남긴다. pick_fallback / pick_question 이 보고 회전한다.
+    if pick.is_question:
+        label = (pick.question_topic or "|").split("|", 1)[0]
+        return f"question-{label}-{today}", f"[{label}] {post.hook}"
+    label = (pick.fallback_topic or "|").split("|", 1)[0]
+    return f"fallback-{label}-{today}", f"[{label}] {post.hook}"
 
 
 def run_auto() -> int:
@@ -112,15 +137,17 @@ def run_auto() -> int:
     print(f"=== {today} {slot}시 자동 발행 (DRY_RUN={dry_run}) ===")
 
     st = state_mod.load()
-    post, kind, _, pick = _build_post(st, allow_memo=False)
+    post, kind, _, pick = _build_post(st, allow_memo=False, slot=slot)
     text = post.render_text()
 
     print("\n--- 본문 ---")
     print(text)
     print(f"--- ({len(text)}자) ---\n")
 
+    with_card = kind not in NO_CARD_KINDS
     card_path = _card_path(today, slot, dry_run)
-    render(post, card_path, account=account)
+    if with_card:
+        render(post, card_path, account=account)
 
     detail = post.render_detail()
     if dry_run:
@@ -129,11 +156,15 @@ def run_auto() -> int:
             f.write(text + "\n")
         if detail:
             print(f"--- 첫 댓글 ---\n{detail}\n")
-        print(f"[auto] DRY_RUN — 발행하지 않았습니다. {card_path} 를 확인하세요.")
+        print(f"[auto] DRY_RUN — 발행하지 않았습니다."
+              + (f" {card_path} 를 확인하세요." if with_card else " (카드 없는 유형)"))
         return 0
 
-    commit_and_push([card_path], f"card: {today}-{slot}")
-    post_id = publish_image_post(text, raw_url_for(card_path))
+    if with_card:
+        commit_and_push([card_path], f"card: {today}-{slot}")
+        post_id = publish_image_post(text, raw_url_for(card_path))
+    else:
+        post_id = publish_text_post(text)
 
     if detail:
         try:
@@ -159,7 +190,7 @@ def run_auto() -> int:
     # 자동 발행은 성공 시 조용히 넘어간다. 하루 세 번 알림은 피로하다.
     notion.create_published(title=post.hook or today, text=text, detail=detail,
                             kind=kind, post_id=post_id,
-                            card_url=raw_url_for(card_path))
+                            card_url=raw_url_for(card_path) if with_card else "")
     return 0
 
 
@@ -170,7 +201,7 @@ def run_draft() -> int:
     print(f"=== {today} 초안 생성 (DRY_RUN={dry_run}) ===")
 
     st = state_mod.load()
-    post, kind, memo, pick = _build_post(st, allow_memo=True)
+    post, kind, memo, pick = _build_post(st, allow_memo=True, slot=slot)
     text = post.render_text()
 
     print("\n--- 초안 ---")

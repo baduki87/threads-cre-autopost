@@ -86,12 +86,14 @@ d = long_post.render_detail()
 assert len(d) <= 500 and d.endswith("…"), f"첫 댓글 길이 제한 실패: {len(d)}자"
 print(f"첫 댓글 분리·제한 통과: {len(d)}자")
 
-# 3줄 강제 (스텁이 4줄을 줬다)
-from src.models import BODY_LINES  # noqa: E402
-four = Post(hook="h", body="1\n2\n3\n4\n5", card_label="l",
-            card_number="", card_headline="", source_line="")
-assert four.body.count("\n") == BODY_LINES - 1, four.body
-print(f"본문 {BODY_LINES}줄 강제 통과")
+# 줄 수는 이제 고정하지 않는다. 상한만 막힌다.
+from src.models import BODY_MAX_LINES  # noqa: E402
+short = Post(hook="h", body="1\n2")
+assert short.body == "1\n2", f"짧은 본문을 건드리면 안 된다: {short.body!r}"
+long_body = Post(hook="h", body="\n".join(str(i) for i in range(BODY_MAX_LINES + 5)))
+assert long_body.body.count("\n") == BODY_MAX_LINES - 1, long_body.body
+assert Post(hook="h", body="한 줄").body == "한 줄"
+print(f"본문 줄 수 자유 통과 (상한 {BODY_MAX_LINES}줄만 강제)")
 
 
 # 슬롯 사이 중복 회귀 테스트

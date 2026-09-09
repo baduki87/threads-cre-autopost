@@ -118,8 +118,32 @@ def _wait_ready(container_id: str, token: str, timeout: int = 120) -> None:
     raise PublishError("컨테이너 처리 대기 시간 초과")
 
 
+def wait_url_ready(url: str, timeout: int = 90) -> None:
+    """이미지가 실제로 열릴 때까지 기다린다.
+
+    커밋·푸시 직후에는 raw.githubusercontent.com 이 아직 404 를 준다.
+    그 상태로 컨테이너를 만들면 발행 단계에서 "Media Not Found" 로 죽는다
+    (2026-09-09 08시 발행이 이걸로 실패했다).
+    """
+    deadline = time.time() + timeout
+    delay = 3
+    while time.time() < deadline:
+        try:
+            r = requests.head(url, timeout=15, allow_redirects=True)
+            if r.ok:
+                return
+            status = r.status_code
+        except requests.RequestException as e:
+            status = f"연결 실패 {e}"
+        print(f"[publish] 이미지 아직 안 열림({status}) — {delay}초 후 재확인")
+        time.sleep(delay)
+        delay = min(delay * 2, 15)
+    raise PublishError(f"이미지 공개 URL 이 열리지 않습니다: {url}")
+
+
 def publish_image_post(text: str, image_url: str) -> str:
     token, user_id = _creds()
+    wait_url_ready(image_url)
 
     r = requests.post(
         f"{API}/{user_id}/threads",
@@ -137,6 +161,41 @@ def publish_image_post(text: str, image_url: str) -> str:
     if not container_id:
         raise PublishError(f"컨테이너 ID 를 받지 못했습니다: {r.text}")
     print(f"[publish] 컨테이너 생성 {container_id}")
+
+    _wait_ready(container_id, token)
+
+    r = requests.post(
+        f"{API}/{user_id}/threads_publish",
+        data={"creation_id": container_id, "access_token": token},
+        timeout=30,
+    )
+    if not r.ok:
+        raise PublishError(f"발행 실패 ({r.status_code}): {r.text}")
+    post_id = r.json().get("id")
+    print(f"[publish] 발행 완료 post_id={post_id}")
+    return post_id
+
+
+def publish_text_post(text: str) -> str:
+    """이미지 없이 글만 올린다.
+
+    AI 가 만든 카드는 도움이 안 됐다. 계정 실측으로 카드 붙인 글이 평균 291,
+    글만 올린 것이 535, 계정 주인이 직접 찍은 현장 사진이 1,914 였다.
+    질문 글과 방법론 글은 카드로 만들 만한 수치가 없어 더 그렇다.
+    """
+    token, user_id = _creds()
+
+    r = requests.post(
+        f"{API}/{user_id}/threads",
+        data={"media_type": "TEXT", "text": text, "access_token": token},
+        timeout=30,
+    )
+    if not r.ok:
+        raise PublishError(f"컨테이너 생성 실패 ({r.status_code}): {r.text}")
+    container_id = r.json().get("id")
+    if not container_id:
+        raise PublishError(f"컨테이너 ID 를 받지 못했습니다: {r.text}")
+    print(f"[publish] 텍스트 컨테이너 생성 {container_id}")
 
     _wait_ready(container_id, token)
 

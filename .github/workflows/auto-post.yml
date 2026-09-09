@@ -1,12 +1,16 @@
 name: 자동 발행 (08시 · 17시)
 
 # 하루 3건 중 승인 없이 나가는 두 슬롯.
-# 주력인 21시만 승인을 거친다 — 하루 세 번 승인은 지속이 어렵다.
-# 메모가 담긴 글은 21시가 가져가므로 여기서는 뉴스·백업만 쓴다.
+#   08시 방법론 / 17시 질문 글  (src/main.py 의 SLOT_KIND)
+# 뉴스 요약을 세 슬롯 모두에 쓰던 것을 2026-09-09 에 바꿨다.
+# 그렇게 낸 6건이 조회 평균 290, 좋아요 합계 4, 남이 단 댓글 1건이었다.
+#
+# 메모가 담긴 글은 승인을 거치는 21시가 가져간다.
 on:
   schedule:
-    - cron: "0 23 * * *"   # KST 08:00 (전날 UTC 23시)
-    - cron: "0 8 * * *"    # KST 17:00
+    # 정각을 피한다. 정각은 전 세계 예약이 몰려 실제로 2~5시간씩 밀렸다.
+    - cron: "17 23 * * *"   # KST 08:17 (전날 UTC 23:17)
+    - cron: "17 8 * * *"    # KST 17:17
   workflow_dispatch:
     inputs:
       slot:
@@ -53,7 +57,7 @@ jobs:
         run: |
           if [ -n "${{ inputs.slot }}" ]; then
             echo "value=${{ inputs.slot }}" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.schedule }}" = "0 23 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "17 23 * * *" ]; then
             echo "value=08" >> "$GITHUB_OUTPUT"
           else
             echo "value=17" >> "$GITHUB_OUTPUT"

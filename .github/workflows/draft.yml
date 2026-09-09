@@ -4,7 +4,7 @@ name: 저녁 초안 생성
 # 회원님이 노션에서 승인하면 밤 9시 발행 워크플로가 올린다.
 on:
   schedule:
-    - cron: "0 10 * * *"
+    - cron: "23 10 * * *"
   workflow_dispatch:
     inputs:
       dry_run:

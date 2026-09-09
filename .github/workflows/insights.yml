@@ -4,7 +4,7 @@ name: 성과 수집
 # state/published.json 과 노션에 채운다. 다음 초안이 이걸 보고 배운다.
 on:
   schedule:
-    - cron: "0 22 * * *"   # KST 07:00 — 08시 발행과 커밋이 겹치지 않게
+    - cron: "41 21 * * *"   # KST 07:00 — 08시 발행과 커밋이 겹치지 않게
   workflow_dispatch:
 
 # 발행 워크플로와 같은 그룹. 둘 다 state/published.json 을 고쳐 커밋하므로
