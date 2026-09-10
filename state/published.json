@@ -89,6 +89,21 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-10T10:09:37+09:00",
+      "key": "fallback-단지파악-2026-09-10",
+      "title": "[단지파악] 단지에 도착해서 10분 안에 분위기를 파악하는 4단계 방법입니다",
+      "url": "",
+      "post_id": "17899897773580908",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
