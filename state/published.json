@@ -104,6 +104,21 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-10T21:56:15+09:00",
+      "key": "question-AI활용도-2026-09-10",
+      "title": "[AI활용도] 부동산 정보 찾을 때 AI를 활용하고 계십니까",
+      "url": "",
+      "post_id": "18108226169141075",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
