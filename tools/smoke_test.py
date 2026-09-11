@@ -203,4 +203,54 @@ assert not 올림, "초안이 없는데 뭔가 올라갔다"
 assert 올림, "승인된 글은 당연히 나가야 한다"
 print("21시 승인 분기 통과: 임장기는 승인 없이 안 나감, 뉴스는 자동 발행")
 
+
+# 질문을 쓰지 않는 유형에서 AI 가 질문을 뱉어도 코드가 지운다.
+#   프롬프트 지시만으로는 안 막혔다. 방법론 글이 "주차와 경사 중 어느 쪽을
+#   먼저 보시나요?" 로 끝나버렸고, 그게 없애려던 바로 그 AI 티였다.
+from src import compose as c_mod  # noqa: E402
+from src.select import pick_fallback, pick_question  # noqa: E402
+
+def 질문검사(pick):
+    c_mod.ask_json = lambda *a, **k: {
+        "hook": "제목", "body": "1\n2\n3", "opinion": "",
+        "question": "주차와 경사 중 어느 쪽을 먼저 보시나요?",
+        "detail": "상세", "card_label": "", "card_number": "",
+        "card_headline": "", "source_line": "출처: 매일경제", "tags": [],
+    }
+    return c_mod.compose(pick)
+
+방법론 = 질문검사(Pick(article=None, score=0, reason="", fallback_topic="임장준비|x"))
+assert 방법론.question == "", f"방법론이 질문으로 끝났다: {방법론.question}"
+질문글 = 질문검사(Pick(article=None, score=0, reason="", question_topic="현금생기면|x"))
+assert 질문글.question, "질문 글에는 질문이 남아야 한다"
+assert 질문글.detail == "", "질문 글에 첫 댓글이 붙었다"
+print("질문 마무리 통제 통과: 방법론은 제거, 질문 글은 유지")
+
+# 카드를 붙이지 않는 유형은 한 곳에서만 정해진다.
+#   08·17시 경로에만 걸어놨더니 21시로 나간 방법론 글에 카드가 붙었다.
+assert "방법론" in main_mod.NO_CARD_KINDS and "질문" in main_mod.NO_CARD_KINDS
+import inspect  # noqa: E402
+for 함수 in (main_mod.run_auto, main_mod.run_draft):
+    본문 = inspect.getsource(함수)
+    assert "NO_CARD_KINDS" in 본문, f"{함수.__name__} 이 카드 유형을 안 본다"
+# 카드 URL 이 비었으면 발행은 글만 올린다
+올린것 = []
+notion_mod.enabled = lambda: True
+notion_mod.fetch_approved = lambda: {"page_id": "p", "title": "t", "text": "본문",
+                                     "detail": "", "card_url": "", "type": "방법론"}
+notion_mod.mark_published = lambda *a, **k: None
+main_mod.notify.send = lambda *a, **k: None
+main_mod.notify.published = lambda *a, **k: None
+main_mod.publish_text_post = lambda text: (올린것.append("텍스트"), "id")[1]
+main_mod.publish_image_post = lambda text, url: (올린것.append("카드"), "id")[1]
+main_mod.state_mod.save = lambda *a, **k: None
+main_mod.commit_and_push = lambda *a, **k: None
+os.environ["DRY_RUN"] = "0"
+try:
+    main_mod.run_publish()
+finally:
+    os.environ["DRY_RUN"] = "1"
+assert 올린것 == ["텍스트"], f"카드 없는 초안인데 {올린것} 로 나갔다"
+print("카드 없는 유형 통과: 초안·발행 양쪽에서 카드가 안 붙음")
+
 sys.exit(code)

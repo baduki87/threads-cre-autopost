@@ -50,7 +50,13 @@ def _today() -> str:
 
 
 def _slot() -> str:
-    """08 / 17 / 21. 지정이 없으면 현재 시각에서 가장 가까운 슬롯."""
+    """08 / 17 / 21.
+
+    워크플로는 **반드시 SLOT 을 넘겨야 한다.** 시각 추측은 손으로 돌릴 때만 쓴다.
+    예약 실행이 2~5시간씩 밀리기 때문에 추측이 자주 틀린다. 실제로 21시 발행이
+    새벽 1시에 돌아 '슬롯08' 로 기록됐고, 19시 초안은 17시로 읽혀 21시 자리에
+    질문 글을 만들 뻔했다.
+    """
     given = os.environ.get("SLOT", "").strip()
     if given:
         return given.zfill(2)
@@ -208,8 +214,12 @@ def run_draft() -> int:
     print(text)
     print(f"--- ({len(text)}자) ---\n")
 
+    # 카드 제거를 08·17시 경로에만 걸어놨더니, 21시로 나간 방법론 글에 카드가
+    # 붙었다(09-11 01:21). 유형 기준은 한 곳에서만 정해야 한다.
+    with_card = kind not in NO_CARD_KINDS
     card_path = _card_path(today, slot, dry_run)
-    render(post, card_path, account=account)
+    if with_card:
+        render(post, card_path, account=account)
 
     if dry_run:
         os.makedirs("out", exist_ok=True)
@@ -218,7 +228,8 @@ def run_draft() -> int:
         detail = post.render_detail()
         if detail:
             print(f"\n--- 첫 댓글 ---\n{detail}\n--- ({len(detail)}자) ---")
-        print(f"[draft] DRY_RUN — 노션에 쓰지 않았습니다. {card_path} 를 확인하세요.")
+        print("[draft] DRY_RUN — 노션에 쓰지 않았습니다."
+              + (f" {card_path} 를 확인하세요." if with_card else " (카드 없는 유형)"))
         return 0
 
     if not notion.enabled():
@@ -226,8 +237,10 @@ def run_draft() -> int:
         return 1
 
     # 카드를 먼저 커밋해야 공개 URL 이 생긴다. 노션에도 그 URL 을 넣는다.
-    commit_and_push([card_path], f"card: {today}-{slot}")
-    card_url = raw_url_for(card_path)
+    card_url = ""
+    if with_card:
+        commit_and_push([card_path], f"card: {today}-{slot}")
+        card_url = raw_url_for(card_path)
 
     page_id = notion.create_draft(
         title=post.hook or today, text=text, card_url=card_url, kind=kind,
@@ -297,15 +310,14 @@ def run_publish() -> int:
         print(f"[publish] 본문이 {len(text)}자로 500자를 넘습니다. 노션에서 줄여주세요.",
               file=sys.stderr)
         return 1
-    if not card_url:
-        print("[publish] 카드 이미지 URL 이 비어 있습니다.", file=sys.stderr)
-        return 1
+    # 카드가 없는 유형(방법론·질문)은 글만 올린다. 빈 URL 은 오류가 아니다.
 
     if dry_run:
         print("[publish] DRY_RUN — 실제로 발행하지 않았습니다.")
         return 0
 
-    post_id = publish_image_post(text, card_url)
+    post_id = (publish_image_post(text, card_url) if card_url
+               else publish_text_post(text))
 
     # 첫 댓글은 부가 기능이다. 실패해도 이미 올라간 본문을 되돌릴 수 없으니
     # 예외를 격리하고 기록만 남긴다.

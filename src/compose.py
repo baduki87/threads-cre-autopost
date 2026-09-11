@@ -176,8 +176,11 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
     if state:
         system += performance_context(state)
 
+    want_question = False
+
     if pick.is_memo:
         m: Memo = pick.memo
+        want_question = True
         prompt = MEMO_PROMPT.format(
             title=m.title or "(제목 없음)",
             text=m.text,
@@ -187,6 +190,7 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
                        detail_from="메모에 있지만 본문에 못 담은 현장 정보를 옮깁니다."),
         )
     elif pick.is_question:
+        want_question = True
         label, topic = (pick.question_topic or "질문|").split("|", 1)
         prompt = QUESTION_PROMPT.format(
             label=label, topic=topic.strip(),
@@ -219,6 +223,13 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
         # 안전장치: 메모가 없는데 판단이 나왔으면 버린다.
         print("[compose] 메모 없는 날 opinion 이 생성되어 제거했습니다.")
         opinion = ""
+
+    if not want_question and str(d.get("question", "")).strip():
+        # 안전장치: 프롬프트로 "질문을 쓰지 마세요" 라고만 해서는 안 막혔다.
+        # 방법론 글이 "주차와 경사 중 어느 쪽을 먼저 보시나요?" 로 끝나버렸고,
+        # 그게 바로 없애려던 그 AI 티였다(6건 연속 질문 마무리). 코드로 막는다.
+        print("[compose] 질문을 쓰지 않는 유형인데 생성되어 제거했습니다.")
+        d["question"] = ""
 
     if pick.is_question:
         # 질문 글에 첫 댓글을 달면 계정 주인이 답을 유도하는 모양이 된다.

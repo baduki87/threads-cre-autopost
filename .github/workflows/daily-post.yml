@@ -42,6 +42,7 @@ jobs:
       - name: 승인된 초안 발행
         env:
           MODE: publish
+          SLOT: "21"
           # 수동 실행이면 입력값을, 스케줄 실행이면 0(=실제 발행)을 쓴다.
           DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '1' || '0' }}
           KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}

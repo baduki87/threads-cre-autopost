@@ -44,6 +44,7 @@ jobs:
       - name: 초안 생성
         env:
           MODE: draft
+          SLOT: "21"        # 저녁 초안은 21시 슬롯 몫이다
           DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '1' || '0' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
