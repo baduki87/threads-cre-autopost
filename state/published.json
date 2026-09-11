@@ -164,6 +164,21 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-12T01:25:14+09:00",
+      "key": "9418b108e8df3d86",
+      "title": "롯데건설, 도곡우성 재건축 수주… 올해 정비사업 4조원 돌파",
+      "url": "",
+      "post_id": "18094016168451361",
+      "kind": "notion",
+      "type": "뉴스",
+      "slot": "21",
+      "notion_page": "3d381007-7564-8168-b958-e489d419ae10",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
