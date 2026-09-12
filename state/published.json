@@ -209,6 +209,21 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-13T00:29:02+09:00",
+      "key": "7061f5f24ac5bfa8",
+      "title": "“언제 또 바뀔지 몰라, 당분간 안팔아”…오락가락 세제에 계약취소까지 속출",
+      "url": "",
+      "post_id": "18096464459639516",
+      "kind": "notion",
+      "type": "뉴스",
+      "slot": "21",
+      "notion_page": "3d481007-7564-812c-a7c7-f3296c573908",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
