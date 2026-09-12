@@ -179,6 +179,21 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-12T10:11:49+09:00",
+      "key": "fallback-오해-2026-09-12",
+      "title": "[오해] 용적률만 보고 재건축 단지 고르면 안 되는 이유",
+      "url": "",
+      "post_id": "18117354562822334",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
