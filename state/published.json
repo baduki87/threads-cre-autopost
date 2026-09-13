@@ -239,6 +239,21 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-13T22:19:52+09:00",
+      "key": "question-현금생기면-2026-09-13",
+      "title": "[현금생기면] 지금 현금 10억이 생긴다면 어디를 보시겠습니까",
+      "url": "",
+      "post_id": "17935146024122997",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
