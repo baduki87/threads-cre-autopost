@@ -254,6 +254,21 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-14T01:12:21+09:00",
+      "key": "5456ac0898755e32",
+      "title": "공공사업에 ‘오티에르·써밋’ 거론… 목동 4209가구 개발",
+      "url": "",
+      "post_id": "18121409410904014",
+      "kind": "notion",
+      "type": "뉴스",
+      "slot": "21",
+      "notion_page": "3d581007-7564-81eb-8bc3-e34fc581cd89",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
