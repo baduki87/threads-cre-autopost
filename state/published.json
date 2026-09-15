@@ -314,6 +314,21 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-15T10:32:45+09:00",
+      "key": "fallback-AI임장-2026-09-15",
+      "title": "[AI임장] 현장 임장 메모를 AI로 데이터화하는 4단계 방법입니다",
+      "url": "",
+      "post_id": "18091364300657149",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
