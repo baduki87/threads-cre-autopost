@@ -329,6 +329,21 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-15T22:34:15+09:00",
+      "key": "question-매도타이밍-2026-09-15",
+      "title": "[매도타이밍] 집을 팔아야 할 시점을 정하는 기준",
+      "url": "",
+      "post_id": "17890179993678394",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
