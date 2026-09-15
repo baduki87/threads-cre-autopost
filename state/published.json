@@ -344,6 +344,21 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-16T01:53:39+09:00",
+      "key": "fafc7bbc4734012b",
+      "title": "목동 49층 재건축 지키기… 서울시, 국토부에 고도제한 ‘예외 규정’ 건의",
+      "url": "",
+      "post_id": "18066622250595363",
+      "kind": "notion",
+      "type": "뉴스",
+      "slot": "21",
+      "notion_page": "3d781007-7564-813b-b662-ef6fed6ed6bc",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
