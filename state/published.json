@@ -374,6 +374,21 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-16T22:34:10+09:00",
+      "key": "question-정보출처-2026-09-16",
+      "title": "[정보출처] 아파트 단지 정보 탐색, 가장 먼저 확인하는 곳이 있습니다",
+      "url": "",
+      "post_id": "18006411446993701",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
