@@ -60,11 +60,15 @@ def _creds() -> tuple[str, str]:
 
 
 def recent_posts(days: int = LOOKBACK_DAYS) -> list[dict]:
-    """최근 N일 안에 올린 내 글. 손으로 올린 글도 포함된다."""
+    """최근 N일 안에 올린 내 글. 손으로 올린 글도 포함된다.
+
+    permalink 를 같이 받아둔다. 상담 댓글 알림에서 그 글로 바로 보내야 한다.
+    """
     token, user_id = _creds()
     r = requests.get(
         f"{API}/{user_id}/threads",
-        params={"fields": "id,text,timestamp", "limit": 50, "access_token": token},
+        params={"fields": "id,text,timestamp,permalink", "limit": 50,
+                "access_token": token},
         timeout=30,
     )
     if not r.ok:
@@ -215,10 +219,12 @@ def run() -> int:
 
     items: list[dict] = []
     본문: dict[str, str] = {}
+    링크: dict[str, str] = {}
     for post in posts:
         새것 = [r for r in fetch_replies(post["id"]) if r["id"] not in handled]
         if 새것:
             본문[post["id"]] = post.get("text", "")
+            링크[post["id"]] = post.get("permalink", "")
             items.extend(새것)
 
     print(f"[replies] 새 댓글 {len(items)}건")
@@ -241,7 +247,8 @@ def run() -> int:
             print(f"      → {d['reply']}")
 
         if d["kind"] in HUMAN_KINDS:
-            for_human.append((who, item["text"], d["kind"]))
+            for_human.append({"who": who, "text": item["text"],
+                              "kind": d["kind"], "link": 링크.get(root, "")})
             # 사람이 답할 것은 처리 완료로 적지 않는다. 다음 실행 때 또 알리면
             # 시끄러우므로 '알림 보냄' 으로만 표시한다.
             handled = state_mod.mark_reply(handled, item["id"],

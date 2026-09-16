@@ -116,22 +116,31 @@ def published(title: str, post_id: str, with_reply: bool) -> None:
     send(body, "https://www.threads.com/@pro_konwoo", "스레드에서 보기")
 
 
-def needs_you(items: list[tuple[str, str, str]]) -> None:
-    """회원님이 직접 답해야 할 댓글. (작성자, 내용, 분류)
+def needs_you(items: list[dict]) -> None:
+    """회원님이 직접 답해야 할 댓글.
 
-    상담성 질문이 상담 유입의 출발점이다. AI 가 먼저 답해버리면 그 기회가
-    사라지므로 여기로 넘긴다. 여러 건을 한 번에 묶어 보낸다 — 댓글마다
-    알림이 오면 며칠 못 간다.
+    각 항목: {who, text, kind, link}
+
+    예전에는 여러 건을 한 통에 묶고 본문을 70자로 잘랐다. 그래서 09-13 과
+    09-15 에 온 상담 댓글 두 건이 그대로 지나갔다. 둘 중 하나는 우리 글의
+    숫자가 틀렸다는 지적이었는데 무응답으로 남았다.
+
+    상담 댓글은 10일에 두 건 오는 정도라 묶을 이유가 없다. **건별로, 전문을,
+    그 글로 바로 가는 링크와 함께** 보낸다. 이게 이 계정의 목적 그 자체다.
     """
-    if not items:
-        return
-    줄 = []
-    for who, text, kind in items[:5]:
-        표시 = "상담 문의" if kind == "상담" else "부정적인 댓글"
-        줄.append(f"· @{who} ({표시})\n  {text[:70]}{'…' if len(text) > 70 else ''}")
-    더 = f"\n\n외 {len(items) - 5}건이 더 있습니다." if len(items) > 5 else ""
-    send(f"직접 답하실 댓글이 {len(items)}건 있습니다.\n\n" + "\n\n".join(줄) + 더,
-         "https://www.threads.com/@pro_konwoo", "스레드에서 답하기")
+    상담 = [i for i in items if i.get("kind") == "상담"]
+    부정 = [i for i in items if i.get("kind") != "상담"]
+
+    for i in 상담:
+        send(f"답변이 필요한 댓글입니다.\n\n@{i['who']}\n\n{i['text'][:600]}",
+             i.get("link") or "https://www.threads.com/@pro_konwoo",
+             "바로 답글 달기")
+
+    if 부정:
+        줄 = [f"· @{i['who']}: {i['text'][:70]}" for i in 부정[:4]]
+        send(f"부정적인 댓글이 {len(부정)}건 있습니다.\n\n" + "\n\n".join(줄),
+             부정[0].get("link") or "https://www.threads.com/@pro_konwoo",
+             "스레드에서 보기")
 
 
 def reply_drafts(items: list[tuple[str, str, str]]) -> None:
