@@ -359,6 +359,21 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-16T10:29:15+09:00",
+      "key": "fallback-정비용어-2026-09-16",
+      "title": "[정비용어] 비례율 100%의 진짜 의미와 계산 공식입니다",
+      "url": "",
+      "post_id": "18094751813422949",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
