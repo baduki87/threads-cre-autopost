@@ -59,6 +59,7 @@ class Pick:
     reason: str
     fallback_topic: str | None = None      # 방법론 주제 "label|prompt"
     question_topic: str | None = None      # 질문 글 주제 "label|prompt"
+    part: int = 0                          # 방법론 연재 회차. 0 이면 단편
     memo: Memo | None = None
 
     @property
@@ -101,6 +102,9 @@ class Post:
     opinion: str = ""      # 본인 판단 한 줄. 메모에서만 나온다
     question: str = ""     # 답하기 쉬운 질문 한 줄
     detail: str = ""       # 첫 댓글에 붙는 상세. 본문과 중복되지 않는다
+    # 글 끝 한 줄. 처음 본 사람에게 이 계정이 뭘 올리는 곳인지 알린다.
+    # AI 가 쓰지 않고 config/closers.yaml 에서 코드가 골라 붙인다.
+    follow_line: str = ""
     tags: list[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
@@ -120,7 +124,7 @@ class Post:
         """
         tag_line = " ".join(f"#{t.lstrip('#')}" for t in self.tags)
         blocks = [self.hook, self.body, self.opinion, self.question,
-                  self.source_line, tag_line]
+                  self.follow_line, self.source_line, tag_line]
 
         def assemble(bs: list[str]) -> str:
             return "\n\n".join(b.strip() for b in bs if b and b.strip())
@@ -129,8 +133,8 @@ class Post:
         if len(text) <= limit:
             return text
 
-        # 태그 → 출처 순으로 덜어낸다. 의견과 질문은 남긴다.
-        for drop in (5, 4):
+        # 태그 → 출처 → 마무리 순으로 덜어낸다. 의견과 질문은 남긴다.
+        for drop in (6, 5, 4):
             blocks[drop] = ""
             text = assemble(blocks)
             if len(text) <= limit:

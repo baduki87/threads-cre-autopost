@@ -80,7 +80,7 @@ def is_near_duplicate(title: str, previous: list[str], threshold: float = 0.72,
 
 def record(state: dict, *, key: str, title: str, url: str, post_id: str | None,
            kind: str, dry_run: bool, type_: str = "", notion_page: str = "",
-           slot: str = "") -> dict:
+           slot: str = "", closer: str = "") -> dict:
     """발행 기록 한 줄. 성과(views/likes/replies)는 며칠 뒤 insights 가 채운다."""
     state.setdefault("posts", []).append(
         {
@@ -92,6 +92,7 @@ def record(state: dict, *, key: str, title: str, url: str, post_id: str | None,
             "kind": kind,
             "type": type_,
             "slot": slot,          # 08 / 17 / 21. 어느 시간대가 잘 되는지 비교용
+            "closer": closer,      # 글 끝 한 줄. 같은 문구를 연달아 쓰지 않으려고 남긴다
             "notion_page": notion_page,
             "dry_run": dry_run,
             "views": None,
@@ -204,3 +205,32 @@ def save_replies(data: dict, path: str = REPLIES_PATH) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+# ------------------------------------------------------ 방법론 연재 (1편 → 2편)
+
+def pending_series(state: dict) -> str | None:
+    """1편만 내고 아직 2편을 안 낸 주제.
+
+    긴 방법론을 한 편에 밀어넣지 않고 둘로 나눈다. 1편 끝에 예고를 걸면
+    다음 글을 기다릴 이유가 생기고, 그게 팔로우 이유가 된다.
+    거북이걸음이 "이어서" 로 쓰는 방식이다.
+
+    이틀이 지나면 버린다. 실행이 밀려 흐름이 끊긴 연재는 이어봐야 어색하다.
+    """
+    s = state.get("series")
+    if not s or not s.get("label"):
+        return None
+    when = _when(s)
+    if when and (datetime.now(KST) - when) > timedelta(days=2):
+        return None
+    return s["label"]
+
+
+def set_pending_series(state: dict, label: str) -> None:
+    state["series"] = {"label": label,
+                       "date": datetime.now(KST).isoformat(timespec="seconds")}
+
+
+def clear_pending_series(state: dict) -> None:
+    state.pop("series", None)

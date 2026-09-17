@@ -32,7 +32,9 @@ from .compose import compose
 from .models import Pick
 from .publish import (PublishError, commit_and_push, publish_image_post,
                       publish_reply, publish_text_post, raw_url_for)
-from .select import pick_fallback, pick_question, select
+from . import closer
+from .select import (fallback_by_label, pick_fallback,
+                     pick_question, select)
 
 KST = timezone(timedelta(hours=9))
 NOTION_PAGE_URL = os.environ.get(
@@ -101,7 +103,18 @@ def _build_post(st: dict, *, allow_memo: bool, slot: str = ""):
 
     want = SLOT_KIND.get(slot, "뉴스")
     if want == "방법론":
-        pick, kind = pick_fallback(st=st), "방법론"
+        # 방법론은 2편으로 나눠 낸다. 1편 끝에 예고가 붙어 다음 글을 기다릴
+        # 이유가 생기고, 그게 팔로우 이유가 된다.
+        이어쓸것 = state_mod.pending_series(st)
+        pick = fallback_by_label(이어쓸것) if 이어쓸것 else None
+        if pick:
+            state_mod.clear_pending_series(st)
+        else:
+            pick = pick_fallback(st=st)
+            pick.part = 1
+            state_mod.set_pending_series(
+                st, (pick.fallback_topic or "|").split("|", 1)[0])
+        kind = "방법론"
     elif want == "질문":
         pick, kind = pick_question(st=st), "질문"
     else:
@@ -144,6 +157,7 @@ def run_auto() -> int:
 
     st = state_mod.load()
     post, kind, _, pick = _build_post(st, allow_memo=False, slot=slot)
+    post.follow_line = closer.pick(kind, st)
     text = post.render_text()
 
     print("\n--- 본문 ---")
@@ -188,6 +202,7 @@ def run_auto() -> int:
         kind="auto",
         type_=kind,
         slot=slot,
+        closer=post.follow_line,
         dry_run=False,
     )
     state_mod.save(st)
@@ -208,6 +223,7 @@ def run_draft() -> int:
 
     st = state_mod.load()
     post, kind, memo, pick = _build_post(st, allow_memo=True, slot=slot)
+    post.follow_line = closer.pick(kind, st)
     text = post.render_text()
 
     print("\n--- 초안 ---")

@@ -81,6 +81,17 @@ def pick_fallback(path: str = "config/fallback.yaml",
     )
 
 
+def fallback_by_label(label: str, path: str = "config/fallback.yaml") -> Pick | None:
+    """연재 2편을 쓰려고 1편과 같은 주제를 다시 집어온다."""
+    with open(path, encoding="utf-8") as f:
+        topics = yaml.safe_load(f)["topics"]
+    for t in topics:
+        if t["label"] == label:
+            return Pick(article=None, score=0, reason="연재 2편입니다.",
+                        fallback_topic=f"{t['label']}|{t['prompt']}", part=2)
+    return None
+
+
 def pick_question(path: str = "config/questions.yaml",
                   st: dict | None = None) -> Pick:
     """질문 글 주제 하나. 최근에 쓴 주제를 피한다.

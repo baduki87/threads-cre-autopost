@@ -253,4 +253,30 @@ finally:
 assert 올린것 == ["텍스트"], f"카드 없는 초안인데 {올린것} 로 나갔다"
 print("카드 없는 유형 통과: 초안·발행 양쪽에서 카드가 안 붙음")
 
+
+# 팔로우 장치 — 마무리 한 줄과 방법론 연재
+from src import closer as closer_mod  # noqa: E402
+
+한 = closer_mod.pick("방법론")
+assert 한 and "상담" not in 한 and "문의" not in 한, f"영업 문구가 섞였다: {한}"
+써봄 = {"posts": [{"closer": 한}]}
+assert closer_mod.pick("방법론", 써봄) != 한, "직전에 쓴 마무리를 또 골랐다"
+assert closer_mod.pick("없는유형") == "", "없는 유형인데 문구가 나왔다"
+붙임 = Post(hook="제목", body="1\n2", follow_line=한)
+assert 한 in 붙임.render_text(), "마무리가 본문에 안 붙었다"
+print("마무리 한 줄 통과: 회전·영업문구 차단·본문 결합")
+
+# 연재: 1편 → 다음 실행이 같은 주제 2편 → 그 다음은 새 주제
+from src.select import fallback_by_label  # noqa: E402
+st2 = {}
+assert state_mod.pending_series(st2) is None
+state_mod.set_pending_series(st2, "단지파악")
+assert state_mod.pending_series(st2) == "단지파악"
+두편 = fallback_by_label("단지파악")
+assert 두편 and 두편.part == 2, 두편
+state_mod.clear_pending_series(st2)
+assert state_mod.pending_series(st2) is None, "2편을 내고도 연재가 남았다"
+assert fallback_by_label("없는주제") is None
+print("방법론 연재 통과: 1편 기억 → 2편 → 정리")
+
 sys.exit(code)
