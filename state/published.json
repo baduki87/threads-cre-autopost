@@ -389,6 +389,21 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-17T10:30:09+09:00",
+      "key": "fallback-면적용어-2026-09-17",
+      "title": "[면적용어] 아파트 살 때 헷갈리는 면적 용어 4가지 기준",
+      "url": "",
+      "post_id": "18142401889596583",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
