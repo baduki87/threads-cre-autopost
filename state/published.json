@@ -419,6 +419,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-18T01:54:55+09:00",
+      "key": "6c593666e83a1956",
+      "title": "“잔금 마련 막혔다” 8월 전국 아파트 입주율 50%대로 추락",
+      "url": "",
+      "post_id": "18463341817190143",
+      "kind": "notion",
+      "type": "뉴스",
+      "slot": "21",
+      "closer": "",
+      "notion_page": "3d881007-7564-8152-b9ce-f47d4652557e",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
