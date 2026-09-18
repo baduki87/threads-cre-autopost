@@ -451,6 +451,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-19T01:21:05+09:00",
+      "key": "482ca46fe8f4cd01",
+      "title": "“세금 폭탄은 피하고 보자”…‘2주택자’ 비율 3년 전 수준으로",
+      "url": "",
+      "post_id": "18095760443403865",
+      "kind": "notion",
+      "type": "뉴스",
+      "slot": "21",
+      "closer": "",
+      "notion_page": "3d981007-7564-8117-8fad-c69650496bc9",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
