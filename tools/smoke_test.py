@@ -279,4 +279,19 @@ assert state_mod.pending_series(st2) is None, "2편을 내고도 연재가 남�
 assert fallback_by_label("없는주제") is None
 print("방법론 연재 통과: 1편 기억 → 2편 → 정리")
 
+
+# 21시 슬롯은 AI 주제만, 08시는 실무 주제만 집어야 한다
+from src.select import pick_fallback as pf  # noqa: E402
+import yaml as _yaml  # noqa: E402
+분류 = {t["label"]: t.get("category") for t in
+        _yaml.safe_load(open("config/fallback.yaml", encoding="utf-8"))["topics"]}
+ai = (pf(category="AI").fallback_topic or "|").split("|", 1)[0]
+실무 = (pf(category="실무").fallback_topic or "|").split("|", 1)[0]
+assert 분류.get(ai) == "AI", f"AI 슬롯이 {ai}({분류.get(ai)}) 를 집었다"
+assert 분류.get(실무) == "실무", f"방법론 슬롯이 {실무}({분류.get(실무)}) 를 집었다"
+assert sum(1 for c in 분류.values() if c == "AI") >= 8, "AI 주제가 너무 적다"
+assert main_mod.SLOT_KIND["21"] == "AI" and "AI활용" in main_mod.NO_CARD_KINDS
+assert closer_mod.pick("AI활용"), "AI 유형 마무리 문구가 없다"
+print(f"AI 슬롯 통과: 21시=AI({ai}) / 08시=실무({실무}), 카드 없음")
+
 sys.exit(code)

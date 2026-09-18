@@ -52,7 +52,7 @@ def _format_candidates(articles: list[Article]) -> str:
 
 
 def pick_fallback(path: str = "config/fallback.yaml",
-                  st: dict | None = None) -> Pick:
+                  st: dict | None = None, category: str = "") -> Pick:
     """백업 주제 하나. 최근에 쓴 주제를 피한다.
 
     예전에는 요일로 골랐는데 주제가 5개뿐이라 매주 같은 요일에 같은 주제가
@@ -63,6 +63,9 @@ def pick_fallback(path: str = "config/fallback.yaml",
     """
     with open(path, encoding="utf-8") as f:
         topics = yaml.safe_load(f)["topics"]
+    if category:
+        # 21시 슬롯은 AI 주제만 쓴다. 해당 분류가 비어 있으면 전체에서 고른다.
+        topics = [t for t in topics if t.get("category") == category] or topics
 
     recent = set()
     if st:
