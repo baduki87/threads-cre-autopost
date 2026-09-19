@@ -483,6 +483,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-19T21:29:58+09:00",
+      "key": "question-신축vs준신축-2026-09-19",
+      "title": "[신축vs준신축] 5년 이내 신축과 10년 차 준신축, 선택의 기준",
+      "url": "",
+      "post_id": "18086386040679931",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "다른 기준으로 보시는 분도 계실 겁니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
