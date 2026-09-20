@@ -401,9 +401,9 @@
       "slot": "08",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 199,
+      "likes": 1,
+      "replies": 1
     },
     {
       "date": "2026-09-17T22:27:22+09:00",
@@ -416,9 +416,9 @@
       "slot": "17",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 425,
+      "likes": 0,
+      "replies": 0
     },
     {
       "date": "2026-09-18T01:54:55+09:00",
@@ -432,9 +432,9 @@
       "closer": "",
       "notion_page": "3d881007-7564-8152-b9ce-f47d4652557e",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 222,
+      "likes": 0,
+      "replies": 1
     },
     {
       "date": "2026-09-18T22:01:31+09:00",
