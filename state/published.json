@@ -547,6 +547,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-21T00:59:59+09:00",
+      "key": "80f25359c24365ac",
+      "title": "삼성물산, 5122억 규모 여의도 목화아파트 재건축 수주",
+      "url": "",
+      "post_id": "18027304922885228",
+      "kind": "notion",
+      "type": "뉴스",
+      "slot": "21",
+      "closer": "",
+      "notion_page": "3db81007-7564-8157-8e3f-fee055d97adb",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
