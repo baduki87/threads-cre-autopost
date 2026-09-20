@@ -515,10 +515,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-20T10:15:19+09:00",
+      "key": "fallback-AI문서-2026-09-20",
+      "title": "[AI문서] 중개 문서 작업을 줄이는 AI 실무 적용 3가지",
+      "url": "",
+      "post_id": "18093946667132226",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "현장에서 직접 본 것만 적습니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ],
-  "series": {
-    "label": "AI문서",
-    "date": "2026-09-19T10:14:36+09:00"
-  }
+  ]
 }
