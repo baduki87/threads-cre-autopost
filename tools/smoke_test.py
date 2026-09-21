@@ -334,4 +334,43 @@ finally:
     _time.sleep = _원래sleep
 print("발행 재시도 통과: 못 찾으면 3번까지, 다른 오류는 즉시 실패")
 
+
+# 대기 초안은 최신 것을, 철 지난 건 안 집어야 한다
+#   오래된 것부터 집었더니 6일 전 뉴스가 오늘 올라가고 그날 만든 AI 글이
+#   줄 뒤에서 밀렸다(2026-09-21).
+import inspect as _ins  # noqa: E402
+from datetime import datetime as _dt, timezone as _tz, timedelta as _td  # noqa: E402
+_요청 = {}
+def _가짜call(method, path, **kw):
+    _요청.update(kw.get("json") or {})
+    나이 = _요청.pop("_나이", 0)
+    만든때 = (_dt.now(_tz.utc) - _td(days=나이)).isoformat()
+    return {"results": [{"id": "p1", "created_time": 만든때,
+                         "properties": {"본문": {"rich_text": [{"plain_text": "글"}]}}}]}
+# 주의: 앞선 시험이 fetch_waiting 을 가짜로 바꿔놨다. 속 함수를 직접 부른다.
+notion_mod._call = _가짜call
+notion_mod._first_with_status(notion_mod.WAITING, newest=True, max_age_days=2)
+assert _요청["sorts"][0]["direction"] == "descending", "대기 초안을 오래된 것부터 집는다"
+# fetch_waiting 도 앞선 시험이 덮어놨으므로 파일에서 직접 확인한다
+_소스 = open("src/notion.py", encoding="utf-8").read()
+_몸통 = _소스[_소스.index("def fetch_waiting"):]
+_몸통 = _몸통[:_몸통.index("\ndef ", 1)]
+assert "newest=True" in _몸통, "fetch_waiting 이 최신 우선으로 안 부른다"
+assert "max_age_days" in _몸통, "fetch_waiting 에 기간 제한이 없다"
+
+def _오래된call(method, path, **kw):
+    만든때 = (_dt.now(_tz.utc) - _td(days=5)).isoformat()
+    return {"results": [{"id": "p1", "created_time": 만든때,
+                         "properties": {"본문": {"rich_text": [{"plain_text": "글"}]}}}]}
+notion_mod._call = _오래된call
+assert notion_mod._first_with_status(
+    notion_mod.WAITING, newest=True, max_age_days=2) is None, "5일 지난 초안을 집었다"
+print("대기 초안 통과: 최신 우선, 이틀 넘으면 건너뜀")
+
+# 08시 방법론은 실무 주제만 — 21시 AI 슬롯과 겹치면 안 된다
+_본문 = _ins.getsource(main_mod._build_post)
+assert 'category="실무"' in _본문, "08시 방법론이 분류를 안 걸고 고른다"
+assert 'category="AI"' in _본문
+print("슬롯별 주제 분리 통과: 08시=실무, 21시=AI")
+
 sys.exit(code)

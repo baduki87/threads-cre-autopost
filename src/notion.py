@@ -133,18 +133,32 @@ def _row(page: dict) -> dict | None:
     }
 
 
-def _first_with_status(status: str) -> dict | None:
+def _first_with_status(status: str, newest: bool = False,
+                       max_age_days: int | None = None) -> dict | None:
     data = _call(
         "POST", f"/databases/{os.environ.get('NOTION_DB_ID', '')}/query",
         json={
             "filter": {"property": "상태", "select": {"equals": status}},
-            "sorts": [{"timestamp": "created_time", "direction": "ascending"}],
+            "sorts": [{"timestamp": "created_time",
+                       "direction": "descending" if newest else "ascending"}],
             "page_size": 1,
         },
     )
     if not data or not data.get("results"):
         return None
-    return _row(data["results"][0])
+
+    page = data["results"][0]
+    if max_age_days is not None:
+        try:
+            만든때 = datetime.fromisoformat(
+                page["created_time"].replace("Z", "+00:00"))
+        except (KeyError, ValueError):
+            만든때 = None
+        if 만든때 and (datetime.now(timezone.utc) - 만든때).days >= max_age_days:
+            print(f"[notion] 대기 중인 초안이 {(datetime.now(timezone.utc) - 만든때).days}일 "
+                  "지나 건너뜁니다.", file=sys.stderr)
+            return None
+    return _row(page)
 
 
 def fetch_approved() -> dict | None:
@@ -156,7 +170,11 @@ def fetch_approved() -> dict | None:
 
 
 def fetch_waiting() -> dict | None:
-    """승인을 못 받고 '대기'로 남아 있는 행 하나.
+    """승인을 못 받고 '대기'로 남아 있는 행 중 **가장 최근 것**.
+
+    오래된 것부터 집었더니 사고가 났다. 승인 없이 쌓인 초안이 6건이 되면서
+    6일 전 뉴스가 오늘 올라가고, 정작 그날 만든 AI 글은 줄 뒤에서 대기했다
+    (2026-09-21 확인). 철 지난 뉴스를 올리는 건 안 올리는 것보다 나쁘다.
 
     승인이 없는 날 21시 슬롯이 통째로 비는 것을 막는다. 실제로 6건 연속으로
     비었고, 그 시간대가 이 계정에서 반응이 가장 좋은 자리였다.
@@ -164,7 +182,8 @@ def fetch_waiting() -> dict | None:
     다만 **판단이 담긴 글(임장기)은 이걸로 나가면 안 된다.** 호출하는 쪽에서
     유형을 보고 거른다(src/main.py).
     """
-    return _first_with_status(WAITING)
+    # 이틀 넘은 초안은 건너뛴다. 그날 만든 것만 그날 올린다.
+    return _first_with_status(WAITING, newest=True, max_age_days=2)
 
 
 def published_pages(days_min: int = 3, limit: int = 50) -> list[dict]:

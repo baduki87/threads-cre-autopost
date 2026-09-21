@@ -125,7 +125,9 @@ def _build_post(st: dict, *, allow_memo: bool, slot: str = ""):
         if pick:
             state_mod.clear_pending_series(st)
         else:
-            pick = pick_fallback(st=st)
+            # 실무 주제만 쓴다. 분류를 안 걸면 21시 AI 슬롯과 주제가 겹친다
+            # (09-19·20 08시가 [AI문서] 를 1·2편으로 써버렸다).
+            pick = pick_fallback(st=st, category="실무")
             pick.part = 1
             state_mod.set_pending_series(
                 st, (pick.fallback_topic or "|").split("|", 1)[0])
