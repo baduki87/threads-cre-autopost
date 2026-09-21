@@ -579,6 +579,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-22T03:12:55+09:00",
+      "key": "fallback-AI단지비교-2026-09-22",
+      "title": "[AI단지비교] 부동산 AI 비교할 때 반드시 지키는 3가지 순서",
+      "url": "",
+      "post_id": "18097179617378404",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "notion_page": "3e281007-7564-8129-af1f-d211e61383f9",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
