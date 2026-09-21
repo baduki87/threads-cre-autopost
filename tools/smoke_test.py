@@ -294,4 +294,44 @@ assert main_mod.SLOT_KIND["21"] == "AI" and "AI활용" in main_mod.NO_CARD_KINDS
 assert closer_mod.pick("AI활용"), "AI 유형 마무리 문구가 없다"
 print(f"AI 슬롯 통과: 21시=AI({ai}) / 08시=실무({실무}), 카드 없음")
 
+
+# 발행 재시도 — "Media Not Found" 로 두 번 통째로 실패한 적이 있다
+#   2026-09-09 이미지, 2026-09-21 텍스트. 컨테이너는 FINISHED 인데
+#   메타 쪽 반영이 안 끝나 발행이 400 을 받는다.
+import time as _time  # noqa: E402
+from src import publish as P  # noqa: E402
+
+_원래sleep, _time.sleep = _time.sleep, lambda s: None
+_원래min, P.MIN_AGE_BEFORE_PUBLISH = P.MIN_AGE_BEFORE_PUBLISH, 0
+_원래post = P.requests.post
+
+class _응답:
+    def __init__(self, ok, payload):
+        self.ok, self._p = ok, payload
+        self.status_code, self.text = (200 if ok else 400), str(payload)
+    def json(self): return self._p
+
+try:
+    _못찾음 = {"error": {"code": 24, "error_subcode": P.MEDIA_NOT_FOUND}}
+    _호출 = []
+    P.requests.post = lambda url, **kw: (
+        _호출.append(url),
+        _응답(True, {"id": "PUB1"}) if len(_호출) >= 3 else _응답(False, _못찾음))[1]
+    assert P._publish_container("C1", "t", "u", _time.time()) == "PUB1"
+    assert len(_호출) == 3, _호출
+
+    _호출.clear()
+    P.requests.post = lambda url, **kw: (
+        _호출.append(url), _응답(False, {"error": {"error_subcode": 1}}))[1]
+    try:
+        P._publish_container("C2", "t", "u", _time.time())
+        raise AssertionError("재시도 대상이 아닌 오류인데 예외가 안 났다")
+    except P.PublishError:
+        pass
+    assert len(_호출) == 1, f"재시도하면 안 되는 오류를 {len(_호출)}번 불렀다"
+finally:
+    P.requests.post, P.MIN_AGE_BEFORE_PUBLISH = _원래post, _원래min
+    _time.sleep = _원래sleep
+print("발행 재시도 통과: 못 찾으면 3번까지, 다른 오류는 즉시 실패")
+
 sys.exit(code)

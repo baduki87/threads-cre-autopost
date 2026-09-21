@@ -95,6 +95,13 @@ def commit_and_push(paths: list[str], message: str) -> None:
     print(f"[publish] 커밋·푸시 완료: {', '.join(paths)}")
 
 
+# 컨테이너가 FINISHED 가 된 뒤에도 곧바로 발행하면 "Media Not Found" 가 난다.
+# 2026-09-09(이미지)와 2026-09-21(텍스트) 두 번 이 오류로 발행이 통째로 실패했다.
+# 상태는 준비됐다고 나오는데 메타 쪽 반영이 아직 안 끝난 경우다.
+MIN_AGE_BEFORE_PUBLISH = 25     # 컨테이너 생성 후 최소 이만큼 지나야 발행한다
+MEDIA_NOT_FOUND = 4279009       # 이 오류는 "아직 못 찾겠다" 라서 다시 해볼 만하다
+
+
 def _wait_ready(container_id: str, token: str, timeout: int = 120) -> None:
     """컨테이너가 FINISHED 가 될 때까지 기다린다. 바로 발행하면 실패한다."""
     deadline = time.time() + timeout
@@ -157,6 +164,7 @@ def publish_image_post(text: str, image_url: str) -> str:
     )
     if not r.ok:
         raise PublishError(f"컨테이너 생성 실패 ({r.status_code}): {r.text}")
+    created = time.time()
     container_id = r.json().get("id")
     if not container_id:
         raise PublishError(f"컨테이너 ID 를 받지 못했습니다: {r.text}")
@@ -164,16 +172,49 @@ def publish_image_post(text: str, image_url: str) -> str:
 
     _wait_ready(container_id, token)
 
-    r = requests.post(
-        f"{API}/{user_id}/threads_publish",
-        data={"creation_id": container_id, "access_token": token},
-        timeout=30,
-    )
-    if not r.ok:
-        raise PublishError(f"발행 실패 ({r.status_code}): {r.text}")
-    post_id = r.json().get("id")
-    print(f"[publish] 발행 완료 post_id={post_id}")
-    return post_id
+    return _publish_container(container_id, token, user_id, created)
+
+
+def _publish_container(container_id: str, token: str, user_id: str,
+                       created_at: float, tries: int = 3) -> str:
+    """컨테이너를 실제로 발행한다.
+
+    두 가지를 한다.
+      1. 생성 직후 너무 빨리 부르지 않도록 최소 시간을 채운다
+      2. "Media Not Found" 면 잠시 뒤 다시 시도한다
+
+    2번이 안전한 이유: 이 오류는 **발행이 안 됐다**는 뜻이다. 발행이 됐는데
+    응답만 못 받은 경우가 아니므로 다시 불러도 두 번 올라가지 않는다.
+    """
+    남은 = MIN_AGE_BEFORE_PUBLISH - (time.time() - created_at)
+    if 남은 > 0:
+        print(f"[publish] 컨테이너가 자리잡도록 {남은:.0f}초 더 기다립니다")
+        time.sleep(남은)
+
+    for 회차 in range(1, tries + 1):
+        r = requests.post(
+            f"{API}/{user_id}/threads_publish",
+            data={"creation_id": container_id, "access_token": token},
+            timeout=30,
+        )
+        if r.ok:
+            post_id = r.json().get("id")
+            print(f"[publish] 발행 완료 post_id={post_id}")
+            return post_id
+
+        try:
+            서브 = r.json().get("error", {}).get("error_subcode")
+        except ValueError:
+            서브 = None
+        if 서브 != MEDIA_NOT_FOUND or 회차 == tries:
+            raise PublishError(f"발행 실패 ({r.status_code}): {r.text}")
+
+        대기 = 10 * 회차
+        print(f"[publish] 컨테이너를 아직 못 찾습니다 — {대기}초 후 재시도 "
+              f"({회차}/{tries})", file=sys.stderr)
+        time.sleep(대기)
+
+    raise PublishError("발행 재시도에 모두 실패했습니다.")
 
 
 def publish_text_post(text: str) -> str:
@@ -192,6 +233,7 @@ def publish_text_post(text: str) -> str:
     )
     if not r.ok:
         raise PublishError(f"컨테이너 생성 실패 ({r.status_code}): {r.text}")
+    created = time.time()
     container_id = r.json().get("id")
     if not container_id:
         raise PublishError(f"컨테이너 ID 를 받지 못했습니다: {r.text}")
@@ -199,16 +241,7 @@ def publish_text_post(text: str) -> str:
 
     _wait_ready(container_id, token)
 
-    r = requests.post(
-        f"{API}/{user_id}/threads_publish",
-        data={"creation_id": container_id, "access_token": token},
-        timeout=30,
-    )
-    if not r.ok:
-        raise PublishError(f"발행 실패 ({r.status_code}): {r.text}")
-    post_id = r.json().get("id")
-    print(f"[publish] 발행 완료 post_id={post_id}")
-    return post_id
+    return _publish_container(container_id, token, user_id, created)
 
 
 def publish_reply(text: str, reply_to_id: str) -> str:
@@ -233,21 +266,15 @@ def publish_reply(text: str, reply_to_id: str) -> str:
     )
     if not r.ok:
         raise PublishError(f"댓글 컨테이너 생성 실패 ({r.status_code}): {r.text}")
+    created = time.time()
     container_id = r.json().get("id")
     if not container_id:
         raise PublishError(f"댓글 컨테이너 ID 를 받지 못했습니다: {r.text}")
 
     _wait_ready(container_id, token)
 
-    r = requests.post(
-        f"{API}/{user_id}/threads_publish",
-        data={"creation_id": container_id, "access_token": token},
-        timeout=30,
-    )
-    if not r.ok:
-        raise PublishError(f"댓글 발행 실패 ({r.status_code}): {r.text}")
-    reply_id = r.json().get("id")
-    print(f"[publish] 첫 댓글 발행 완료 reply_id={reply_id}")
+    reply_id = _publish_container(container_id, token, user_id, created)
+    print(f"[publish] 첫 댓글 reply_id={reply_id}")
     return reply_id
 
 
