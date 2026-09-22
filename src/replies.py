@@ -11,8 +11,9 @@
 
   인사·호응   → 자동 답글. 판단이 안 들어간다
   사실 질문   → 자동 답글. 원글에 있는 사실만 옮긴다
-  상담·자문   → **답글 안 함.** 카카오톡으로 모아 알리고 회원님이 직접 답한다
+  상담·자문   → **답글 안 함.** 카카오톡으로 알리고 회원님이 직접 답한다
   부정·시비   → **답글 안 함.** 수용 답글은 단지 사정을 알아야 해서 자동화가 위험하다
+  광고·스팸   → **답글도 알림도 안 함.** 조용히 기록만 남긴다
 
 본문 파이프라인의 규칙("의견은 메모에서만")과 같은 원칙이다.
 AI 는 사실을 옮기고, 판단은 사람이 한다.
@@ -36,6 +37,9 @@ KST = timezone(timedelta(hours=9))
 # 자동으로 답글을 다는 분류. 나머지는 사람에게 넘긴다.
 AUTO_KINDS = {"인사", "사실질문"}
 HUMAN_KINDS = {"상담", "부정"}
+# 답글도 알림도 하지 않는다. 2026-09-16 에 매물 홍보 댓글이 '상담' 으로 잡혀
+# 카톡이 갔다. 상담 알림 3건 중 1건이 스팸이면 알림을 믿을 수 없게 된다.
+SILENT_KINDS = {"광고"}
 
 # 답글을 다는 대상 기간. 오래된 글에 뒤늦게 답글이 달리는 것까지 쫓지 않는다.
 LOOKBACK_DAYS = 7
@@ -131,9 +135,14 @@ SYSTEM = """당신은 서울 아파트를 다루는 공인중개사의 스레드
   ("지금 사도 될까요", "○○단지 어떤가요", "저는 이런 상황인데 어떻게 할까요",
    "전세 낀 매물인데 괜찮을까요")
 - `부정`: 반박·비판·시비·비아냥
+- `광고`: **본인 매물·강의·서비스를 홍보하거나 연락을 유도합니다.**
+  질문처럼 보여도 목적이 홍보면 광고입니다.
+  ("잔여세대 분양 문의주세요", "디엠 주시면 자료 드립니다", "맞팔해요",
+   "저도 중개사인데 같이 일하실 분", 이모지로 도배된 매물 안내)
 
 애매하면 **`상담` 으로 분류하세요.** 잘못 자동 답변하는 것보다
 사람에게 넘기는 쪽이 낫습니다.
+다만 홍보 문구·연락처·가격표가 들어 있으면 망설이지 말고 `광고` 입니다.
 
 ## 답글 초안 (`인사`, `사실질문` 에만 씁니다)
 
@@ -188,7 +197,7 @@ PROMPT = """원글:
 JSON 으로만 답하세요.
 
 {{
-  "kind": "인사 | 사실질문 | 상담 | 부정",
+  "kind": "인사 | 사실질문 | 상담 | 부정 | 광고",
   "reply": "<'인사'·'사실질문' 일 때만 답글 1~2문장. 나머지는 빈 문자열>",
   "why": "<왜 그렇게 분류했는지 한 문장>"
 }}"""
@@ -205,11 +214,11 @@ def classify(reply: dict, post: str) -> dict:
     kind = str(d.get("kind", "")).strip()
     text = str(d.get("reply", "")).strip()
 
-    if kind not in AUTO_KINDS | HUMAN_KINDS:
+    if kind not in AUTO_KINDS | HUMAN_KINDS | SILENT_KINDS:
         # 분류를 못 알아들으면 사람에게 넘긴다. 자동 답글의 기본값은 '안 함' 이다.
         print(f"[replies] 알 수 없는 분류 '{kind}' — 상담으로 넘깁니다", file=sys.stderr)
         kind, text = "상담", ""
-    if kind in HUMAN_KINDS:
+    if kind in HUMAN_KINDS | SILENT_KINDS:
         text = ""
     if kind in AUTO_KINDS and not text:
         # 근거가 없어 답글을 비웠다는 뜻이다. 그러면 자동으로 나가면 안 된다.
@@ -244,7 +253,7 @@ def run() -> int:
     if not items:
         return 0
 
-    replied, for_human, drafts = 0, [], []
+    replied, 무시, for_human, drafts = 0, 0, [], []
 
     for item in items:
         root = item["root_post_id"]
@@ -258,6 +267,13 @@ def run() -> int:
         print(f"  [{d['kind']}] @{who}: {item['text'][:40]}")
         if d["reply"]:
             print(f"      → {d['reply']}")
+
+        if d["kind"] in SILENT_KINDS:
+            # 홍보 댓글. 답글도 알림도 하지 않고 처리 완료로만 남긴다.
+            handled = state_mod.mark_reply(handled, item["id"],
+                                           kind=d["kind"], action="무시")
+            무시 += 1
+            continue
 
         if d["kind"] in HUMAN_KINDS:
             for_human.append({"who": who, "text": item["text"],
@@ -288,7 +304,7 @@ def run() -> int:
         notify.reply_drafts(drafts)
 
     print(f"[replies] 자동 답글 {replied}건 / 회원님 몫 {len(for_human)}건 "
-          f"/ 초안만 {len(drafts)}건")
+          f"/ 초안만 {len(drafts)}건 / 광고 무시 {무시}건")
     return 0
 
 

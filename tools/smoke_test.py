@@ -373,4 +373,21 @@ assert 'category="실무"' in _본문, "08시 방법론이 분류를 안 걸고 
 assert 'category="AI"' in _본문
 print("슬롯별 주제 분리 통과: 08시=실무, 21시=AI")
 
+
+# 광고 댓글은 답글도 알림도 안 한다
+#   2026-09-16 에 매물 홍보 댓글이 '상담' 으로 잡혀 카톡이 갔다.
+#   상담 알림 3건 중 1건이 스팸이면 알림 자체를 못 믿게 된다.
+def _광고시험(응답):
+    replies_mod.ask_json = lambda *a, **k: 응답
+    return replies_mod.classify({"username": "t", "text": "아무거나"}, "원글")
+
+_r = _광고시험({"kind": "광고", "reply": "감사합니다!", "why": "홍보"})
+assert _r["kind"] == "광고" and _r["reply"] == "", f"광고에 답글이 남았다: {_r}"
+assert "광고" in replies_mod.SILENT_KINDS
+assert not (replies_mod.SILENT_KINDS & replies_mod.AUTO_KINDS), "광고가 자동답글 대상이다"
+assert not (replies_mod.SILENT_KINDS & replies_mod.HUMAN_KINDS), "광고로 알림이 간다"
+# 모르는 분류는 여전히 사람에게
+assert _광고시험({"kind": "이상한값", "reply": "x", "why": ""})["kind"] == "상담"
+print("광고 분류 통과: 답글 없음, 알림 없음, 불명은 여전히 사람에게")
+
 sys.exit(code)
