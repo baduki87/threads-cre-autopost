@@ -611,6 +611,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-22T22:26:12+09:00",
+      "key": "question-대단지vs소단지-2026-09-22",
+      "title": "[대단지vs소단지] 대단지 랜드마크 vs 알짜 소단지 아파트",
+      "url": "",
+      "post_id": "18148104379477684",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "다른 기준으로 보시는 분도 계실 겁니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
