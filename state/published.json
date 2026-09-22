@@ -627,6 +627,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-23T01:53:35+09:00",
+      "key": "fallback-AI등기부-2026-09-23",
+      "title": "[AI등기부] 등기부등본 AI 분석 시 반드시 지켜야 할 원칙",
+      "url": "",
+      "post_id": "17874861165573657",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "notion_page": "3e381007-7564-8107-a708-f20e65374422",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
