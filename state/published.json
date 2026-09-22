@@ -595,6 +595,26 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-22T10:39:28+09:00",
+      "key": "fallback-매물확인-2026-09-22",
+      "title": "[매물확인] 집 보러 갈 때 놓치기 쉬운 필수 확인 항목 2가지",
+      "url": "",
+      "post_id": "17952643509254076",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "도곡·대치 임장 기록을 남기고 있습니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ]
+  ],
+  "series": {
+    "label": "매물확인",
+    "date": "2026-09-22T10:37:58+09:00"
+  }
 }
