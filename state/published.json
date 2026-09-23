@@ -643,10 +643,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-23T10:33:48+09:00",
+      "key": "fallback-매물확인-2026-09-23",
+      "title": "[매물확인] 매물 확인 시 놓치기 쉬운 필수 점검 항목 3가지",
+      "url": "",
+      "post_id": "17992500435019599",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "현장에서 직접 본 것만 적습니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ],
-  "series": {
-    "label": "매물확인",
-    "date": "2026-09-22T10:37:58+09:00"
-  }
+  ]
 }
