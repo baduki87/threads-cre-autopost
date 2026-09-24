@@ -576,9 +576,9 @@
       "closer": "답글로 의견 남겨주시면 다음 글에 참고하겠습니다.",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 101,
+      "likes": 0,
+      "replies": 0
     },
     {
       "date": "2026-09-22T03:12:55+09:00",
@@ -592,9 +592,9 @@
       "closer": "",
       "notion_page": "3e281007-7564-8129-af1f-d211e61383f9",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 210,
+      "likes": 1,
+      "replies": 1
     },
     {
       "date": "2026-09-22T10:39:28+09:00",
