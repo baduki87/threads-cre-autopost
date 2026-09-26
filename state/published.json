@@ -691,6 +691,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-26T22:05:09+09:00",
+      "key": "question-손님기억-2026-09-26",
+      "title": "[손님기억] 가장 오래 기억에 남는 손님의 기준",
+      "url": "",
+      "post_id": "18147674920480053",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "답글로 의견 남겨주시면 다음 글에 참고하겠습니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
