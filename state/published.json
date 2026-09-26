@@ -675,6 +675,26 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-26T10:39:59+09:00",
+      "key": "fallback-정비용어-2026-09-26",
+      "title": "[정비용어] 재개발 수익성을 결정하는 비례율, 기본 구조부터 짚어봅니다",
+      "url": "",
+      "post_id": "18060610739716946",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "임장 다니며 정리한 것들을 올립니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ]
+  ],
+  "series": {
+    "label": "정비용어",
+    "date": "2026-09-26T10:38:25+09:00"
+  }
 }
