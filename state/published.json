@@ -707,6 +707,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-27T22:58:09+09:00",
+      "key": "question-재방문-2026-09-27",
+      "title": "[재방문] 같은 집을 두 번째 보러 갈 때 생기는 일",
+      "url": "",
+      "post_id": "18143366323596129",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "답글로 의견 남겨주시면 다음 글에 참고하겠습니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
