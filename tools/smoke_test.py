@@ -390,4 +390,35 @@ assert not (replies_mod.SILENT_KINDS & replies_mod.HUMAN_KINDS), "광고로 알�
 assert _광고시험({"kind": "이상한값", "reply": "x", "why": ""})["kind"] == "상담"
 print("광고 분류 통과: 답글 없음, 알림 없음, 불명은 여전히 사람에게")
 
+
+# 글 못 쓰는 모델로 갈아타다 죽는 것을 막는다
+#   09-23~28 실행 실패 10건이 전부 이것이었다. 3.8-flash 가 과부하일 때
+#   대체 1순위가 gemini-3.8-flash-tts(음성 합성)였고 400 을 냈다.
+from src import llm as llm_mod  # noqa: E402
+
+_목록 = ["gemini-3.8-flash", "gemini-3.8-flash-tts", "gemini-3.8-flash-lite-tts",
+        "gemini-3.1-flash-image", "gemini-omni-1.1-flash", "gemini-3.7-flash",
+        "gemini-3.6-flash"]
+assert llm_mod._text_models(_목록) == [
+    "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.6-flash"], \
+    llm_mod._text_models(_목록)
+
+_원래목록 = llm_mod.list_gemini_models
+llm_mod.list_gemini_models = lambda: _목록
+try:
+    _후보 = llm_mod._alternate_models({"gemini-3.8-flash"})
+    assert _후보, "대체 후보가 비었다"
+    assert not any(llm_mod._NOT_TEXT.search(m) for m in _후보), f"글 못 쓰는 모델: {_후보}"
+finally:
+    llm_mod.list_gemini_models = _원래목록
+print("모델 전환 통과: tts·image·omni 제외, 텍스트 모델만 후보")
+
+# 재시도 대상이 아닌 오류여도 다음 모델로 넘어가야 한다
+_소스 = open("src/llm.py", encoding="utf-8").read()
+_구간 = _소스[_소스.index("if r.status_code not in _RETRYABLE"):]
+_구간 = _구간[:_구간.index("_is_daily_quota")]
+assert "break" in _구간 and "raise" not in _구간, \
+    "재시도 대상이 아닌 오류에서 바로 죽는다 — 남은 후보를 못 써본다"
+print("모델 전환 통과: 처리 못하는 오류면 다음 후보로 넘어감")
+
 sys.exit(code)

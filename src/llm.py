@@ -75,6 +75,18 @@ def _version_score(name: str) -> float:
     return float(m.group(1)) if m else 0.0
 
 
+# 이름에 flash 가 들어 있어도 글을 못 쓰는 모델들.
+# 2026-09-23~28 의 실행 실패 10건이 전부 이것 때문이었다. gemini-3.8-flash 가
+# 과부하(503)일 때 대체 후보 1순위가 gemini-3.8-flash-tts 였고, 음성 합성
+# 모델이라 HTTP 400 을 냈다. 400 은 재시도 대상이 아니라 그대로 죽었다.
+_NOT_TEXT = re.compile(r"tts|image|audio|embedding|vision|omni|live")
+
+
+def _text_models(models: list[str]) -> list[str]:
+    """글을 쓸 수 있는 모델만 남긴다."""
+    return [m for m in models if not _NOT_TEXT.search(m)]
+
+
 def resolve_gemini_model() -> str:
     """무료 등급에서 쓸 수 있는 flash 계열 중 가장 최신을 고른다."""
     global _gemini_model_cache
@@ -88,7 +100,7 @@ def resolve_gemini_model() -> str:
 
     models = list_gemini_models()
     # 무료 등급은 flash 계열만 열려 있다. 미리보기/실험판은 뒤로 미룬다.
-    flash = [m for m in models if "flash" in m and "lite" not in m]
+    flash = _text_models([m for m in models if "flash" in m and "lite" not in m])
     stable = [m for m in flash if not re.search(r"preview|exp|latest", m)]
     pool = stable or flash or models
     if not pool:
@@ -124,8 +136,9 @@ def _alternate_models(tried: set[str], limit: int = 4) -> list[str]:
         models = list_gemini_models()
     except Exception:
         return []
-    flash = [m for m in models
-             if "flash" in m and m not in tried and not re.search(r"preview|exp", m)]
+    flash = _text_models([m for m in models
+                          if "flash" in m and m not in tried
+                          and not re.search(r"preview|exp", m)])
     return sorted(flash, key=_version_score, reverse=True)[:limit]
 
 
@@ -183,7 +196,12 @@ def _ask_gemini(system: str, prompt: str, max_tokens: int, tries: int = 3) -> st
 
             last_err = f"HTTP {r.status_code}: {r.text[:250]}"
             if r.status_code not in _RETRYABLE:
-                raise RuntimeError(f"Gemini 호출 실패 ({model}) — {last_err}")
+                # 이 모델에서는 안 되는 오류다. **남은 후보로 넘어간다.**
+                # 전에는 여기서 바로 죽었다. TTS 모델이 400 을 내자 아직 써보지도
+                # 않은 3.7·3.6 을 두고 그날 발행이 통째로 실패했다.
+                print(f"[llm] {model} 은 이 요청을 처리하지 못합니다 "
+                      f"({r.status_code}) — 다음 모델로 넘어갑니다", file=sys.stderr)
+                break
 
             if r.status_code == 429 and _is_daily_quota(r.text):
                 print(f"[llm] {model} 은 오늘 무료 한도를 다 썼습니다 — "
@@ -205,8 +223,8 @@ def _ask_gemini(system: str, prompt: str, max_tokens: int, tries: int = 3) -> st
                 candidates_models = alts
 
     raise RuntimeError(
-        "Gemini 호출이 재시도와 모델 전환에도 실패했습니다.\n"
-        f"마지막 오류 — {last_err}"
+        f"Gemini 호출이 실패했습니다. 시도한 모델 {len(tried)}개: "
+        f"{', '.join(sorted(tried))}\n마지막 오류 — {last_err}"
     )
 
 
