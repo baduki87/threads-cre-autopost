@@ -755,6 +755,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-29T04:39:15+09:00",
+      "key": "fallback-AI계약서-2026-09-29",
+      "title": "[AI계약서] 계약서 특약 검토에 AI를 활용하는 3단계 순서",
+      "url": "",
+      "post_id": "18066903029603895",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "notion_page": "3e981007-7564-81c0-bd88-cda59a49ef4b",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
