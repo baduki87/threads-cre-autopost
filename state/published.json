@@ -803,6 +803,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-30T03:04:03+09:00",
+      "key": "fallback-AI한계-2026-09-30",
+      "title": "[AI한계] 부동산에서 AI가 절대 대신할 수 없는 세 가지 영역",
+      "url": "",
+      "post_id": "17936671443124426",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "notion_page": "3ea81007-7564-81ec-876c-e5f7a7726067",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
