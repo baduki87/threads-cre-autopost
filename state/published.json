@@ -819,10 +819,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-09-30T11:11:47+09:00",
+      "key": "fallback-실수-2026-09-30",
+      "title": "[실수] 부동산 계약 직전 초보가 놓치기 쉬운 핵심 확인법",
+      "url": "",
+      "post_id": "18440066209135075",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "현장에서 직접 본 것만 적습니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ],
-  "series": {
-    "label": "실수",
-    "date": "2026-09-29T11:36:08+09:00"
-  }
+  ]
 }
