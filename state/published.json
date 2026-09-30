@@ -851,6 +851,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-01T02:59:46+09:00",
+      "key": "fallback-AI도구-2026-10-01",
+      "title": "[AI도구] 부동산 실무 효율을 높이는 AI 활용법 3가지",
+      "url": "",
+      "post_id": "18030949253854988",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "notion_page": "3eb81007-7564-8122-8f9b-db798cdad6b4",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
