@@ -883,6 +883,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-02T00:28:10+09:00",
+      "key": "question-가격협상-2026-10-02",
+      "title": "[가격협상] 아파트 가격 협상이 통하는 순간",
+      "url": "",
+      "post_id": "18384041848225679",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "다른 기준으로 보시는 분도 계실 겁니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
