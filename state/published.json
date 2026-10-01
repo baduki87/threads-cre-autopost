@@ -899,6 +899,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-02T03:24:45+09:00",
+      "key": "fallback-AI프롬프트-2026-10-02",
+      "title": "[AI프롬프트] 부동산 AI 질문법, 답이 완전히 달라지는 프롬프트 작성법",
+      "url": "",
+      "post_id": "18116575442051162",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "notion_page": "3ec81007-7564-814e-a111-c5e942bf86d2",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
