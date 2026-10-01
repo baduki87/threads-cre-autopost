@@ -720,9 +720,9 @@
       "closer": "답글로 의견 남겨주시면 다음 글에 참고하겠습니다.",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 72,
+      "likes": 1,
+      "replies": 0
     },
     {
       "date": "2026-09-28T01:56:02+09:00",
@@ -736,9 +736,9 @@
       "closer": "",
       "notion_page": "3e881007-7564-8160-90a8-e69c9a0424e8",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 520,
+      "likes": 7,
+      "replies": 1
     },
     {
       "date": "2026-09-29T01:45:54+09:00",
