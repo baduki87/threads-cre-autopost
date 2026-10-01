@@ -867,6 +867,26 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-01T11:13:20+09:00",
+      "key": "fallback-세금용어-2026-10-01",
+      "title": "[세금용어] 양도소득세 줄이는 필요경비 인정 기준 [1편]",
+      "url": "",
+      "post_id": "18283202131292834",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "임장 다니며 정리한 것들을 올립니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ]
+  ],
+  "series": {
+    "label": "세금용어",
+    "date": "2026-10-01T11:12:00+09:00"
+  }
 }
