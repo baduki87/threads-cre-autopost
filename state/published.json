@@ -931,6 +931,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-02T23:47:19+09:00",
+      "key": "question-마음바뀜-2026-10-02",
+      "title": "[마음바뀜] 계약 직전 마음이 바뀌는 진짜 이유",
+      "url": "",
+      "post_id": "18023738987877422",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "생각이 갈리는 지점이라 궁금합니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
