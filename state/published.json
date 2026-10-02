@@ -947,6 +947,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-03T02:51:12+09:00",
+      "key": "fallback-AI시세-2026-10-03",
+      "title": "[AI시세] AI로 실거래가 데이터를 3분 만에 정리하는 법을 공유합니다",
+      "url": "",
+      "post_id": "17937053127123693",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "notion_page": "3ed81007-7564-8161-9674-f286c79de556",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
