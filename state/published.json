@@ -915,10 +915,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-02T11:23:52+09:00",
+      "key": "fallback-세금용어-2026-10-02",
+      "title": "[세금용어] 양도세 필요경비 인정 여부 핵심 정리",
+      "url": "",
+      "post_id": "18123616976475370",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "도곡·대치 임장 기록을 남기고 있습니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ],
-  "series": {
-    "label": "세금용어",
-    "date": "2026-10-01T11:12:00+09:00"
-  }
+  ]
 }
