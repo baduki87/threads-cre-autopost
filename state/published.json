@@ -963,6 +963,26 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-03T11:04:51+09:00",
+      "key": "fallback-임장준비-2026-10-03",
+      "title": "[임장준비] 임장 전 30분 만에 끝내는 사전 조사 2단계",
+      "url": "",
+      "post_id": "17991184239062578",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "현장에서 직접 본 것만 적습니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ]
+  ],
+  "series": {
+    "label": "임장준비",
+    "date": "2026-10-03T11:03:09+09:00"
+  }
 }
