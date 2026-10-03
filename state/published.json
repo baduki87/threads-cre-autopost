@@ -995,6 +995,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-04T01:13:13+09:00",
+      "key": "fallback-AI임장메모-2026-10-03",
+      "title": "[AI임장메모] 임장 중 흩어진 메모를 데이터로 만드는 3단계 정리법",
+      "url": "",
+      "post_id": "18034824077902712",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "notion_page": "3ee81007-7564-81dd-a168-ddf35b3a7e86",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
