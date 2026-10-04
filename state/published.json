@@ -1043,6 +1043,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-05T01:50:58+09:00",
+      "key": "fallback-AI단지비교-2026-10-05",
+      "title": "[AI단지비교] AI로 아파트 단지 비교할 때 실패 없는 3단계 질문 순서입니다",
+      "url": "",
+      "post_id": "18080067755354890",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "notion_page": "3ef81007-7564-81c5-bd87-d57b3a7a0624",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
