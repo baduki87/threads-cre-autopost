@@ -1011,10 +1011,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-04T11:44:39+09:00",
+      "key": "fallback-임장준비-2026-10-04",
+      "title": "[임장준비] 임장 전 30분 만에 끝내는 사전 조사 순서입니다",
+      "url": "",
+      "post_id": "18112100771171589",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "임장 다니며 정리한 것들을 올립니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ],
-  "series": {
-    "label": "임장준비",
-    "date": "2026-10-03T11:03:09+09:00"
-  }
+  ]
 }
