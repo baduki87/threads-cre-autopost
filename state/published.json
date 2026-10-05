@@ -1091,6 +1091,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-06T05:43:41+09:00",
+      "key": "fallback-AI등기부-2026-10-06",
+      "title": "[AI등기부] AI로 등기부등본 검토할 때 누락을 막는 3단계 방법",
+      "url": "",
+      "post_id": "18634161157020733",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "notion_page": "3f081007-7564-8148-a197-d6b8b17e18e3",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
