@@ -1075,6 +1075,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-06T02:10:28+09:00",
+      "key": "question-보여주기-2026-10-06",
+      "title": "[보여주기] 거주 중인 집을 보러 갈 때 가장 어색한 순간이 있습니다",
+      "url": "",
+      "post_id": "18358205611172272",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "생각이 갈리는 지점이라 궁금합니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
