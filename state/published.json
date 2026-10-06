@@ -1123,6 +1123,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-07T00:11:28+09:00",
+      "key": "question-문열기-2026-10-07",
+      "title": "[문열기] 중개사무소 문을 열 때 가장 어색한 순간",
+      "url": "",
+      "post_id": "17992654497014557",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "답글로 의견 남겨주시면 다음 글에 참고하겠습니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
