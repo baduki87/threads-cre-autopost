@@ -1107,10 +1107,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-06T12:05:55+09:00",
+      "key": "fallback-시세조사-2026-10-06",
+      "title": "[시세조사] 실거래가 거품 빼는 3단계 필터링법",
+      "url": "",
+      "post_id": "18115543823010976",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "현장에서 직접 본 것만 적습니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ],
-  "series": {
-    "label": "시세조사",
-    "date": "2026-10-05T11:03:20+09:00"
-  }
+  ]
 }
