@@ -1139,6 +1139,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-07T03:19:29+09:00",
+      "key": "fallback-AI문서-2026-10-07",
+      "title": "[AI문서] 공인중개사 문서 작업을 줄이는 AI 활용법입니다",
+      "url": "",
+      "post_id": "17947325379340061",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "notion_page": "3f181007-7564-819d-950b-d67e102da7de",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
