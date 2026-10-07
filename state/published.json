@@ -1171,6 +1171,22 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-08T00:34:32+09:00",
+      "key": "question-전화문의-2026-10-08",
+      "title": "[전화문의] 전화로 매물을 물을 때와 받을 때의 온도 차이",
+      "url": "",
+      "post_id": "18027784814884782",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "다른 기준으로 보시는 분도 계실 겁니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
