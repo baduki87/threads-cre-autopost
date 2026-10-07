@@ -1155,6 +1155,26 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-07T11:29:21+09:00",
+      "key": "fallback-계약전-2026-10-07",
+      "title": "[계약전] 계약 직전 등기부등본에서 먼저 봐야 할 3가지",
+      "url": "",
+      "post_id": "18104583058997607",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "임장 다니며 정리한 것들을 올립니다.",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ]
+  ],
+  "series": {
+    "label": "계약전",
+    "date": "2026-10-07T11:26:52+09:00"
+  }
 }
