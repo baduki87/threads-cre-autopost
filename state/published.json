@@ -1236,6 +1236,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-09T03:50:01+09:00",
+      "key": "fallback-AI문서-2026-10-09",
+      "title": "[AI문서] 중개 실무 문서 작업을 AI로 단축하는 3가지 순서",
+      "url": "",
+      "post_id": "18127895458892177",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "",
+      "notion_page": "3f381007-7564-81ce-a4f4-fb33adc92f00",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
