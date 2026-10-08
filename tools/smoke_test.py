@@ -421,4 +421,34 @@ assert "break" in _구간 and "raise" not in _구간, \
     "재시도 대상이 아닌 오류에서 바로 죽는다 — 남은 후보를 못 써본다"
 print("모델 전환 통과: 처리 못하는 오류면 다음 후보로 넘어감")
 
+
+# 질문 글이 같은 틀을 반복하지 않게 코드가 막는다.
+#   09-23 이후 11건이 전부 "~라고들 합니다 → A입니까 B입니까" 였고
+#   제목 절반이 "~순간" 이었다. 댓글이 13건에 7개 → 11건에 2개로 줄었다.
+기록 = {"posts": [
+    {"type": "질문", "title": "[문열기] 중개사무소 문을 열 때 가장 어색한 순간", "shape": "하나만"},
+    {"type": "질문", "title": "[놓친집] 놓치고 나서 계속 생각나는 집이 있습니다", "shape": "경험"},
+]}
+assert c_mod.pick_shape(기록) == "통념확인", "최근에 쓴 모양을 또 골랐다"
+assert c_mod.pick_shape({"posts": []}) == "하나만"
+금지 = c_mod.banned_endings(기록)
+assert "순간" in 금지 and "있습니다" in 금지, 금지
+assert c_mod.question_problems({"hook": "계약 직전 망설이는 순간", "body": "", "question": "하나만?"},
+                               "하나만", 금지), "'순간' 제목이 통과했다"
+assert c_mod.question_problems({"hook": "계약서 첫 확인 항목", "body": "꼼꼼히 봐야 한다고들 합니다",
+                                "question": "하나만 꼽는다면요?"}, "하나만", 금지), "통념 문장이 통과했다"
+assert not c_mod.question_problems({"hook": "계약서 첫 확인 항목", "body": "꼼꼼히 봐야 한다고들 합니다",
+                                    "question": "정말 그런가요?"}, "통념확인", 금지), "통념확인형은 통념을 써야 한다"
+
+# 걸리면 다시 쓰게 하고, 고친 글을 쓴다
+응답 = iter([
+    {"hook": "문 열 때 어색한 순간", "body": "처음이 어렵다고들 합니다", "question": "어떠세요?"},
+    {"hook": "중개사무소 첫 마디", "body": "", "question": "첫 마디, 하나만 꼽는다면요?"},
+])
+c_mod.ask_json = lambda *a, **k: next(응답)
+글 = c_mod.compose(Pick(article=None, score=0, reason="", question_topic="문열기|x"), state=기록)
+assert 글.hook == "중개사무소 첫 마디" and 글.shape == "통념확인", (글.hook, 글.shape)
+print("질문 글 틀 반복 통제 통과: 모양 회전, '순간' 제목·통념 반복 시 재생성")
+
+
 sys.exit(code)

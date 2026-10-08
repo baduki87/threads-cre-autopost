@@ -80,7 +80,7 @@ def is_near_duplicate(title: str, previous: list[str], threshold: float = 0.72,
 
 def record(state: dict, *, key: str, title: str, url: str, post_id: str | None,
            kind: str, dry_run: bool, type_: str = "", notion_page: str = "",
-           slot: str = "", closer: str = "") -> dict:
+           slot: str = "", closer: str = "", shape: str = "") -> dict:
     """발행 기록 한 줄. 성과(views/likes/replies)는 며칠 뒤 insights 가 채운다."""
     state.setdefault("posts", []).append(
         {
@@ -93,6 +93,7 @@ def record(state: dict, *, key: str, title: str, url: str, post_id: str | None,
             "type": type_,
             "slot": slot,          # 08 / 17 / 21. 어느 시간대가 잘 되는지 비교용
             "closer": closer,      # 글 끝 한 줄. 같은 문구를 연달아 쓰지 않으려고 남긴다
+            "shape": shape,        # 질문 글의 모양. 같은 틀을 연달아 쓰지 않으려고 남긴다
             "notion_page": notion_page,
             "dry_run": dry_run,
             "views": None,

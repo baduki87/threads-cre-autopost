@@ -106,6 +106,7 @@ class Post:
     # AI 가 쓰지 않고 config/closers.yaml 에서 코드가 골라 붙인다.
     follow_line: str = ""
     tags: list[str] = field(default_factory=list)
+    shape: str = ""        # 질문 글의 모양(compose.QUESTION_SHAPES). 같은 틀 반복을 막으려고 기록한다
 
     def __post_init__(self) -> None:
         # 상한만 막는다. 줄 수를 고정하지 않는 것이 이번 변경의 핵심이다.

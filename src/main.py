@@ -220,6 +220,7 @@ def run_auto() -> int:
         type_=kind,
         slot=slot,
         closer=post.follow_line,
+        shape=post.shape,
         dry_run=False,
     )
     state_mod.save(st)

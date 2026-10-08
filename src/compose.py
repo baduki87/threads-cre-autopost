@@ -108,26 +108,22 @@ QUESTION_PROMPT = """독자에게 던지는 **질문 글**을 작성하세요.
 두 사람이 모두 중개사였습니다.
 
 "A와 B 중 무엇이 더 좋은가" 는 쓰지 마세요. 그렇게 낸 두 건이 연속으로
-좋아요 0 이었습니다. **현장의 한 순간**을 집어내야 합니다.
+좋아요 0 이었습니다. **현장의 구체적인 상황**을 집어내야 합니다.
 
 주제: {label}
 무엇을 물을지: {topic}
 
+## 이번 글의 모양: {shape_name}
+
+{shape_rule}
+
+{title_rule}
+
 지침:
-- **통념을 한 줄 제시하고 그게 맞는지 물으세요.** 이게 핵심입니다.
-  막연히 "어느 쪽이십니까" 만 물으면 답할 거리가 없습니다. 실제로 우리 질문
-  글 5건 중 4건이 그래서 조회 8~126 에 그쳤습니다.
-  팔로워 14명짜리 계정이 좋아요 148·리포스트 37 을 받은 글은 이랬습니다.
-    "1주택자의 상급지 갈아타기 방법이 뭐야?
-     결국 1주택 실거주 하면서 자산을 계속 축적해야 가능한 거 아니야?"
-  뒤에 붙은 한 줄 덕분에 사람들이 "맞다/아니다" 로 답할 수 있었습니다.
-  - 통념은 "~라고들 합니다", "~라는 말이 많습니다" 처럼 **남의 말**로 씁니다
-  - **계정 주인의 판단으로 쓰면 안 됩니다.** 메모 없는 날 판단을 지어내는 것과
-    같습니다. 떠도는 통념을 놓고 독자에게 확인을 구하는 것입니다
 - **배경은 한두 줄이면 충분합니다.** 길게 설명하면 질문이 죽습니다
 - **계정 주인은 답을 내놓지 않습니다.** 묻기만 합니다.
   opinion 은 반드시 빈 문자열입니다
-- question 이 이 글의 전부입니다. 둘 중 하나를 고르게 하세요
+- question 이 이 글의 전부입니다. 읽자마자 한 줄로 답할 수 있어야 합니다
 - 특정인에게 하는 투자 권유로 읽히지 않게, 일반적인 상황으로 물으세요
 - **금액과 특정 지역·단지를 함께 묶지 마세요.** 이게 가장 중요합니다.
   "현금 10억이면 강남 재건축과 마용성 신축 중 어디" 라고 물었다가
@@ -153,6 +149,91 @@ PERFORMANCE_BLOCK = """
 같은 계정, 같은 독자에게서 나온 결과입니다.
 잘 된 쪽의 길이·구조·마무리를 따르세요.
 """
+
+
+# 질문 글의 모양. 코드가 돌려가며 고른다.
+#
+# 09-23 이후 질문 글 11건이 전부 같은 틀이었다.
+#   "~라고들 합니다" → "~라는 말이 많습니다" → "A입니까, B입니까?"
+# 제목 절반이 "~순간". 조회는 올랐지만(중앙값 193 → 293) 진짜 댓글은
+# 13건에 7개 → 11건에 2개로 줄었고, 09-30 이후 7건은 0이었다.
+# 처음 6건이 같은 틀이라 기계로 읽혔던 실패를 그대로 반복한 것이다.
+# 프롬프트에 "다양하게" 라고 써서는 안 바뀐다. 모양을 코드가 정해서 넘긴다.
+QUESTION_SHAPES: dict[str, str] = {
+    "하나만": """**딱 하나만** 꼽아달라고 묻습니다. 답이 한 단어나 짧은 한 줄로 끝나야 합니다.
+  예: "계약서 볼 때 제일 먼저 확인하는 항목, 하나만 꼽는다면요?"
+- 보기를 주지 마세요. 독자가 자기 답을 직접 씁니다
+- "~라고들 합니다" 같은 통념 문장은 쓰지 마세요""",
+    "경험": """독자가 **실제로 겪은 일**을 꺼내게 묻습니다. "그런 적 있으신가요? 뭐 때문이었나요" 형태입니다.
+- 배경 없이 질문으로 바로 들어가도 됩니다. body 는 한 줄이면 충분합니다
+- 보기 둘을 나열하지 마세요
+- "~라고들 합니다" 같은 통념 문장은 쓰지 마세요""",
+    "통념확인": """떠도는 통념 한 줄을 놓고 **맞는지 틀린지**만 묻습니다. "맞다/아니다" 로 답하게 합니다.
+  예: "1주택 실거주하면서 자산을 쌓아야 상급지로 갈 수 있다고들 하죠. 정말 그런가요?"
+- 통념은 반드시 "~라고들 합니다/하죠" 처럼 **남의 말**로 씁니다. 계정 주인의 판단으로 쓰면 안 됩니다
+- 보기 둘을 나열하지 마세요. 질문은 예/아니오로 답할 수 있어야 합니다""",
+    "택일": """둘 중 하나를 고르게 묻습니다. 보기 둘은 **실제 상황의 선택지**여야 합니다.
+  좋음: 전세 만기가 왔을 때 갱신과 매수 중 어느 쪽을
+  나쁨: 대단지와 소단지 중 무엇이 더 좋은가
+- 배경은 상황 설명 한 줄. "~라고들 합니다" 같은 통념 문장은 쓰지 마세요""",
+}
+# 이전 기록에는 모양이 없다. 그때는 전부 택일이었다.
+_DEFAULT_SHAPE = "택일"
+_HEARSAY = ("고들 ", "말이 많", "라고 합니다", "다고 합니다")
+
+
+def _recent_questions(state: dict | None, n: int = 3) -> list[dict]:
+    posts = [p for p in (state or {}).get("posts", [])
+             if p.get("type") == "질문" and not p.get("dry_run")]
+    return posts[-n:]
+
+
+def pick_shape(state: dict | None) -> str:
+    """최근 질문 글에 쓴 모양을 피해서 고른다. 순서는 정의 순서.
+
+    댓글이 끊긴 쪽이 택일·통념이라 그 둘을 뒤에 뒀다.
+    """
+    used = [p.get("shape") or _DEFAULT_SHAPE for p in _recent_questions(state)]
+    for name in QUESTION_SHAPES:
+        if name not in used:
+            return name
+    # 다 썼으면 가장 오래 전에 쓴 것
+    return min(QUESTION_SHAPES, key=lambda k: max(
+        (i for i, u in enumerate(used) if u == k), default=-1))
+
+
+def _hook_of(title: str) -> str:
+    # 기록의 제목은 "[라벨] 제목" 모양이다
+    return title.split("] ", 1)[-1].strip()
+
+
+def _last_word(text: str) -> str:
+    words = text.strip().rstrip(".?!…~ ").split()
+    return words[-1] if words else ""
+
+
+def banned_endings(state: dict | None, n: int = 5) -> set[str]:
+    """최근 질문 글 제목의 마지막 낱말. 같은 말로 끝나는 제목을 막는다."""
+    out = {_last_word(_hook_of(p.get("title", ""))) for p in _recent_questions(state, n)}
+    out.discard("")
+    return out
+
+
+def question_problems(d: dict, shape: str, banned: set[str]) -> list[str]:
+    """질문 글이 틀을 반복하는지 코드로 검사한다. 빈 목록이면 통과."""
+    problems = []
+    hook = str(d.get("hook", "")).strip()
+    if _last_word(hook) in banned or any(hook.rstrip(".?!…~ ").endswith(b) for b in banned):
+        problems.append(f"제목이 최근 글과 같은 말로 끝남: {hook}")
+    if "순간" in hook and "순간" in banned:
+        problems.append(f"제목에 '순간' 이 또 들어감: {hook}")
+    if shape != "통념확인":
+        text = str(d.get("body", "")) + str(d.get("question", ""))
+        if any(h in text for h in _HEARSAY):
+            problems.append("통념 문장('~라고들 합니다')을 또 씀")
+    if not str(d.get("question", "")).strip():
+        problems.append("질문이 비어 있음")
+    return problems
 
 
 def _voice(path: str = "config/voice.md") -> str:
@@ -220,6 +301,7 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
         system += performance_context(state)
 
     want_question = False
+    shape = ""
 
     if pick.is_memo:
         m: Memo = pick.memo
@@ -235,8 +317,14 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
     elif pick.is_question:
         want_question = True
         label, topic = (pick.question_topic or "질문|").split("|", 1)
+        shape = pick_shape(state)
+        banned = banned_endings(state)
         prompt = QUESTION_PROMPT.format(
             label=label, topic=topic.strip(),
+            shape_name=shape, shape_rule=QUESTION_SHAPES[shape],
+            title_rule=(
+                "제목은 다음 말로 끝내지 마세요(최근 질문 글이 이렇게 끝났습니다): "
+                + ", ".join(sorted(banned)) if banned else ""),
             spec=_spec(allow_opinion=False, lines="1~3", want_question=True,
                        detail_from="질문 글에는 첫 댓글을 달지 않습니다. 빈 문자열입니다."),
         )
@@ -261,6 +349,21 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
         )
 
     d = ask_json(system, prompt, effort="high")
+
+    if pick.is_question:
+        # 프롬프트로 부탁만 하면 같은 틀로 돌아간다. 걸리면 이유를 붙여 다시 쓰게 한다.
+        for _ in range(2):
+            problems = question_problems(d, shape, banned)
+            if not problems:
+                break
+            print(f"[compose] 질문 글 다시 생성: {' / '.join(problems)}")
+            d = ask_json(system, prompt + "\n\n## 방금 쓴 글의 문제\n"
+                         + "\n".join(f"- {x}" for x in problems)
+                         + "\n위 문제를 고쳐서 다시 쓰세요.", effort="high")
+        else:
+            problems = question_problems(d, shape, banned)
+            if problems:
+                print(f"[compose] 두 번 고쳐도 남은 문제(그대로 씁니다): {' / '.join(problems)}")
 
     opinion = str(d.get("opinion", "")).strip()
     if not pick.is_memo and opinion:
@@ -290,6 +393,7 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
         card_headline=str(d.get("card_headline", "")).strip(),
         source_line=str(d.get("source_line", "")).strip(),
         tags=[],   # 이 계정은 해시태그를 쓰지 않는다
+        shape=shape if pick.is_question else "",
     )
 
     text = post.render_text()
