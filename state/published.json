@@ -1270,6 +1270,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-10T00:19:36+09:00",
+      "key": "question-갱신연락-2026-10-10",
+      "title": "[갱신연락] 전세 만기 갱신 연락을 꺼내는 타이밍",
+      "url": "",
+      "post_id": "17911710510497028",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "답글로 의견 남겨주시면 다음 글에 참고하겠습니다.",
+      "shape": "경험",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
