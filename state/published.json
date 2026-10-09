@@ -1287,6 +1287,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-10T03:20:34+09:00",
+      "key": "fallback-AI계약서-2026-10-10",
+      "title": "[AI계약서] 계약서 특약 누락을 AI로 검토하는 3단계 방법입니다",
+      "url": "",
+      "post_id": "17923971582429722",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "",
+      "notion_page": "3f481007-7564-81d0-a4af-d93274c0926f",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
