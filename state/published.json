@@ -1338,6 +1338,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-11T02:19:53+09:00",
+      "key": "fallback-AI한계-2026-10-11",
+      "title": "[AI한계] 부동산에서 AI에 의존하면 실패하는 3가지 영역",
+      "url": "",
+      "post_id": "18376484593214212",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "",
+      "notion_page": "3f581007-7564-81ee-ba9a-c500a22ed95d",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
