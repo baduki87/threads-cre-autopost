@@ -1321,6 +1321,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-10T23:30:05+09:00",
+      "key": "question-입주하자-2026-10-10",
+      "title": "[입주하자] 입주 첫날 발견한 하자, 첫 연락처",
+      "url": "",
+      "post_id": "18069656564756186",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "다른 기준으로 보시는 분도 계실 겁니다.",
+      "shape": "통념확인",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
