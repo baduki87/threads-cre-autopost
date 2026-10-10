@@ -1304,10 +1304,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-10T11:25:52+09:00",
+      "key": "fallback-관리사무소-2026-10-10",
+      "title": "[관리사무소] 관리사무소에서 파악해야 할 핵심 체크리스트 2편",
+      "url": "",
+      "post_id": "18223126264355650",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "임장 다니며 정리한 것들을 올립니다.",
+      "shape": "",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ],
-  "series": {
-    "label": "관리사무소",
-    "date": "2026-10-09T11:57:48+09:00"
-  }
+  ]
 }
