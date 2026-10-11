@@ -1389,6 +1389,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-12T02:41:15+09:00",
+      "key": "fallback-AI도구-2026-10-12",
+      "title": "[AI도구] 부동산 실무에서 실제로 활용하는 AI 용도 3가지입니다",
+      "url": "",
+      "post_id": "18097142657389317",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "",
+      "notion_page": "3f681007-7564-8157-94db-ed7dacbd470f",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
