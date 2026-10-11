@@ -1372,6 +1372,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-11T23:56:34+09:00",
+      "key": "question-단점묻기-2026-10-11",
+      "title": "[단점묻기] 집 보러 가서 \"이 집 단점이 뭡니까\" 물어보십니까",
+      "url": "",
+      "post_id": "18117107426071310",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "생각이 갈리는 지점이라 궁금합니다.",
+      "shape": "택일",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
