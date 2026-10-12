@@ -450,5 +450,17 @@ c_mod.ask_json = lambda *a, **k: next(응답)
 assert 글.hook == "중개사무소 첫 마디" and 글.shape == "통념확인", (글.hook, 글.shape)
 print("질문 글 틀 반복 통제 통과: 모양 회전, '순간' 제목·통념 반복 시 재생성")
 
+# 가격·가치 판단 문장은 메모 없는 글에서 코드가 막는다.
+#   10-12 빌딩 첫 시험에서 "매도 사유에 따라 가격 협상 폭이 달라집니다" 가 나왔다.
+assert c_mod.judgment_sentences("매도 사유에 따라 가격 협상 폭이 달라집니다.")
+assert c_mod.judgment_sentences("1층 공실이 길면 건물 가치가 떨어집니다.")
+assert not c_mod.judgment_sentences("수익률을 계산할 때 보증금을 먼저 뺍니다."), "방법 문장까지 막았다"
+assert not c_mod.judgment_sentences("시세는 반드시 원출처로 확인하세요.")
+응답 = iter([{"hook": "빌딩 중개사에게 할 질문", "body": "1. 매각 배경을 묻습니다.\n사유에 따라 가격 협상 폭이 달라집니다."}] * 3)
+c_mod.ask_json = lambda *a, **k: next(응답)
+글 = c_mod.compose(Pick(article=None, score=0, reason="", fallback_topic="빌딩중개사대화|x"))
+assert "협상 폭" not in 글.body and "매각 배경" in 글.body, 글.body
+print("판단 문장 통제 통과: 두 번 다시 써도 남으면 코드가 지운다, 방법 문장은 통과")
+
 
 sys.exit(code)

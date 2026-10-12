@@ -6,6 +6,8 @@
 """
 from __future__ import annotations
 
+import re
+
 from .llm import ask_json
 from .models import Memo, Pick, Post
 
@@ -28,7 +30,10 @@ _FIELDS = """{{
 - **출처를 쓰지 마세요.** source_line 은 항상 빈 문자열입니다.
   반응 좋은 계정 중 출처를 붙이는 곳이 하나도 없습니다
 - 제목을 매번 '~습니다' 로 끝내지 마세요. 명사로 끊거나 수치로 시작해도 됩니다
-- tags 는 항상 빈 배열입니다 — 이 계정은 해시태그를 쓰지 않습니다"""
+- tags 는 항상 빈 배열입니다 — 이 계정은 해시태그를 쓰지 않습니다
+- **가격·시세·가치·수익률·임대료가 어떻게 된다(오른다, 달라진다, 유리하다 등)는 문장은 쓰지 마세요.**
+  "매도 사유에 따라 가격 협상 폭이 달라집니다" 같은 문장도 판단입니다.
+  무엇을 확인하는지만 쓰고, 그래서 값이 어떻게 되는지는 쓰지 않습니다"""
 
 MEMO_PROMPT = """아래는 작성자가 현장에서 직접 남긴 메모입니다.
 이걸 스레드 게시물로 다듬으세요.
@@ -236,6 +241,55 @@ def question_problems(d: dict, shape: str, banned: set[str]) -> list[str]:
     return problems
 
 
+# 가격·가치 판단 문장. 메모 없는 글에서는 코드로 걸러낸다.
+#
+# 빌딩 전환 첫 시험(10-12)에서 "매도 사유에 따라 가격 협상 폭이 달라집니다" 가 나왔다.
+# 일반론이지만 공인중개사 이름으로 나가면 판단으로 읽힌다(정한 것 1번).
+# 프롬프트 지시만으로는 안 막히므로 "값을 뜻하는 말 + 변화·우열을 뜻하는 말" 이
+# 한 문장에 같이 있으면 판단으로 본다. "수익률을 계산할 때" 처럼 방법만 말하는 문장은 통과한다.
+_VALUE_WORDS = ("가격", "협상", "시세", "가치", "수익률", "수익", "임대료", "매매가",
+                "몸값", "프리미엄", "집값", "땅값", "건물값", "호가", "보증금", "월세")
+_JUDGE_WORDS = ("달라", "오르", "올라", "오릅", "내려", "내립", "떨어", "높아", "낮아",
+                "커지", "커집", "줄어", "늘어", "좌우", "결정됩", "결정된", "유리", "불리",
+                "상승", "하락", "깎", "협상력", "협상 폭", "협상폭", "저평가", "고평가",
+                "호재", "악재", "전망", "기대할 수", "벌 수", "남는 장사")
+
+
+def judgment_sentences(text: str) -> list[str]:
+    """값(가격·수익률 등)과 변화·우열 표현이 한 문장에 같이 있는 문장들."""
+    out = []
+    for line in text.splitlines():
+        for sent in re.split(r"(?<=[.!?])\s+", line.strip()):
+            if any(v in sent for v in _VALUE_WORDS) and any(j in sent for j in _JUDGE_WORDS):
+                out.append(sent.strip())
+    return [x for x in out if x]
+
+
+def strip_judgments(text: str) -> tuple[str, list[str]]:
+    """판단 문장을 지운다. 문장이 지워져 빈 줄이 된 줄은 줄째로 지운다."""
+    removed, lines = [], []
+    for line in text.splitlines():
+        sents = re.split(r"(?<=[.!?])\s+", line.strip())
+        keep = []
+        for sent in sents:
+            if any(v in sent for v in _VALUE_WORDS) and any(j in sent for j in _JUDGE_WORDS):
+                removed.append(sent.strip())
+            else:
+                keep.append(sent)
+        joined = " ".join(k for k in keep if k).strip()
+        # 번호만 남은 줄("2.")은 지운다
+        if joined and not re.fullmatch(r"\d+[.)]?", joined):
+            lines.append(joined)
+    return "\n".join(lines), removed
+
+
+def _judgment_problems(d: dict) -> list[str]:
+    found = []
+    for key in ("hook", "body", "question", "detail"):
+        found += judgment_sentences(str(d.get(key, "")))
+    return [f"가격·가치 판단 문장: \"{x}\"" for x in found]
+
+
 def _voice(path: str = "config/voice.md") -> str:
     with open(path, encoding="utf-8") as f:
         return f.read()
@@ -350,20 +404,36 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
 
     d = ask_json(system, prompt, effort="high")
 
-    if pick.is_question:
-        # 프롬프트로 부탁만 하면 같은 틀로 돌아간다. 걸리면 이유를 붙여 다시 쓰게 한다.
-        for _ in range(2):
-            problems = question_problems(d, shape, banned)
-            if not problems:
-                break
-            print(f"[compose] 질문 글 다시 생성: {' / '.join(problems)}")
-            d = ask_json(system, prompt + "\n\n## 방금 쓴 글의 문제\n"
-                         + "\n".join(f"- {x}" for x in problems)
-                         + "\n위 문제를 고쳐서 다시 쓰세요.", effort="high")
-        else:
-            problems = question_problems(d, shape, banned)
-            if problems:
-                print(f"[compose] 두 번 고쳐도 남은 문제(그대로 씁니다): {' / '.join(problems)}")
+    def _problems(d: dict) -> list[str]:
+        out = []
+        if pick.is_question:
+            out += question_problems(d, shape, banned)
+        if not pick.is_memo:
+            # 메모 글의 판단은 서프로님 본인 말이라 걸지 않는다
+            out += _judgment_problems(d)
+        return out
+
+    # 프롬프트로 부탁만 하면 같은 틀·같은 실수로 돌아간다. 걸리면 이유를 붙여 다시 쓰게 한다.
+    for _ in range(2):
+        problems = _problems(d)
+        if not problems:
+            break
+        print(f"[compose] 다시 생성: {' / '.join(problems)}")
+        d = ask_json(system, prompt + "\n\n## 방금 쓴 글의 문제\n"
+                     + "\n".join(f"- {x}" for x in problems)
+                     + "\n위 문제를 고쳐서 다시 쓰세요.", effort="high")
+    else:
+        problems = _problems(d)
+        if problems:
+            print(f"[compose] 두 번 고쳐도 남은 문제: {' / '.join(problems)}")
+
+    if not pick.is_memo:
+        # 그래도 남은 판단 문장은 코드가 지운다. 제목에 있으면 제목은 남기되 경고만 남긴다.
+        for key in ("body", "question", "detail"):
+            cleaned, removed = strip_judgments(str(d.get(key, "")))
+            if removed:
+                print(f"[compose] 판단 문장 제거({key}): {' / '.join(removed)}")
+                d[key] = cleaned
 
     opinion = str(d.get("opinion", "")).strip()
     if not pick.is_memo and opinion:
