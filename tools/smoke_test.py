@@ -270,9 +270,9 @@ print("마무리 한 줄 통과: 회전·영업문구 차단·본문 결합")
 from src.select import fallback_by_label  # noqa: E402
 st2 = {}
 assert state_mod.pending_series(st2) is None
-state_mod.set_pending_series(st2, "단지파악")
-assert state_mod.pending_series(st2) == "단지파악"
-두편 = fallback_by_label("단지파악")
+state_mod.set_pending_series(st2, "건물외관")
+assert state_mod.pending_series(st2) == "건물외관"
+두편 = fallback_by_label("건물외관")
 assert 두편 and 두편.part == 2, 두편
 state_mod.clear_pending_series(st2)
 assert state_mod.pending_series(st2) is None, "2편을 내고도 연재가 남았다"
