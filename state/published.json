@@ -1440,6 +1440,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-13T06:15:29+09:00",
+      "key": "fallback-AI빌딩등기부-2026-10-13",
+      "title": "[AI빌딩등기부] 빌딩 등기부등본, AI로 검토할 때 놓치지 않는 3단계",
+      "url": "",
+      "post_id": "18138867721578594",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "",
+      "notion_page": "3f781007-7564-811b-91f4-e89f800be43d",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
