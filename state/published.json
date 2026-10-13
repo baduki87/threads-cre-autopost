@@ -1474,6 +1474,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-14T00:58:58+09:00",
+      "key": "question-임차인바람-2026-10-14",
+      "title": "[임차인바람] 임대인과 임차인의 입장 차이",
+      "url": "",
+      "post_id": "18079987193435388",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "다른 기준으로 보시는 분도 계실 겁니다.",
+      "shape": "경험",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
