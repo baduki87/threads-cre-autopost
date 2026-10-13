@@ -1457,6 +1457,27 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-13T12:38:41+09:00",
+      "key": "fallback-첫건물실수-2026-10-13",
+      "title": "[첫건물실수] 첫 꼬마빌딩 매수 시 임대차 현황표만 믿으면 안 됩니다",
+      "url": "",
+      "post_id": "18125447500892181",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "현장에서 직접 본 것만 적습니다.",
+      "shape": "",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ]
+  ],
+  "series": {
+    "label": "첫건물실수",
+    "date": "2026-10-13T12:36:36+09:00"
+  }
 }
