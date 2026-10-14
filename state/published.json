@@ -1525,6 +1525,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-15T02:05:55+09:00",
+      "key": "fallback-AI건축물대장-2026-10-15",
+      "title": "[AI건축물대장] 건축물대장 분석을 AI로 빠르게 끝내는 3단계",
+      "url": "",
+      "post_id": "18125356786911395",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "",
+      "notion_page": "3f981007-7564-8131-a3c8-cfafa50c251c",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
