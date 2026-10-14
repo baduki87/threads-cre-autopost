@@ -1508,6 +1508,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-14T22:44:33+09:00",
+      "key": "question-건물주바람-2026-10-14",
+      "title": "[건물주바람] 건물주와 중개사 사이의 오랜 통념",
+      "url": "",
+      "post_id": "17871339306644112",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "생각이 갈리는 지점이라 궁금합니다.",
+      "shape": "통념확인",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
