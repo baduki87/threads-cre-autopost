@@ -1491,10 +1491,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-14T10:58:58+09:00",
+      "key": "fallback-첫건물실수-2026-10-14",
+      "title": "[첫건물실수] 첫 건물 매수 시 위반건축물 위험을 피하는 확인 절차",
+      "url": "",
+      "post_id": "18169468036481500",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "건물 보러 다니며 정리한 것들을 올립니다.",
+      "shape": "",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ],
-  "series": {
-    "label": "첫건물실수",
-    "date": "2026-10-13T12:36:36+09:00"
-  }
+  ]
 }
