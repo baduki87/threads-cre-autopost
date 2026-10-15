@@ -1559,6 +1559,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-15T22:25:24+09:00",
+      "key": "question-낡은건물걱정-2026-10-15",
+      "title": "[낡은건물걱정] 오래된 건물 매수 전 가장 먼저 확인하는 설비",
+      "url": "",
+      "post_id": "18098447816552465",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "답글로 의견 남겨주시면 다음 글에 참고하겠습니다.",
+      "shape": "택일",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
