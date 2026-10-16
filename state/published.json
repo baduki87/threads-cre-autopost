@@ -1593,10 +1593,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-16T10:27:51+09:00",
+      "key": "fallback-건물사전조사-2026-10-16",
+      "title": "[건물사전조사] 현장 출발 전 30분 만에 끝내는 건물 등기부등본 확인 순서입니다",
+      "url": "",
+      "post_id": "18126317579512236",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "현장에서 직접 본 것만 적습니다.",
+      "shape": "",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ],
-  "series": {
-    "label": "건물사전조사",
-    "date": "2026-10-15T10:32:08+09:00"
-  }
+  ]
 }
