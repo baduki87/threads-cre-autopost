@@ -1627,6 +1627,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-17T01:34:36+09:00",
+      "key": "fallback-AI매물장-2026-10-16",
+      "title": "[AI매물장] 빌딩 매물 관리를 AI로 바꾸는 방법",
+      "url": "",
+      "post_id": "18034535009665685",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "",
+      "notion_page": "3fb81007-7564-81a4-9442-c16b007a67d2",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
