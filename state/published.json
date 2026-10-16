@@ -1610,6 +1610,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-16T22:15:21+09:00",
+      "key": "question-빌딩공동중개-2026-10-16",
+      "title": "[빌딩공동중개] 빌딩 공동중개에서 가장 먼저 틀어지는 순간",
+      "url": "",
+      "post_id": "18033115721904703",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "다른 기준으로 보시는 분도 계실 겁니다.",
+      "shape": "하나만",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
