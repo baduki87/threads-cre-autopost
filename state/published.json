@@ -1678,6 +1678,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-18T00:29:12+09:00",
+      "key": "fallback-AI안내문-2026-10-17",
+      "title": "[AI안내문] 건물주와 매수자 안내문, AI 초안 작성 3단계",
+      "url": "",
+      "post_id": "18355865482218724",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "",
+      "notion_page": "3fc81007-7564-815d-bf8f-f3b154652fb8",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
