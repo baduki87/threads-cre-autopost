@@ -1661,6 +1661,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-17T21:11:14+09:00",
+      "key": "question-임대현수막-2026-10-17",
+      "title": "[임대현수막] 길가다 보이는 임대 현수막 번호",
+      "url": "",
+      "post_id": "18011643128969399",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "생각이 갈리는 지점이라 궁금합니다.",
+      "shape": "경험",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
