@@ -1644,6 +1644,27 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-17T10:22:44+09:00",
+      "key": "fallback-임대차현황표-2026-10-17",
+      "title": "[임대차현황표] 건물 매수 시 렌트롤에서 먼저 대조할 2가지",
+      "url": "",
+      "post_id": "18096338135553438",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "건물 보러 다니며 정리한 것들을 올립니다.",
+      "shape": "",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ]
+  ],
+  "series": {
+    "label": "임대차현황표",
+    "date": "2026-10-17T10:21:15+09:00"
+  }
 }
