@@ -1712,6 +1712,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-18T21:37:01+09:00",
+      "key": "question-주차결정-2026-10-18",
+      "title": "[주차결정] 꼬마빌딩은 주차 대수가 수익률보다 먼저라는 말이 있습니다",
+      "url": "",
+      "post_id": "18120338659941239",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "답글로 의견 남겨주시면 다음 글에 참고하겠습니다.",
+      "shape": "통념확인",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
