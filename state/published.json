@@ -1695,10 +1695,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-18T10:09:46+09:00",
+      "key": "fallback-임대차현황표-2026-10-18",
+      "title": "[임대차현황표] 임대차 현황표 검토 시 교차 대조할 3가지",
+      "url": "",
+      "post_id": "17892646278447759",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "양재역 라인 빌딩을 발로 뛰며 기록합니다.",
+      "shape": "",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ],
-  "series": {
-    "label": "임대차현황표",
-    "date": "2026-10-17T10:21:15+09:00"
-  }
+  ]
 }
