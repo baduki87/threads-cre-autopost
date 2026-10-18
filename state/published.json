@@ -1729,6 +1729,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-19T00:48:58+09:00",
+      "key": "fallback-AI건물임장메모-2026-10-18",
+      "title": "[AI건물임장메모] 건물 임장 사진과 메모를 AI로 정리하는 3단계 순서입니다",
+      "url": "",
+      "post_id": "18215506168361108",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "",
+      "notion_page": "3fd81007-7564-81ca-b2e3-d6ba8e2a5c76",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
