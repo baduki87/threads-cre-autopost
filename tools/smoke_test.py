@@ -462,5 +462,23 @@ c_mod.ask_json = lambda *a, **k: next(응답)
 assert "협상 폭" not in 글.body and "매각 배경" in 글.body, 글.body
 print("판단 문장 통제 통과: 두 번 다시 써도 남으면 코드가 지운다, 방법 문장은 통과")
 
+# 서프로님이 한 적 없는 경험·법률 단정·없는 내용 가리키기·아파트 글도 막는다 (10-19)
+#   "건물을 관리하며 양쪽의 입장을 모두 봅니다" / "법적 대항력에 문제가 생깁니다" / "아래의 검증 프롬프트로"
+_걸림 = lambda t: [n for n, _ in c_mod.flagged_sentences(t)]
+assert _걸림("건물을 관리하며 양쪽의 입장을 모두 봅니다.") == ["서프로님이 한 적 없는 경험"]
+assert _걸림("명의가 다른 경우 법적 대항력에 문제가 생깁니다.") == ["법률 결과 단정"]
+assert _걸림("3단계: 아래의 검증 프롬프트로 원본과 대조합니다.") == ["본문에 없는 내용을 가리킴"]
+assert not _걸림("사업자등록증상 명의와 계약서상 임차인이 같은지 확인합니다."), "확인 방법까지 막았다"
+assert not _걸림("대항력 요건은 법률 전문가 확인이 필요한 지점입니다."), "전문가 확인 안내까지 막았다"
+assert not _걸림("나머지는 다음 글에서 이어서 정리하겠습니다."), "연재 예고까지 막았다"
+응답 = iter([{"hook": "오래된 아파트 리모델링", "body": "건물을 관리하며 양쪽을 봅니다.\n1. 서류를 봅니다."}] * 3)
+c_mod.ask_json = lambda *a, **k: next(응답)
+글 = c_mod.compose(Pick(article=None, score=0, reason="", fallback_topic="건물외관|x"))
+assert "관리하며" not in 글.body and "서류를 봅니다" in 글.body, 글.body
+닫는말 = open("config/closers.yaml", encoding="utf-8").read()
+for 금지 in ("직접 본 것만", "직접 써보고", "실제로 쓰는", "중개하며 알게"):
+    assert 금지 not in 닫는말, f"글 끝 문장이 하지 않은 일을 말한다: {금지}"
+print("경험·법률·가리킴 통제 통과: 지어낸 경험·법률 단정·없는 내용 가리키기 차단, 확인 방법은 통과")
+
 
 sys.exit(code)

@@ -33,7 +33,13 @@ _FIELDS = """{{
 - tags 는 항상 빈 배열입니다 — 이 계정은 해시태그를 쓰지 않습니다
 - **가격·시세·가치·수익률·임대료가 어떻게 된다(오른다, 달라진다, 유리하다 등)는 문장은 쓰지 마세요.**
   "매도 사유에 따라 가격 협상 폭이 달라집니다" 같은 문장도 판단입니다.
-  무엇을 확인하는지만 쓰고, 그래서 값이 어떻게 되는지는 쓰지 않습니다"""
+  무엇을 확인하는지만 쓰고, 그래서 값이 어떻게 되는지는 쓰지 않습니다
+- **계정 주인이 한 적 없는 일을 했다고 쓰지 마세요.** "건물을 관리하며", "제가 보니", "중개하며 겪어보니",
+  "써보니" 같은 경험담은 계정 주인이 직접 준 메모에만 있습니다. 이 글은 방법·개념만 씁니다
+- **법률 결과를 단정하지 마세요.** "대항력에 문제가 생깁니다", "무효가 됩니다" 처럼 쓰지 말고
+  "법률 전문가 확인이 필요한 지점입니다" 로 씁니다
+- **"아래의 ~", "다음 프롬프트" 처럼 본문에 없는 내용을 가리키지 마세요.** 필요한 문장은 본문에 직접 씁니다
+- 주제는 빌딩(꼬마빌딩·상가건물)입니다. 아파트 이야기를 쓰지 마세요"""
 
 MEMO_PROMPT = """아래는 작성자가 현장에서 직접 남긴 메모입니다.
 이걸 스레드 게시물로 다듬으세요.
@@ -176,6 +182,8 @@ QUESTION_SHAPES: dict[str, str] = {
     "통념확인": """떠도는 통념 한 줄을 놓고 **맞는지 틀린지**만 묻습니다. "맞다/아니다" 로 답하게 합니다.
   예: "1주택 실거주하면서 자산을 쌓아야 상급지로 갈 수 있다고들 하죠. 정말 그런가요?"
 - 통념은 반드시 "~라고들 합니다/하죠" 처럼 **남의 말**로 씁니다. 계정 주인의 판단으로 쓰면 안 됩니다
+- **건물주·임차인·손님을 나쁘게 그리는 통념은 쓰지 마세요.** 이 계정은 건물주의 믿음을 얻어야 합니다.
+  (10-14 "건물주는 일 잘하는 중개사보다 수수료 깎아주는 곳을 선호한다고들" → 건물주들이 "아니다" 로 반박)
 - 보기 둘을 나열하지 마세요. 질문은 예/아니오로 답할 수 있어야 합니다""",
     "택일": """둘 중 하나를 고르게 묻습니다. 보기 둘은 **실제 상황의 선택지**여야 합니다.
   좋음: 전세 만기가 왔을 때 갱신과 매수 중 어느 쪽을
@@ -255,24 +263,65 @@ _JUDGE_WORDS = ("달라", "오르", "올라", "오릅", "내려", "내립", "떨
                 "호재", "악재", "전망", "기대할 수", "벌 수", "남는 장사")
 
 
-def judgment_sentences(text: str) -> list[str]:
-    """값(가격·수익률 등)과 변화·우열 표현이 한 문장에 같이 있는 문장들."""
-    out = []
+def _is_judgment(sent: str) -> bool:
+    return any(v in sent for v in _VALUE_WORDS) and any(j in sent for j in _JUDGE_WORDS)
+
+
+# 서프로님이 한 적 없는 경험을 AI 가 지어내는 문장. 10-14 "건물을 관리하며 양쪽의 입장을 모두 봅니다"
+# (서프로님: "내가 한 적 없는 것을 했다고 하지마"). 경험담은 메모 글에만 있어야 한다.
+_EXPERIENCE_RE = re.compile(
+    r"(관리하(며|면서)|중개하(며|면서)|운영하(며|면서)"
+    r"|(?:^|[\s\"'“(])(제가|저는|저희|제 (경험|고객|손님|사무실|사무소))"  # '문제가' 의 '제가' 는 아니다
+    r"|경험상|겪어 ?보니|해 ?보니|써 ?보니|다녀 ?보니|만나 ?보(면|니)"
+    r"|직접 (보고|가 ?보|만나|겪|써 ?보)|현장에서 (보면|보니|만나|자주 보))")
+
+# 법률 결과 단정. 10-13 "명의가 다른 경우 법적 대항력에 문제가 생깁니다".
+_LEGAL_TERMS = ("대항력", "우선변제", "무효", "효력", "법적", "법률상", "소송", "처벌", "과태료",
+                "이행강제금", "손해배상", "계약 해제", "권리금 회수")
+_ASSERT_RE = re.compile(r"(생깁니다|생긴다|발생합니다|발생한다|없습니다|없다|잃습니다|잃는다"
+                        r"|됩니다|된다|집니다|진다|부과|물어야|물게|인정되|인정받)")
+
+# 본문에 없는 내용을 가리키는 문장. 10-15 "아래의 검증 프롬프트로 원본과 대조를 시작합니다"(본문에 없음).
+_DANGLING_RE = re.compile(r"(아래|다음)(의)? ?(검증 )?(프롬프트|표|문장|예시|내용|체크리스트|질문)")
+
+SENTENCE_RULES: list[tuple[str, object]] = [
+    ("가격·가치 판단", _is_judgment),
+    ("서프로님이 한 적 없는 경험", lambda s: bool(_EXPERIENCE_RE.search(s))),
+    ("법률 결과 단정", lambda s: any(t in s for t in _LEGAL_TERMS) and bool(_ASSERT_RE.search(s))),
+    ("본문에 없는 내용을 가리킴", lambda s: bool(_DANGLING_RE.search(s))),
+]
+
+
+def _sentences(text: str):
     for line in text.splitlines():
         for sent in re.split(r"(?<=[.!?])\s+", line.strip()):
-            if any(v in sent for v in _VALUE_WORDS) and any(j in sent for j in _JUDGE_WORDS):
-                out.append(sent.strip())
-    return [x for x in out if x]
+            if sent.strip():
+                yield sent.strip()
+
+
+def judgment_sentences(text: str) -> list[str]:
+    """값(가격·수익률 등)과 변화·우열 표현이 한 문장에 같이 있는 문장들."""
+    return [s for s in _sentences(text) if _is_judgment(s)]
+
+
+def flagged_sentences(text: str) -> list[tuple[str, str]]:
+    """규칙에 걸린 (규칙 이름, 문장). 메모 없는 글에만 쓴다."""
+    out = []
+    for sent in _sentences(text):
+        for name, rule in SENTENCE_RULES:
+            if rule(sent):
+                out.append((name, sent)); break
+    return out
 
 
 def strip_judgments(text: str) -> tuple[str, list[str]]:
-    """판단 문장을 지운다. 문장이 지워져 빈 줄이 된 줄은 줄째로 지운다."""
+    """규칙에 걸린 문장을 지운다. 문장이 지워져 빈 줄이 된 줄은 줄째로 지운다."""
     removed, lines = [], []
     for line in text.splitlines():
         sents = re.split(r"(?<=[.!?])\s+", line.strip())
         keep = []
         for sent in sents:
-            if any(v in sent for v in _VALUE_WORDS) and any(j in sent for j in _JUDGE_WORDS):
+            if sent.strip() and any(rule(sent) for _, rule in SENTENCE_RULES):
                 removed.append(sent.strip())
             else:
                 keep.append(sent)
@@ -286,8 +335,12 @@ def strip_judgments(text: str) -> tuple[str, list[str]]:
 def _judgment_problems(d: dict) -> list[str]:
     found = []
     for key in ("hook", "body", "question", "detail"):
-        found += judgment_sentences(str(d.get(key, "")))
-    return [f"가격·가치 판단 문장: \"{x}\"" for x in found]
+        found += flagged_sentences(str(d.get(key, "")))
+    out = [f"{name} 문장: \"{x}\"" for name, x in found]
+    # 빌딩 전환(10-12) 뒤 아파트 글이 섞였다(10-12 하자점검, 10-13 리모델링)
+    if any("아파트" in str(d.get(k, "")) for k in ("hook", "body", "question")):
+        out.append("빌딩 계정인데 아파트 이야기를 씀")
+    return out
 
 
 def _voice(path: str = "config/voice.md") -> str:
@@ -432,7 +485,7 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
         for key in ("body", "question", "detail"):
             cleaned, removed = strip_judgments(str(d.get(key, "")))
             if removed:
-                print(f"[compose] 판단 문장 제거({key}): {' / '.join(removed)}")
+                print(f"[compose] 규칙 위반 문장 제거({key}): {' / '.join(removed)}")
                 d[key] = cleaned
 
     opinion = str(d.get("opinion", "")).strip()
