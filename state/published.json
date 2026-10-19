@@ -1746,6 +1746,27 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-19T10:22:57+09:00",
+      "key": "fallback-빌딩중개사대화-2026-10-19",
+      "title": "[빌딩중개사대화] 빌딩 중개사무소에서 진짜 정보를 얻는 첫 질문 2가지",
+      "url": "",
+      "post_id": "18127370023859366",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "현장에서 직접 본 것만 적습니다.",
+      "shape": "",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ]
+  ],
+  "series": {
+    "label": "빌딩중개사대화",
+    "date": "2026-10-19T10:20:36+09:00"
+  }
 }
