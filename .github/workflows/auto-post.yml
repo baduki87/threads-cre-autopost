@@ -9,8 +9,9 @@ name: 자동 발행 (08시 · 17시)
 on:
   schedule:
     # 정각을 피한다. 정각은 전 세계 예약이 몰려 실제로 2~5시간씩 밀렸다.
-    - cron: "17 23 * * *"   # KST 08:17 (전날 UTC 23:17)
-    - cron: "17 8 * * *"    # KST 17:17
+    # 2026-10-19: 3시간 앞당김. 빌딩 첫 주 실측으로 실제 발행이 3~10시간 밀렸다(17시 글이 밤 9시~새벽 3시).
+    - cron: "17 20 * * *"   # KST 05:17 예약 → 08시 슬롯 (전날 UTC 20:17)
+    - cron: "17 5 * * *"    # KST 14:17 예약 → 17시 슬롯
   workflow_dispatch:
     inputs:
       slot:
@@ -57,7 +58,7 @@ jobs:
         run: |
           if [ -n "${{ inputs.slot }}" ]; then
             echo "value=${{ inputs.slot }}" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.schedule }}" = "17 23 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "17 20 * * *" ]; then
             echo "value=08" >> "$GITHUB_OUTPUT"
           else
             echo "value=17" >> "$GITHUB_OUTPUT"

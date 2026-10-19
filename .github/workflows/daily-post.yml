@@ -5,7 +5,8 @@ name: 밤 9시 발행
 on:
   schedule:
     # KST 21:00 = UTC 12:00. Actions cron 은 UTC 기준이다.
-    - cron: "13 12 * * *"
+    # 2026-10-19: 3시간 앞당김. 빌딩 첫 주 실측으로 실제 발행이 3~10시간 밀렸다(17시 글이 밤 9시~새벽 3시).
+    - cron: "13 9 * * *"    # KST 18:13 예약 → 21시 슬롯
   workflow_dispatch:
     inputs:
       dry_run:
