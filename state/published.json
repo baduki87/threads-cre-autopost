@@ -1780,6 +1780,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-20T01:29:42+09:00",
+      "key": "fallback-AI렌트롤-2026-10-19",
+      "title": "[AI렌트롤] 빌딩 임대차 현황표를 AI로 검토하는 3가지 방법",
+      "url": "",
+      "post_id": "18396494836201340",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "",
+      "notion_page": "3fe81007-7564-8139-8987-ee56ae872bb0",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
