@@ -1797,10 +1797,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-20T08:39:38+09:00",
+      "key": "fallback-빌딩중개사대화-2026-10-20",
+      "title": "[빌딩중개사대화] 빌딩 중개사무소에서 던져야 할 핵심 질문 2가지 [2편]",
+      "url": "",
+      "post_id": "17911080750483686",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "양재역 라인 빌딩을 중개합니다.",
+      "shape": "",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
-  ],
-  "series": {
-    "label": "빌딩중개사대화",
-    "date": "2026-10-19T10:20:36+09:00"
-  }
+  ]
 }
