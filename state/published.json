@@ -1763,6 +1763,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-19T19:46:59+09:00",
+      "key": "question-건물첫눈-2026-10-19",
+      "title": "[건물첫눈] 건물 보러 가서 가장 먼저 확인하는 자리",
+      "url": "",
+      "post_id": "18126304207894309",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "다른 기준으로 보시는 분도 계실 겁니다.",
+      "shape": "택일",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
