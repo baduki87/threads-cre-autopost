@@ -1831,6 +1831,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-20T23:20:22+09:00",
+      "key": "fallback-AI지도-2026-10-20",
+      "title": "[AI지도] 건물 공실 지도를 직접 제작하는 AI 3단계 과정입니다",
+      "url": "",
+      "post_id": "18114121268126771",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "",
+      "notion_page": "3ff81007-7564-8147-960e-e9a4a58ab441",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ]
 }
