@@ -1882,6 +1882,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-21T23:31:16+09:00",
+      "key": "fallback-AI빌딩질문법-2026-10-21",
+      "title": "[AI빌딩질문법] 빌딩 질문할 때 답이 달라지는 AI 프롬프트 작성법",
+      "url": "",
+      "post_id": "18027543980700227",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "",
+      "notion_page": "40081007-7564-81ca-a138-ea0a3224bb75",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
