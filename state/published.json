@@ -1865,6 +1865,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-21T19:11:43+09:00",
+      "key": "question-건물관리-2026-10-21",
+      "title": "[건물관리] 건물 관리에서 가장 손이 많이 가는 항목",
+      "url": "",
+      "post_id": "18118149554045187",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "답글로 의견 남겨주시면 다음 글에 참고하겠습니다.",
+      "shape": "경험",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
