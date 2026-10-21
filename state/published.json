@@ -1658,9 +1658,9 @@
       "shape": "",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 60,
+      "likes": 0,
+      "replies": 1
     },
     {
       "date": "2026-10-17T21:11:14+09:00",
@@ -1675,9 +1675,9 @@
       "shape": "경험",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 505,
+      "likes": 3,
+      "replies": 3
     },
     {
       "date": "2026-10-18T00:29:12+09:00",
@@ -1692,9 +1692,9 @@
       "shape": "",
       "notion_page": "3fc81007-7564-815d-bf8f-f3b154652fb8",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 146,
+      "likes": 1,
+      "replies": 1
     },
     {
       "date": "2026-10-18T10:09:46+09:00",
