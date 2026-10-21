@@ -118,19 +118,10 @@ def _build_post(st: dict, *, allow_memo: bool, slot: str = ""):
         # AI 주제는 연재로 쪼개지 않는다. 한 편에 방법이 다 들어가야 쓸모가 있다.
         pick, kind = pick_fallback(st=st, category="AI"), "AI활용"
     elif want == "방법론":
-        # 방법론은 2편으로 나눠 낸다. 1편 끝에 예고가 붙어 다음 글을 기다릴
-        # 이유가 생기고, 그게 팔로우 이유가 된다.
-        이어쓸것 = state_mod.pending_series(st)
-        pick = fallback_by_label(이어쓸것) if 이어쓸것 else None
-        if pick:
-            state_mod.clear_pending_series(st)
-        else:
-            # 실무 주제만 쓴다. 분류를 안 걸면 21시 AI 슬롯과 주제가 겹친다
-            # (09-19·20 08시가 [AI문서] 를 1·2편으로 써버렸다).
-            pick = pick_fallback(st=st, category="실무")
-            pick.part = 1
-            state_mod.set_pending_series(
-                st, (pick.fallback_topic or "|").split("|", 1)[0])
+        # 2편 연재는 10-22 에 껐다. 1편 성적이 계속 낮았고(10-19 1편 조회 23 → 2편 280),
+        # 같은 제목이 이틀 연속 나가 "너무 글 내용이 비슷해" 의 원인 중 하나였다.
+        # 실무 주제만 쓴다. 분류를 안 걸면 21시 AI 슬롯과 주제가 겹친다.
+        pick = pick_fallback(st=st, category="실무")
         kind = "방법론"
     elif want == "질문":
         pick, kind = pick_question(st=st), "질문"
@@ -290,7 +281,7 @@ def run_draft() -> int:
 
     # 어떤 기사에서 나온 초안인지 남긴다. 21시 발행이 이걸 읽어 이력에 적는다.
     src_key, src_title = _source_id(pick, post, today, slot)
-    state_mod.remember_draft(page_id, key=src_key, title=src_title)
+    state_mod.remember_draft(page_id, key=src_key, title=src_title, shape=post.shape)
     commit_and_push([state_mod.DRAFTS_PATH], f"draft: {today}-{slot} 소재 기록")
 
     notify.draft_ready(post.hook or today, text, NOTION_PAGE_URL)
@@ -377,6 +368,7 @@ def run_publish() -> int:
         type_=row.get("type", ""),
         slot=_slot(),
         notion_page=row["page_id"],
+        shape=src.get("shape", ""),
         dry_run=False,
     )
     state_mod.save(st)

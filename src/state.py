@@ -128,7 +128,7 @@ def apply_metrics(state: dict, post_id: str, *, views: int, likes: int,
 
 # ------------------------------------------------- 초안 → 발행 사이의 소재 기록
 
-def remember_draft(page_id: str, *, key: str, title: str,
+def remember_draft(page_id: str, *, key: str, title: str, shape: str = "",
                    path: str = DRAFTS_PATH) -> None:
     """19시 초안이 어떤 기사에서 나왔는지 적어둔다.
 
@@ -147,6 +147,7 @@ def remember_draft(page_id: str, *, key: str, title: str,
     data[page_id] = {
         "key": key,
         "title": title,
+        "shape": shape,   # 글 모양. 같은 모양을 연달아 쓰지 않으려고 21시 발행 때 이력에 옮긴다
         "date": datetime.now(KST).isoformat(timespec="seconds"),
     }
     # 승인 없이 지나간 초안이 계속 쌓이므로 2주 지난 것은 버린다.

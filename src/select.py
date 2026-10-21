@@ -73,8 +73,28 @@ def pick_fallback(path: str = "config/fallback.yaml",
         recent = {t for t in state_mod.recent_titles(st, days=10)}
 
     unseen = [t for t in topics if not any(t["label"] in r for r in recent)]
-    pool = unseen or topics
-    topic = pool[datetime.now(KST).timetuple().tm_yday % len(pool)]
+
+    # 같은 묶음(group)을 최근 7일 안에 다뤘으면 피한다. 라벨만 피했더니
+    # 임대차 현황표·AI 렌트롤·임차인 승계가 번갈아 나와 2주에 렌트롤 이야기가 5번이었다(10-22).
+    used_groups: set = set()
+    with open(path, encoding="utf-8") as f:
+        every = yaml.safe_load(f)["topics"]   # 분류(실무·AI)를 넘어 묶음을 본다
+    if st:
+        week = state_mod.recent_titles(st, days=7)
+        used_groups = {t.get("group") for t in every
+                       if t.get("group") and any(f"[{t['label']}]" in r for r in week)}
+
+    fresh = [t for t in unseen if t.get("group") not in used_groups]
+    if fresh:
+        topic = fresh[datetime.now(KST).timetuple().tm_yday % len(fresh)]
+    else:
+        # 새 주제가 없으면 **묶음 기준으로 가장 오래전에 다룬 것**부터, 같으면 주제 기준으로.
+        # 날짜로 아무거나 고르면 어제 쓴 주제가 또 나오거나(10-22 시험: AI 안내문 이틀 연속)
+        # 같은 묶음이 사흘 연속 나왔다(수익률 → AI 수익률표 → 대출 점검).
+        def _group_last(t):
+            labels = [x["label"] for x in every if x.get("group") == t.get("group")] or [t["label"]]
+            return max(_last_used(st, l) for l in labels)
+        topic = min(topics, key=lambda t: (_group_last(t), _last_used(st, t["label"])))
 
     return Pick(
         article=None,
@@ -82,6 +102,13 @@ def pick_fallback(path: str = "config/fallback.yaml",
         reason="쓸 만한 신규 소스가 없어 백업 콘텐츠로 전환했습니다.",
         fallback_topic=f"{topic['label']}|{topic['prompt']}",
     )
+
+
+def _last_used(st: dict | None, label: str) -> str:
+    """그 주제를 마지막으로 쓴 날짜(ISO 문자열). 안 썼으면 빈 문자열 → 가장 먼저 고른다."""
+    dates = [p.get("date", "") for p in (st or {}).get("posts", [])
+             if f"[{label}]" in p.get("title", "")]
+    return max(dates) if dates else ""
 
 
 def fallback_by_label(label: str, path: str = "config/fallback.yaml") -> Pick | None:

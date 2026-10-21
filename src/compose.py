@@ -82,10 +82,16 @@ FALLBACK_PROMPT = """아래 주제로 방법론 글을 작성하세요.
 주제: {topic}
 {series}
 
+## 이번 글의 모양: {shape_name}
+
+{shape_rule}
+
+{title_rule}
+
 지침:
 - 시의성 있는 척하지 마세요. 최신 수치를 지어내지 마세요
 - **opinion 은 빈 문자열로 두세요**
-- **바로 따라 할 수 있게 쓰세요.** 순서가 있으면 번호를 붙입니다
+- **바로 따라 할 수 있게 쓰세요**
 - **제목에 개수를 쓰려면 본문 항목 수와 반드시 맞추세요.**
   "4단계" 라고 써놓고 다섯 개를 나열하면 안 됩니다.
   헷갈리면 제목에 개수를 넣지 마세요
@@ -190,6 +196,63 @@ QUESTION_SHAPES: dict[str, str] = {
   나쁨: 대단지와 소단지 중 무엇이 더 좋은가
 - 배경은 상황 설명 한 줄. "~라고들 합니다" 같은 통념 문장은 쓰지 마세요""",
 }
+# 방법론·AI 글의 모양. 10-22: 2주 동안 19건 중 "~3단계" 7건, "~N가지" 7건, AI 글 6건이 전부
+# "AI로 ~" 로 시작했고 본문은 거의 다 번호 목록 → "원본과 대조하세요" 였다(서프로님: "너무 글 내용이 비슷해").
+# 질문 글과 같은 방식으로 모양을 코드가 돌려가며 정한다.
+METHOD_SHAPES: dict[str, str] = {
+    "번호목록": """확인할 것을 **번호 목록(3~4개)** 으로 씁니다. 제목에 개수("3단계", "N가지")는 넣지 마세요.""",
+    "착각바로잡기": """흔히 하는 **착각 하나**를 짚고("~면 된다고들 생각하지만"), 왜 그것만으로 부족한지,
+대신 무엇을 확인하는지를 **문장으로** 씁니다. 번호 목록을 쓰지 마세요.
+- 착각은 남의 말로 씁니다. 가격·법률 결과를 단정하지 마세요""",
+    "문답": """독자가 실제로 물을 법한 **질문 하나**를 제목으로 쓰고("~해도 되나요?", "~는 어디서 보나요?"),
+본문은 그 답을 **3~5줄 문장**으로 씁니다. 번호 목록을 쓰지 마세요.""",
+    "한줄읽기": """서류(건축물대장·등기부·토지이음·임대차 현황표 등) 속 **칸이나 줄 하나**만 골라,
+그 줄이 무엇을 뜻하고 어디를 봐야 하는지 **짧게** 씁니다. 제목은 그 칸 이름으로 시작합니다. 번호 목록을 쓰지 마세요.
+(AI 글이면: AI 에게 그대로 넣을 **문장 하나**와 그 문장이 왜 그렇게 생겼는지를 씁니다)""",
+}
+_TITLE_PATTERNS = {"단계": r"단계", "N가지": r"(\d+|두|세|네|다섯)\s*가지", "순서": r"순서",
+                   "AI로": r"AI\s*로", "방법": r"방법"}
+
+
+def _recent_of_type(state: dict | None, type_: str, n: int) -> list[dict]:
+    posts = [p for p in (state or {}).get("posts", [])
+             if p.get("type") == type_ and not p.get("dry_run")]
+    return posts[-n:]
+
+
+def pick_method_shape(state: dict | None, type_: str) -> str:
+    """같은 종류의 최근 2건에 쓴 모양을 피한다. 기록이 없던 예전 글은 번호목록으로 본다."""
+    used = [p.get("shape") or "번호목록" for p in _recent_of_type(state, type_, 2)]
+    for name in METHOD_SHAPES:
+        if name not in used:
+            return name
+    return "번호목록"
+
+
+def banned_title_patterns(state: dict | None, type_: str) -> set[str]:
+    """같은 종류의 최근 3건 제목에 쓴 틀("3단계", "N가지", "AI로" 등)."""
+    out = set()
+    for p in _recent_of_type(state, type_, 3):
+        hook = _hook_of(p.get("title", ""))
+        for name, pat in _TITLE_PATTERNS.items():
+            if re.search(pat, hook):
+                out.add(name)
+    return out
+
+
+def method_problems(d: dict, shape: str, banned: set[str]) -> list[str]:
+    problems = []
+    hook = str(d.get("hook", ""))
+    for name in banned:
+        if re.search(_TITLE_PATTERNS[name], hook):
+            problems.append(f"제목 틀 '{name}' 을 최근 글에서 이미 씀: {hook}")
+    if shape != "번호목록":
+        numbered = [l for l in str(d.get("body", "")).splitlines() if re.match(r"\s*\d+\s*[.)단]", l)]
+        if len(numbered) >= 2:
+            problems.append(f"'{shape}' 모양인데 번호 목록을 씀")
+    return problems
+
+
 # 이전 기록에는 모양이 없다. 그때는 전부 택일이었다.
 _DEFAULT_SHAPE = "택일"
 _HEARSAY = ("고들 ", "말이 많", "라고 합니다", "다고 합니다")
@@ -437,9 +500,15 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
         )
     elif pick.is_fallback:
         label, topic = (pick.fallback_topic or "관점|").split("|", 1)
+        mtype = "AI활용" if label.startswith("AI") else "방법론"
+        shape = pick_method_shape(state, mtype)
+        mbanned = banned_title_patterns(state, mtype)
         prompt = FALLBACK_PROMPT.format(
             label=label, topic=topic.strip(),
             series={1: SERIES_1, 2: SERIES_2}.get(pick.part, ""),
+            shape_name=shape, shape_rule=METHOD_SHAPES[shape],
+            title_rule=("제목에 다음 틀을 쓰지 마세요(최근 글이 이미 썼습니다): "
+                        + ", ".join(sorted(mbanned))) if mbanned else "",
             spec=_spec(allow_opinion=False, lines="4~8", want_question=False,
                        detail_from="본문에서 다 못 쓴 배경이나 구체적인 방법을 덧붙입니다."),
         )
@@ -461,6 +530,8 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
         out = []
         if pick.is_question:
             out += question_problems(d, shape, banned)
+        elif pick.is_fallback:
+            out += method_problems(d, shape, mbanned)
         if not pick.is_memo:
             # 메모 글의 판단은 서프로님 본인 말이라 걸지 않는다
             out += _judgment_problems(d)
@@ -516,7 +587,7 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
         card_headline=str(d.get("card_headline", "")).strip(),
         source_line=str(d.get("source_line", "")).strip(),
         tags=[],   # 이 계정은 해시태그를 쓰지 않는다
-        shape=shape if pick.is_question else "",
+        shape=shape if (pick.is_question or pick.is_fallback) else "",
     )
 
     text = post.render_text()

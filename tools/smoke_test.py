@@ -480,5 +480,26 @@ for 금지 in ("직접 본 것만", "직접 써보고", "실제로 쓰는", "중
     assert 금지 not in 닫는말, f"글 끝 문장이 하지 않은 일을 말한다: {금지}"
 print("경험·법률·가리킴 통제 통과: 지어낸 경험·법률 단정·없는 내용 가리키기 차단, 확인 방법은 통과")
 
+# 방법론·AI 글도 모양을 돌리고, 제목 틀·주제 묶음 반복을 막는다 (10-22, "너무 글 내용이 비슷해")
+_기록 = {"posts": [
+    {"type": "방법론", "title": "[임대차현황표] 렌트롤에서 대조할 3가지", "shape": "번호목록"},
+    {"type": "방법론", "title": "[건물외관] 건물 앞 10분 점검 3단계", "shape": "착각바로잡기"},
+]}
+assert c_mod.pick_method_shape(_기록, "방법론") == "문답", "최근에 쓴 모양을 또 골랐다"
+_금지 = c_mod.banned_title_patterns(_기록, "방법론")
+assert {"N가지", "단계"} <= _금지, _금지
+assert c_mod.method_problems({"hook": "꼬마빌딩 주차 점검 3단계", "body": ""}, "문답", _금지), "제목 틀 반복이 통과했다"
+assert c_mod.method_problems({"hook": "주차장은 어디서 보나요?", "body": "1. 가\n2. 나"}, "문답", set()), "번호 목록이 통과했다"
+assert not c_mod.method_problems({"hook": "주차장은 어디서 보나요?", "body": "대장의 주차대수를 봅니다."}, "문답", _금지)
+import datetime as _dt
+_어제 = (_dt.datetime.now(state_mod.KST) - _dt.timedelta(days=1)).isoformat()
+_고른것 = set()
+for _ in range(1):
+    _p = pick_fallback(st={"posts": [{"date": _어제, "title": "[임대차현황표] x", "type": "방법론"}]}, category="실무")
+    _고른것.add(_p.fallback_topic.split("|")[0])
+assert not (_고른것 & {"임대차현황표", "임차인승계"}), f"같은 묶음(임대차)을 7일 안에 또 골랐다: {_고른것}"
+assert "pending_series" not in inspect.getsource(main_mod._build_post), "방법론 연재가 아직 켜져 있다"
+print("글 모양·제목 틀·주제 묶음 통과: 모양 회전, 제목 틀 반복 차단, 같은 묶음 7일 회피, 연재 꺼짐")
+
 
 sys.exit(code)
