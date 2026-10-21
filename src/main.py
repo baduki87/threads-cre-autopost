@@ -102,6 +102,14 @@ SLOT_KIND = {"08": "방법론", "17": "질문", "21": "AI"}
 NO_CARD_KINDS = {"질문", "방법론", "AI활용"}
 
 
+def _last_slot_type(st: dict, slot: str) -> str:
+    """그 슬롯에 마지막으로 나간 글의 종류(방법론·AI활용 등). 없으면 빈 문자열."""
+    for p in reversed(st.get("posts", [])):
+        if p.get("slot") == slot and not p.get("dry_run"):
+            return p.get("type", "")
+    return ""
+
+
 def _build_post(st: dict, *, allow_memo: bool, slot: str = ""):
     """소재를 골라 글 하나를 만든다. (post, kind, memo, pick) 을 돌려준다.
 
@@ -120,9 +128,12 @@ def _build_post(st: dict, *, allow_memo: bool, slot: str = ""):
     elif want == "방법론":
         # 2편 연재는 10-22 에 껐다. 1편 성적이 계속 낮았고(10-19 1편 조회 23 → 2편 280),
         # 같은 제목이 이틀 연속 나가 "너무 글 내용이 비슷해" 의 원인 중 하나였다.
-        # 실무 주제만 쓴다. 분류를 안 걸면 21시 AI 슬롯과 주제가 겹친다.
-        pick = pick_fallback(st=st, category="실무")
-        kind = "방법론"
+        # 10-22 서프로님 B안: 08시도 이틀에 한 번은 AI 글. AI 글이 2주 연속 반응 1위였다.
+        # 날짜 홀짝이 아니라 **직전 08시 글의 종류**를 보고 번갈아 고른다(하루 빠져도 어긋나지 않게).
+        if _last_slot_type(st, "08") == "방법론":
+            pick, kind = pick_fallback(st=st, category="AI"), "AI활용"
+        else:
+            pick, kind = pick_fallback(st=st, category="실무"), "방법론"
     elif want == "질문":
         pick, kind = pick_question(st=st), "질문"
     else:

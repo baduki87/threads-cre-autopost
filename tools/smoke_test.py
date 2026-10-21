@@ -501,5 +501,13 @@ assert not (_고른것 & {"임대차현황표", "임차인승계"}), f"같은 �
 assert "pending_series" not in inspect.getsource(main_mod._build_post), "방법론 연재가 아직 켜져 있다"
 print("글 모양·제목 틀·주제 묶음 통과: 모양 회전, 제목 틀 반복 차단, 같은 묶음 7일 회피, 연재 꺼짐")
 
+# 08시는 직전 08시 글 종류를 보고 방법론·AI 를 번갈아 낸다 (10-22 서프로님 B안)
+assert main_mod._last_slot_type({"posts": [{"slot": "08", "type": "방법론"}]}, "08") == "방법론"
+assert main_mod._last_slot_type({"posts": []}, "08") == ""
+_실사용 = [t for t in _yaml.safe_load(open("config/fallback.yaml", encoding="utf-8"))["topics"]
+           if t["label"] in ("AI안내판사진", "AI법조문찾기", "AI스레드자동화")]
+assert len(_실사용) == 3 and all(t["category"] == "AI" and "효과 수치" in t["prompt"] for t in _실사용)
+print("08시 번갈아 내기·AI 실사용 주제 통과")
+
 
 sys.exit(code)
