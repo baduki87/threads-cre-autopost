@@ -1950,6 +1950,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-23T08:25:03+09:00",
+      "key": "fallback-수익률계산법-2026-10-23",
+      "title": "[수익률계산법] 월세에 열두 달을 곱하면 끝난다고 생각합니다",
+      "url": "",
+      "post_id": "18088176824301717",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "양재역 라인 빌딩을 중개합니다.",
+      "shape": "착각바로잡기",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
