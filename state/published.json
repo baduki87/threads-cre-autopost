@@ -1933,6 +1933,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-22T23:32:22+09:00",
+      "key": "fallback-AI제안서초안-2026-10-22",
+      "title": "[AI제안서초안] 건물주 전속 제안서 초안을 AI로 작성해도 되나요?",
+      "url": "",
+      "post_id": "17901370767605016",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "문답",
+      "notion_page": "40181007-7564-817a-b268-eecd1c375bf3",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
