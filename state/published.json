@@ -1984,6 +1984,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-23T23:16:04+09:00",
+      "key": "fallback-AI안내판사진-2026-10-23",
+      "title": "[AI안내판사진] 현장 조사 시 층별 안내판 사진으로 입주사를 정리합니다",
+      "url": "",
+      "post_id": "18116263577027322",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "번호목록",
+      "notion_page": "40281007-7564-813b-8151-ef99d60cef62",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
