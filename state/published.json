@@ -1828,9 +1828,9 @@
       "shape": "하나만",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 154,
+      "likes": 2,
+      "replies": 0
     },
     {
       "date": "2026-10-20T23:20:22+09:00",
@@ -1845,9 +1845,9 @@
       "shape": "",
       "notion_page": "3ff81007-7564-8147-960e-e9a4a58ab441",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 271,
+      "likes": 3,
+      "replies": 1
     },
     {
       "date": "2026-10-21T08:12:14+09:00",
@@ -1862,9 +1862,9 @@
       "shape": "",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 25,
+      "likes": 0,
+      "replies": 1
     },
     {
       "date": "2026-10-21T19:11:43+09:00",
