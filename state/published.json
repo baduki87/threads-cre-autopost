@@ -1967,6 +1967,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-23T19:06:32+09:00",
+      "key": "question-렌트롤첫줄-2026-10-23",
+      "title": "[렌트롤첫줄] 빌딩 매수 검토 시 임대차 현황표를 먼저 살핍니다",
+      "url": "",
+      "post_id": "18113031707174686",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "생각이 갈리는 지점이라 궁금합니다.",
+      "shape": "택일",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
