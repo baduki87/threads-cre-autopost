@@ -2018,6 +2018,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-24T18:35:44+09:00",
+      "key": "question-진짜매수자-2026-10-24",
+      "title": "[진짜매수자] 건물 매수 첫 통화에서 오가는 핵심 질문",
+      "url": "",
+      "post_id": "17951684205340442",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "답글로 의견 남겨주시면 다음 글에 참고하겠습니다.",
+      "shape": "하나만",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
