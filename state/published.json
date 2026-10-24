@@ -2035,6 +2035,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-24T22:21:41+09:00",
+      "key": "fallback-AI빌딩등기부-2026-10-24",
+      "title": "[AI빌딩등기부] 빌딩 등기부등본 검토할 때 AI를 참고해도 되나요?",
+      "url": "",
+      "post_id": "17876827854650733",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "문답",
+      "notion_page": "40381007-7564-8138-9147-e8ee744fa745",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
