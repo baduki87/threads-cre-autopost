@@ -2052,6 +2052,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-25T07:29:52+09:00",
+      "key": "fallback-첫건물실수-2026-10-25",
+      "title": "[첫건물실수] 꼬마빌딩 임대차 현황은 계약서만 보고 계약해도 되나요?",
+      "url": "",
+      "post_id": "18120179566954271",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "건물 볼 때 확인할 것들을 하나씩 정리합니다.",
+      "shape": "문답",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
