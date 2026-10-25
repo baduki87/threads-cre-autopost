@@ -2086,6 +2086,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-25T22:44:27+09:00",
+      "key": "fallback-AI조사엑셀-2026-10-25",
+      "title": "[AI조사엑셀] 빌딩 조사목록과 층별 입주사를 엑셀로 자동 정리합니다",
+      "url": "",
+      "post_id": "18117588859807283",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "번호목록",
+      "notion_page": "40481007-7564-816b-8a2e-ed9739e0b2e5",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
