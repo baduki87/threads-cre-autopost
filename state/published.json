@@ -2069,6 +2069,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-25T18:49:49+09:00",
+      "key": "question-공실대응-2026-10-25",
+      "title": "[공실대응] 공실 발생 직후 가장 먼저 움직인 방식",
+      "url": "",
+      "post_id": "18109990133348701",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "다른 기준으로 보시는 분도 계실 겁니다.",
+      "shape": "경험",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
