@@ -2103,6 +2103,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-26T07:34:34+09:00",
+      "key": "fallback-AI건축물대장-2026-10-26",
+      "title": "[AI건축물대장] 건축물대장 AI 요약 시 반드시 넣는 누락 검증 프롬프트",
+      "url": "",
+      "post_id": "17891935803459326",
+      "kind": "auto",
+      "type": "AI활용",
+      "slot": "08",
+      "closer": "중개 일에 AI 를 쓰는 방법을 정리하고 있습니다.",
+      "shape": "착각바로잡기",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
