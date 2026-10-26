@@ -2154,6 +2154,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-27T08:56:35+09:00",
+      "key": "fallback-건물주질문-2026-10-27",
+      "title": "[건물주질문] 건물 매수 전 매도인에게 직접 물어야 할 질문 목록",
+      "url": "",
+      "post_id": "18121831826058751",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "양재역 라인 빌딩을 중개합니다.",
+      "shape": "번호목록",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
