@@ -2120,6 +2120,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-26T20:09:29+09:00",
+      "key": "question-임차인연락-2026-10-26",
+      "title": "[임차인연락] 임차인과의 소통에 관한 통념을 짚어봅니다.",
+      "url": "",
+      "post_id": "17872775127645789",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "생각이 갈리는 지점이라 궁금합니다.",
+      "shape": "통념확인",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
