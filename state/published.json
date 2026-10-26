@@ -2137,6 +2137,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-27T01:09:27+09:00",
+      "key": "fallback-AI건물임장메모-2026-10-26",
+      "title": "[AI건물임장메모] 임장 사진과 메모를 AI로 정리하는 방법이 궁금하신가요?",
+      "url": "",
+      "post_id": "18199093588344257",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "문답",
+      "notion_page": "40581007-7564-81dd-9f2a-fb49b4f49f9e",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
