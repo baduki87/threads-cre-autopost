@@ -2171,6 +2171,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-27T19:33:24+09:00",
+      "key": "question-건물주첫만남-2026-10-27",
+      "title": "[건물주첫만남] 건물주와 중개사의 첫 미팅 대화 방식입니다",
+      "url": "",
+      "post_id": "18175960453407521",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "답글로 의견 남겨주시면 다음 글에 참고하겠습니다.",
+      "shape": "택일",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
