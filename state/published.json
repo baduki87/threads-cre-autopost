@@ -2205,6 +2205,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-28T08:46:58+09:00",
+      "key": "fallback-AI매물장-2026-10-28",
+      "title": "[AI매물장] 건물 매물장 관리, 엑셀 모음만으로 부족한 이유",
+      "url": "",
+      "post_id": "18134702116734811",
+      "kind": "auto",
+      "type": "AI활용",
+      "slot": "08",
+      "closer": "AI 로 건물 서류 정리하는 법을 모으고 있습니다.",
+      "shape": "착각바로잡기",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
