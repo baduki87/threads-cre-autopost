@@ -2188,6 +2188,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-28T00:23:07+09:00",
+      "key": "fallback-AI렌트롤-2026-10-27",
+      "title": "[AI렌트롤] 빌딩 임대차 현황표 점검 시 AI 활용 순서입니다",
+      "url": "",
+      "post_id": "17985596679089191",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "번호목록",
+      "notion_page": "40681007-7564-81ec-97fc-fdd1afad161c",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
