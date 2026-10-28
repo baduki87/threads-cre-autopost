@@ -2032,9 +2032,9 @@
       "shape": "하나만",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 39,
+      "likes": 0,
+      "replies": 0
     },
     {
       "date": "2026-10-24T22:21:41+09:00",
@@ -2049,9 +2049,9 @@
       "shape": "문답",
       "notion_page": "40381007-7564-8138-9147-e8ee744fa745",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 155,
+      "likes": 1,
+      "replies": 2
     },
     {
       "date": "2026-10-25T07:29:52+09:00",
@@ -2066,9 +2066,9 @@
       "shape": "문답",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 77,
+      "likes": 0,
+      "replies": 1
     },
     {
       "date": "2026-10-25T18:49:49+09:00",
