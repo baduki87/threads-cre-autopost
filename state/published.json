@@ -2222,6 +2222,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-28T20:21:06+09:00",
+      "key": "question-첫건물망설임-2026-10-28",
+      "title": "[첫건물망설임] 첫 건물 매수 직전 가장 오래 망설였던 요인",
+      "url": "",
+      "post_id": "18111395699524807",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "다른 기준으로 보시는 분도 계실 겁니다.",
+      "shape": "하나만",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
