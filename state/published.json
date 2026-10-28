@@ -2239,6 +2239,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-29T01:04:36+09:00",
+      "key": "fallback-AI빌딩질문법-2026-10-28",
+      "title": "[AI빌딩질문법] 빌딩 분석할 때 AI 질문은 어떻게 적어야 정확합니까?",
+      "url": "",
+      "post_id": "18641855242014651",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "문답",
+      "notion_page": "40781007-7564-8111-8a47-edce986fc3b1",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
