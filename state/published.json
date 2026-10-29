@@ -2307,6 +2307,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-30T08:58:12+09:00",
+      "key": "fallback-AI하루정리-2026-10-30",
+      "title": "[AI하루정리] 하루 기록을 AI로 정리할 때 가장 먼저 챙기는 원칙입니다",
+      "url": "",
+      "post_id": "18647377765027320",
+      "kind": "auto",
+      "type": "AI활용",
+      "slot": "08",
+      "closer": "중개 일에 AI 를 쓰는 방법을 정리하고 있습니다.",
+      "shape": "착각바로잡기",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
