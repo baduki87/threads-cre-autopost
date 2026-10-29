@@ -2290,6 +2290,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-30T01:09:00+09:00",
+      "key": "fallback-AI스레드자동화-2026-10-29",
+      "title": "[AI스레드자동화] 자동화 스레드 운영에서 AI의 역할을 제한하는 방법",
+      "url": "",
+      "post_id": "18078670328567982",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "번호목록",
+      "notion_page": "40881007-7564-81c9-898f-df9a76d669c7",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
