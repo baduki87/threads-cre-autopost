@@ -510,4 +510,21 @@ assert len(_실사용) == 3 and all(t["category"] == "AI" and "효과 수치" in
 print("08시 번갈아 내기·AI 실사용 주제 통과")
 
 
+# 종류가 달라도 최근 10일 제목의 소재는 피한다 (10-29 서프로님 1번: 임대차 현황표 2주 7번)
+from src import subjects as _subj
+from src.select import pick_question as _pq
+assert _subj.subjects_in("[AI렌트롤] 빌딩 임대차 현황표 점검 시 AI 활용 순서") == {"임대차현황표"}
+_최근 = {"posts": [{"date": _어제, "title": "[AI렌트롤] 빌딩 임대차 현황표 점검", "type": "AI활용"},
+                   {"date": _어제, "title": "[공실확인] 층별 안내판만 보고 공실을 판단", "type": "방법론"}]}
+assert {"임대차현황표", "안내판", "공실"} <= _subj.recent_subjects(_최근)
+_q = _pq(st=_최근).question_topic.split("|")[0]
+assert _q not in ("렌트롤첫줄", "공실대응", "1층공실"), f"질문 글이 최근 소재를 또 골랐다: {_q}"
+_f = pick_fallback(st=_최근, category="실무").fallback_topic.split("|")[0]
+assert _f not in ("임대차현황표", "공실확인", "임차인승계"), f"방법론이 최근 소재를 또 골랐다: {_f}"
+assert _subj.title_problems("빌딩 매수 검토 시 임대차 현황표를 먼저 살핍니다", _subj.recent_subjects(_최근), set())
+assert not _subj.title_problems("빌딩 매수 검토 시 임대차 현황표를 먼저 살핍니다", _subj.recent_subjects(_최근), {"임대차현황표"})
+assert not _subj.title_problems("건물 앞 10분 점검", _subj.recent_subjects(_최근), set())
+print("소재 겹침 통과: 종류를 넘어 10일 회피, 제목 검사")
+
+
 sys.exit(code)

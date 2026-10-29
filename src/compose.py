@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import re
 
+from . import subjects
 from .llm import ask_json
 from .models import Memo, Pick, Post
 
@@ -524,10 +525,22 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
                        detail_from="기사에 있는 구체적 조건·일정·적용 범위를 정리합니다."),
         )
 
+    # 소재 겹침(10-29): 최근 10일 제목의 소재를 프롬프트에 알리고, 제목에 나오면 다시 쓰게 한다.
+    hot: set[str] = set()
+    allowed: set[str] = set()
+    if not pick.is_memo and (pick.is_question or pick.is_fallback):
+        hot = subjects.recent_subjects(state)
+        lab, top = (pick.question_topic or pick.fallback_topic or "|").split("|", 1)
+        allowed = subjects.topic_subjects({"label": lab, "prompt": top})
+        avoid = sorted(hot - allowed)
+        if avoid:
+            prompt += ("\n\n최근 10일 동안 다른 글에서 다룬 소재입니다. 제목과 중심 소재로 쓰지 마세요: "
+                       + ", ".join(avoid))
+
     d = ask_json(system, prompt, effort="high")
 
     def _problems(d: dict) -> list[str]:
-        out = []
+        out = subjects.title_problems(str(d.get("hook", "")), hot, allowed)
         if pick.is_question:
             out += question_problems(d, shape, banned)
         elif pick.is_fallback:

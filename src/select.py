@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, timezone
 import yaml
 
 from . import state as state_mod
+from . import subjects as subj
 from .llm import ask_json
 from .models import Article, Pick
 
@@ -84,7 +85,10 @@ def pick_fallback(path: str = "config/fallback.yaml",
         used_groups = {t.get("group") for t in every
                        if t.get("group") and any(f"[{t['label']}]" in r for r in week)}
 
-    fresh = [t for t in unseen if t.get("group") not in used_groups]
+    # 종류(방법론·질문·AI)를 넘어 최근 10일 제목에 나온 소재도 피한다(10-29).
+    hot = subj.recent_subjects(st)
+    fresh = [t for t in unseen if t.get("group") not in used_groups
+             and not (subj.topic_subjects(t) & hot)]
     if fresh:
         topic = fresh[datetime.now(KST).timetuple().tm_yday % len(fresh)]
     else:
@@ -94,7 +98,8 @@ def pick_fallback(path: str = "config/fallback.yaml",
         def _group_last(t):
             labels = [x["label"] for x in every if x.get("group") == t.get("group")] or [t["label"]]
             return max(_last_used(st, l) for l in labels)
-        topic = min(topics, key=lambda t: (_group_last(t), _last_used(st, t["label"])))
+        topic = min(topics, key=lambda t: (bool(subj.topic_subjects(t) & hot),
+                                           _group_last(t), _last_used(st, t["label"])))
 
     return Pick(
         article=None,
@@ -136,7 +141,9 @@ def pick_question(path: str = "config/questions.yaml",
     if st:
         recent = {t for t in state_mod.recent_titles(st, days=21)}
     unseen = [t for t in topics if not any(t["label"] in r for r in recent)]
-    pool = unseen or topics
+    hot = subj.recent_subjects(st)
+    cool = [t for t in unseen if not (subj.topic_subjects(t) & hot)]
+    pool = cool or unseen or topics
     topic = pool[datetime.now(KST).timetuple().tm_yday % len(pool)]
 
     return Pick(
