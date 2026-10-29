@@ -2256,6 +2256,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-29T09:02:00+09:00",
+      "key": "fallback-공실확인-2026-10-29",
+      "title": "[공실확인] 층별 안내판만 보고 공실을 판단하면 놓치는 부분이 생깁니다",
+      "url": "",
+      "post_id": "18453632956123564",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "건물 볼 때 확인할 것들을 하나씩 정리합니다.",
+      "shape": "착각바로잡기",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
