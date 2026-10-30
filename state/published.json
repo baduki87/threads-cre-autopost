@@ -2341,6 +2341,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-31T00:57:44+09:00",
+      "key": "fallback-AI말로적기-2026-10-30",
+      "title": "[AI말로적기] 건물 앞에서 걸으며 본 것은 어떻게 메모하나요?",
+      "url": "",
+      "post_id": "18090026594281090",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "문답",
+      "notion_page": "40981007-7564-8187-883d-ebfb27d035bd",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
