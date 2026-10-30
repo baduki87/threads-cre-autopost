@@ -2358,6 +2358,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-31T08:46:03+09:00",
+      "key": "fallback-건물대출점검-2026-10-31",
+      "title": "[건물대출점검] 건물 대출 상담 전 은행에 무엇부터 물어야 하나요?",
+      "url": "",
+      "post_id": "18120138017085677",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "양재역 라인 빌딩을 중개합니다.",
+      "shape": "문답",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
