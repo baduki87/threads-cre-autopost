@@ -2409,6 +2409,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-01T08:24:52+09:00",
+      "key": "fallback-AI법조문찾기-2026-11-01",
+      "title": "[AI법조문찾기] 손님 표현을 법령 조문과 연결하는 기준",
+      "url": "",
+      "post_id": "17906445381353108",
+      "kind": "auto",
+      "type": "AI활용",
+      "slot": "08",
+      "closer": "AI 로 건물 서류 정리하는 법을 모으고 있습니다.",
+      "shape": "착각바로잡기",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
