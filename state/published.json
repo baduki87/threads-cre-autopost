@@ -2392,6 +2392,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-01T00:21:44+09:00",
+      "key": "fallback-AI빌딩한계-2026-10-31",
+      "title": "[AI빌딩한계] 빌딩 검토 시 전산 데이터로 확인하기 어려운 지점입니다",
+      "url": "",
+      "post_id": "18002107436814303",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "번호목록",
+      "notion_page": "40a81007-7564-81a1-a1c2-ea28cd3f415d",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
