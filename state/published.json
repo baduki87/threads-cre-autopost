@@ -2375,6 +2375,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-10-31T19:56:45+09:00",
+      "key": "question-임차인연락-2026-10-31",
+      "title": "[임차인연락] 임대차 시설 수리 요청 연락의 선호 방식",
+      "url": "",
+      "post_id": "18122128949278726",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "다른 기준으로 보시는 분도 계실 겁니다.",
+      "shape": "택일",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
