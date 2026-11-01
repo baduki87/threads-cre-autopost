@@ -2460,6 +2460,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-02T08:38:57+09:00",
+      "key": "fallback-건물세금용어-2026-11-02",
+      "title": "[건물세금용어] 상가 건물 거래 시 포괄양도양수 확인 사항입니다",
+      "url": "",
+      "post_id": "18070326059784701",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "건물 볼 때 확인할 것들을 하나씩 정리합니다.",
+      "shape": "번호목록",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
