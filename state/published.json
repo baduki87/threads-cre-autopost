@@ -2236,9 +2236,9 @@
       "shape": "하나만",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 79,
+      "likes": 0,
+      "replies": 0
     },
     {
       "date": "2026-10-29T01:04:36+09:00",
@@ -2253,9 +2253,9 @@
       "shape": "문답",
       "notion_page": "40781007-7564-8111-8a47-edce986fc3b1",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 65,
+      "likes": 1,
+      "replies": 1
     },
     {
       "date": "2026-10-29T09:02:00+09:00",
@@ -2270,9 +2270,9 @@
       "shape": "착각바로잡기",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 42,
+      "likes": 0,
+      "replies": 1
     },
     {
       "date": "2026-10-29T20:31:21+09:00",
