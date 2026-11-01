@@ -2443,6 +2443,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-02T01:03:29+09:00",
+      "key": "fallback-AI안내문-2026-11-01",
+      "title": "[AI안내문] 빌딩 매수자 안내문, AI로 작성해도 되나요?",
+      "url": "",
+      "post_id": "17964676572211904",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "문답",
+      "notion_page": "40b81007-7564-819f-9cb1-e534bd411b09",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
