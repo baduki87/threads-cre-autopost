@@ -2494,6 +2494,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-03T04:30:41+09:00",
+      "key": "fallback-AI쇼츠편집-2026-11-03",
+      "title": "[AI쇼츠편집] 촬영 영상에서 숏폼 후보를 추출하는 순서",
+      "url": "",
+      "post_id": "18163896346498416",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "번호목록",
+      "notion_page": "40c81007-7564-81d1-93b7-df857833baf7",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
