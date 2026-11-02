@@ -2477,6 +2477,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-02T22:32:27+09:00",
+      "key": "question-건물주첫만남-2026-11-02",
+      "title": "[건물주첫만남] 건물주와의 첫 대화에서 물꼬를 트는 한마디",
+      "url": "",
+      "post_id": "18453401644126870",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "답글로 의견 남겨주시면 다음 글에 참고하겠습니다.",
+      "shape": "경험",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
