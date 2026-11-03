@@ -2545,6 +2545,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-04T02:05:07+09:00",
+      "key": "fallback-AI빌딩등기부-2026-11-04",
+      "title": "[AI빌딩등기부] 빌딩 등기부등본 검토 시 AI를 활용해도 되나요?",
+      "url": "",
+      "post_id": "18112852622126353",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "문답",
+      "notion_page": "40d81007-7564-8167-be97-ee63a15fb34a",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
