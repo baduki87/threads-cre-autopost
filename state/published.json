@@ -2338,9 +2338,9 @@
       "shape": "통념확인",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 18,
+      "likes": 0,
+      "replies": 0
     },
     {
       "date": "2026-10-31T00:57:44+09:00",
@@ -2355,9 +2355,9 @@
       "shape": "문답",
       "notion_page": "40981007-7564-8187-883d-ebfb27d035bd",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 24,
+      "likes": 0,
+      "replies": 1
     },
     {
       "date": "2026-10-31T08:46:03+09:00",
@@ -2372,9 +2372,9 @@
       "shape": "문답",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 86,
+      "likes": 1,
+      "replies": 1
     },
     {
       "date": "2026-10-31T19:56:45+09:00",
