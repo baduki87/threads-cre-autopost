@@ -2528,6 +2528,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-03T21:47:45+09:00",
+      "key": "question-매각계기-2026-11-03",
+      "title": "[매각계기] 상가건물 매도는 자금 압박 때문이라는 통념",
+      "url": "",
+      "post_id": "18223502599343526",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "다른 기준으로 보시는 분도 계실 겁니다.",
+      "shape": "통념확인",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
