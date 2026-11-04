@@ -2562,6 +2562,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-04T09:39:56+09:00",
+      "key": "fallback-빌딩오해-2026-11-04",
+      "title": "[빌딩오해] 역과의 거리만 보고 보행 동선을 판단하는 오해가 있습니다",
+      "url": "",
+      "post_id": "18650724850000267",
+      "kind": "auto",
+      "type": "방법론",
+      "slot": "08",
+      "closer": "양재역 라인 빌딩을 중개합니다.",
+      "shape": "착각바로잡기",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
