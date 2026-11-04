@@ -2579,6 +2579,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-04T22:00:21+09:00",
+      "key": "question-건물주바람-2026-11-04",
+      "title": "[건물주바람] 상가건물 거래 시 건물주와 중개사가 소통할 때 중시하는 기준입니다",
+      "url": "",
+      "post_id": "18049924661820468",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "생각이 갈리는 지점이라 궁금합니다.",
+      "shape": "택일",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
