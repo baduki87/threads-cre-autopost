@@ -2596,6 +2596,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-05T02:16:19+09:00",
+      "key": "fallback-AI파밍지도-2026-11-05",
+      "title": "[AI파밍지도] 빌딩 현장 파밍 시 지도 시각화를 활용하는 방법",
+      "url": "",
+      "post_id": "17975849445073790",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "번호목록",
+      "notion_page": "40e81007-7564-8197-b156-cc0ed464b7d3",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
