@@ -2440,9 +2440,9 @@
       "shape": "하나만",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 93,
+      "likes": 0,
+      "replies": 0
     },
     {
       "date": "2026-11-02T01:03:29+09:00",
@@ -2457,9 +2457,9 @@
       "shape": "문답",
       "notion_page": "40b81007-7564-819f-9cb1-e534bd411b09",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 176,
+      "likes": 1,
+      "replies": 1
     },
     {
       "date": "2026-11-02T08:38:57+09:00",
@@ -2474,9 +2474,9 @@
       "shape": "번호목록",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 230,
+      "likes": 3,
+      "replies": 2
     },
     {
       "date": "2026-11-02T22:32:27+09:00",
