@@ -2630,6 +2630,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-05T22:13:02+09:00",
+      "key": "question-낡은건물걱정-2026-11-05",
+      "title": "[낡은건물걱정] 노후 건물 검토할 때 가장 신경 쓰이는 설비",
+      "url": "",
+      "post_id": "18647250499018712",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "경험",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
