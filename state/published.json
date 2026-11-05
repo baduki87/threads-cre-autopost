@@ -2647,6 +2647,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-06T02:25:57+09:00",
+      "key": "fallback-1층상가보기-2026-11-06",
+      "title": "[1층상가보기] 건물 1층 상가 상태를 현장에서 눈으로 파악하는 방법",
+      "url": "",
+      "post_id": "18150179788564768",
+      "kind": "notion",
+      "type": "방법론",
+      "slot": "21",
+      "closer": "",
+      "shape": "문답",
+      "notion_page": "40f81007-7564-81ed-a2f2-cd3034b2d050",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
