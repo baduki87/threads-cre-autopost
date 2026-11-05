@@ -123,8 +123,11 @@ def _build_post(st: dict, *, allow_memo: bool, slot: str = ""):
 
     want = SLOT_KIND.get(slot, "뉴스")
     if want == "AI":
-        # AI 주제는 연재로 쪼개지 않는다. 한 편에 방법이 다 들어가야 쓸모가 있다.
-        pick, kind = pick_fallback(st=st, category="AI"), "AI활용"
+        # 11-05 하루 3건 → 2건(08시 슬롯 끔). 21시가 방법론·AI 를 번갈아 맡는다(직전 21시 글 종류 기준).
+        if _last_slot_type(st, "21") == "AI활용":
+            pick, kind = pick_fallback(st=st, category="실무"), "방법론"
+        else:
+            pick, kind = pick_fallback(st=st, category="AI"), "AI활용"
     elif want == "방법론":
         # 2편 연재는 10-22 에 껐다. 1편 성적이 계속 낮았고(10-19 1편 조회 23 → 2편 280),
         # 같은 제목이 이틀 연속 나가 "너무 글 내용이 비슷해" 의 원인 중 하나였다.
@@ -176,7 +179,8 @@ def run_auto() -> int:
 
     st = state_mod.load()
     post, kind, _, pick = _build_post(st, allow_memo=False, slot=slot)
-    post.follow_line = closer.pick(kind, st)
+    # 11-05: 글 끝 한 줄(closers.yaml)을 뗐다. 매번 붙는 홍보 문장이 AI 글 티를 냈다.
+    post.follow_line = ""
     text = post.render_text()
 
     print("\n--- 본문 ---")
@@ -243,7 +247,8 @@ def run_draft() -> int:
 
     st = state_mod.load()
     post, kind, memo, pick = _build_post(st, allow_memo=True, slot=slot)
-    post.follow_line = closer.pick(kind, st)
+    # 11-05: 글 끝 한 줄(closers.yaml)을 뗐다. 매번 붙는 홍보 문장이 AI 글 티를 냈다.
+    post.follow_line = ""
     text = post.render_text()
 
     print("\n--- 초안 ---")

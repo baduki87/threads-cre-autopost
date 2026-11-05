@@ -97,6 +97,8 @@ FALLBACK_PROMPT = """아래 주제로 방법론 글을 작성하세요.
   "4단계" 라고 써놓고 다섯 개를 나열하면 안 됩니다.
   헷갈리면 제목에 개수를 넣지 마세요
 - 질문으로 끝내지 마세요. 정리로 끝냅니다
+- **평서체(~다·~음)로 짧게.** 계정 주인이 현장에서 메모하듯 씁니다. 보고서·강의 말투 금지
+  좋은 예: "하루 메모를 AI에 넣기 전에 이름부터 지운다. / 손님 이름·번호는 A, B로. / 그다음 '내일 할 일'만 뽑아 달라고 한다."
 
 {spec}"""
 
@@ -139,6 +141,7 @@ QUESTION_PROMPT = """독자에게 던지는 **질문 글**을 작성하세요.
 
 지침:
 - **배경은 한두 줄이면 충분합니다.** 길게 설명하면 질문이 죽습니다
+- **hook·body 는 평서체(~다·~음), question 한 줄만 존댓말**("~신가요?", "정말 그런가요?")로 씁니다
 - **계정 주인은 답을 내놓지 않습니다.** 묻기만 합니다.
   opinion 은 반드시 빈 문자열입니다
 - question 이 이 글의 전부입니다. 읽자마자 한 줄로 답할 수 있어야 합니다
@@ -211,6 +214,11 @@ METHOD_SHAPES: dict[str, str] = {
 그 줄이 무엇을 뜻하고 어디를 봐야 하는지 **짧게** 씁니다. 제목은 그 칸 이름으로 시작합니다. 번호 목록을 쓰지 마세요.
 (AI 글이면: AI 에게 그대로 넣을 **문장 하나**와 그 문장이 왜 그렇게 생겼는지를 씁니다)""",
 }
+# 11-05 검수: 실제로 돌리는 모양. 서프로님 "말투와 내용의 문제" — 반응이 남은 질문은 통념확인·경험뿐이었고
+# (통념 610·현수막 508), 착각바로잡기는 "~라고들 생각합니다 → 그러나 → ~합니다" 틀로 굳어 9~95에 그쳤다.
+ACTIVE_QUESTION_SHAPES = ("통념확인", "경험")
+ACTIVE_METHOD_SHAPES = ("번호목록", "문답", "한줄읽기")
+
 _TITLE_PATTERNS = {"단계": r"단계", "N가지": r"(\d+|두|세|네|다섯)\s*가지", "순서": r"순서",
                    "AI로": r"AI\s*로", "방법": r"방법"}
 
@@ -224,7 +232,7 @@ def _recent_of_type(state: dict | None, type_: str, n: int) -> list[dict]:
 def pick_method_shape(state: dict | None, type_: str) -> str:
     """같은 종류의 최근 2건에 쓴 모양을 피한다. 기록이 없던 예전 글은 번호목록으로 본다."""
     used = [p.get("shape") or "번호목록" for p in _recent_of_type(state, type_, 2)]
-    for name in METHOD_SHAPES:
+    for name in ACTIVE_METHOD_SHAPES:
         if name not in used:
             return name
     return "번호목록"
@@ -271,11 +279,11 @@ def pick_shape(state: dict | None) -> str:
     댓글이 끊긴 쪽이 택일·통념이라 그 둘을 뒤에 뒀다.
     """
     used = [p.get("shape") or _DEFAULT_SHAPE for p in _recent_questions(state)]
-    for name in QUESTION_SHAPES:
+    for name in ACTIVE_QUESTION_SHAPES:
         if name not in used:
             return name
     # 다 썼으면 가장 오래 전에 쓴 것
-    return min(QUESTION_SHAPES, key=lambda k: max(
+    return min(ACTIVE_QUESTION_SHAPES, key=lambda k: max(
         (i for i, u in enumerate(used) if u == k), default=-1))
 
 
@@ -407,6 +415,29 @@ def _judgment_problems(d: dict) -> list[str]:
     return out
 
 
+# 11-05: 반응이 사라진 자동 글의 공통점 — 보고서 말투. 손글(조회 820)은 4줄 평서체였다.
+# 프롬프트 부탁만으로는 안 바뀌므로 코드가 검사해 다시 쓰게 한다.
+STIFF_WORDS = ("그러나", "핵심", "원칙", "기준입니다", "라고들 생각", "중시", "필수적",
+               "결정합니다", "도출", "원활")
+
+
+def stiff_problems(d: dict, max_lines: int = 4) -> list[str]:
+    """보고서 말투·긴 글을 잡는다. question(독자에게 묻는 한 줄)만 존댓말을 허용한다."""
+    out = []
+    text = "\n".join(str(d.get(k, "")) for k in ("hook", "body"))
+    for w in STIFF_WORDS:
+        if w.strip("~") in text:
+            out.append(f"딱딱한 말 '{w.strip('~')}' 을 썼음 — 평소 말로 바꿀 것")
+    polite = [l for l in text.splitlines()
+              if re.search(r"(니다|니까|세요|나요|가요|까요|어요|아요|죠)[.!?]?\s*$", l.strip())]
+    if polite:
+        out.append(f"존댓말 문장 {len(polite)}개 — 평서체(~다·~음)로: {polite[0].strip()[:30]}")
+    body = [l for l in str(d.get("body", "")).splitlines() if l.strip()]
+    if len(body) > max_lines:
+        out.append(f"본문 {len(body)}줄 — {max_lines}줄 이내로 줄일 것")
+    return out
+
+
 def _voice(path: str = "config/voice.md") -> str:
     with open(path, encoding="utf-8") as f:
         return f.read()
@@ -496,7 +527,7 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
             title_rule=(
                 "제목은 다음 말로 끝내지 마세요(최근 질문 글이 이렇게 끝났습니다): "
                 + ", ".join(sorted(banned)) if banned else ""),
-            spec=_spec(allow_opinion=False, lines="1~3", want_question=True,
+            spec=_spec(allow_opinion=False, lines="1~2", want_question=True, tone=TONE_PLAIN,
                        detail_from="질문 글에는 첫 댓글을 달지 않습니다. 빈 문자열입니다."),
         )
     elif pick.is_fallback:
@@ -510,7 +541,7 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
             shape_name=shape, shape_rule=METHOD_SHAPES[shape],
             title_rule=("제목에 다음 틀을 쓰지 마세요(최근 글이 이미 썼습니다): "
                         + ", ".join(sorted(mbanned))) if mbanned else "",
-            spec=_spec(allow_opinion=False, lines="4~8", want_question=False,
+            spec=_spec(allow_opinion=False, lines="2~4", want_question=False, tone=TONE_PLAIN,
                        detail_from="본문에서 다 못 쓴 배경이나 구체적인 방법을 덧붙입니다."),
         )
     else:
@@ -548,6 +579,10 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
         if not pick.is_memo:
             # 메모 글의 판단은 서프로님 본인 말이라 걸지 않는다
             out += _judgment_problems(d)
+        if pick.is_question:
+            out += stiff_problems(d, max_lines=2)
+        elif pick.is_fallback:
+            out += stiff_problems(d, max_lines=4)
         return out
 
     # 프롬프트로 부탁만 하면 같은 틀·같은 실수로 돌아간다. 걸리면 이유를 붙여 다시 쓰게 한다.

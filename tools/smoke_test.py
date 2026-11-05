@@ -430,7 +430,7 @@ print("모델 전환 통과: 처리 못하는 오류면 다음 후보로 넘어�
     {"type": "질문", "title": "[놓친집] 놓치고 나서 계속 생각나는 집이 있습니다", "shape": "경험"},
 ]}
 assert c_mod.pick_shape(기록) == "통념확인", "최근에 쓴 모양을 또 골랐다"
-assert c_mod.pick_shape({"posts": []}) == "하나만"
+assert c_mod.pick_shape({"posts": []}) == "통념확인"  # 11-05: 통념확인·경험만 돌린다
 금지 = c_mod.banned_endings(기록)
 assert "순간" in 금지 and "있습니다" in 금지, 금지
 assert c_mod.question_problems({"hook": "계약 직전 망설이는 순간", "body": "", "question": "하나만?"},
@@ -535,6 +535,16 @@ _전부 = {"posts": [{"date": (_dt.datetime.now(state_mod.KST) - _dt.timedelta(d
 _골라 = _pq(st=_전부).question_topic.split("|")[0]
 assert _골라 == _qs[-1], f"가장 오래전 주제가 아니라 {_골라} 를 골랐다"
 print("질문 주제 바닥난 뒤 가장 오래된 것부터 통과")
+
+
+# 11-05 말투: 보고서체·긴 글은 다시 쓰게 한다. 질문 한 줄만 존댓말 허용
+assert c_mod.stiff_problems({"hook": "하루 기록 정리 원칙입니다", "body": "그러나 핵심은 따로 있습니다."})
+assert not c_mod.stiff_problems({"hook": "AI에 넣기 전에 이름부터 지운다", "body": "손님 이름·번호는 A, B로.\n그다음 내일 할 일만 뽑는다.", "question": "어떻게 하시나요?"})
+assert c_mod.stiff_problems({"hook": "x", "body": "가\n나\n다\n라\n마"}, max_lines=4), "5줄이 통과했다"
+assert main_mod._last_slot_type({"posts": [{"slot": "21", "type": "AI활용"}]}, "21") == "AI활용"
+assert "closer.pick(kind, st)" not in inspect.getsource(main_mod.run_auto), "글 끝 한 줄이 아직 붙는다"
+assert not c_mod.stiff_problems({"hook": "수익률 계산표, AI로 바로 만들어도 될까", "body": "검산은 손으로 한다."}), "반말 의문형을 존댓말로 잡았다"
+print("말투·길이 검사, 글 끝 한 줄 끔 통과")
 
 
 sys.exit(code)
