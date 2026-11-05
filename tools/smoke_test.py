@@ -547,4 +547,14 @@ assert not c_mod.stiff_problems({"hook": "수익률 계산표, AI로 바로 만�
 print("말투·길이 검사, 글 끝 한 줄 끔 통과")
 
 
+# 11-05 실제 기록 글: 개인정보 모양은 모든 글에서 지운다
+for _t in ["010-1234-5678로 연락", "보증금 3억에 월세", "논현로 213 상가", "도곡동 963-1 건물", "kim@a.com 으로", "109호 사장님"]:
+    assert c_mod.pii_found(_t), _t
+for _t in ["양재역 이면 5층 건물", "약국장님 이야기를 들었다", "3호선 양재역", "2023년 건물을 지었다"]:
+    assert not c_mod.pii_found(_t), _t
+_정리, _뺌 = c_mod.strip_pii("약국장님을 만났다. 번호는 010-1111-2222.\n조건 맞추려고 내일 다시 간다.")
+assert "010" not in _정리 and "약국장님" in _정리 and len(_뺌) == 1, (_정리, _뺌)
+print("개인정보 모양 차단 통과")
+
+
 sys.exit(code)

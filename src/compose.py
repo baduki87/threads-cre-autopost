@@ -386,6 +386,37 @@ def flagged_sentences(text: str) -> list[tuple[str, str]]:
     return out
 
 
+# 11-05 서프로님 A: 실제 기록으로 만든 글(메모)이 들어온다. 익명화는 맥에서 먼저 하지만(복덕이 밤 정리),
+# 혹시 남은 개인정보 모양은 여기서 한 번 더 지운다. 메모 글에도 건다. 공개 리포라 초안도 공개된다.
+_PII = {
+    "전화번호": re.compile(r"0\d{1,2}[-. ]?\d{3,4}[-. ]?\d{4}"),
+    "이메일": re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+"),
+    "금액": re.compile(r"\d[\d,.]*\s*(억|천만|백만|만\s*원|원)"),
+    "주소": re.compile(r"(\d+-\d+\s*번지|\d+번지|[가-힣]+(로|길)\s?\d+(-\d+)?|[가-힣]+동\s?\d+-\d+)"),
+    "호수": re.compile(r"\d{2,4}\s*호(?!선|기|주)"),
+}
+
+
+def pii_found(text: str) -> list[str]:
+    return [name for name, pat in _PII.items() if pat.search(text)]
+
+
+def strip_pii(text: str) -> tuple[str, list[str]]:
+    """개인정보 모양이 든 문장을 지운다."""
+    removed, lines = [], []
+    for line in text.splitlines():
+        keep = []
+        for sent in re.split(r"(?<=[.!?])\s+", line.strip()):
+            if sent.strip() and pii_found(sent):
+                removed.append(sent.strip())
+            else:
+                keep.append(sent)
+        joined = " ".join(k for k in keep if k).strip()
+        if joined:
+            lines.append(joined)
+    return "\n".join(lines), removed
+
+
 def strip_judgments(text: str) -> tuple[str, list[str]]:
     """규칙에 걸린 문장을 지운다. 문장이 지워져 빈 줄이 된 줄은 줄째로 지운다."""
     removed, lines = [], []
@@ -606,6 +637,16 @@ def compose(pick: Pick, *, state: dict | None = None) -> Post:
             if removed:
                 print(f"[compose] 규칙 위반 문장 제거({key}): {' / '.join(removed)}")
                 d[key] = cleaned
+
+    # 개인정보 모양은 메모 글까지 모든 글에서 지운다(11-05). 제목에 있으면 제목을 비워 발행이 멈추게 한다.
+    for key in ("body", "opinion", "question", "detail"):
+        cleaned, removed = strip_pii(str(d.get(key, "")))
+        if removed:
+            print(f"[compose] 개인정보 모양 문장 제거({key}): {' / '.join(x[:20] + '…' for x in removed)}")
+            d[key] = cleaned
+    if pii_found(str(d.get("hook", ""))):
+        print(f"[compose] 제목에 개인정보 모양({pii_found(str(d.get('hook', '')))}) — 제목을 비웁니다")
+        d["hook"] = ""
 
     opinion = str(d.get("opinion", "")).strip()
     if not pick.is_memo and opinion:

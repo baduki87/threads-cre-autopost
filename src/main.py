@@ -28,7 +28,7 @@ from . import notion
 from . import state as state_mod
 from .card import render
 from .collect import collect, load_config
-from .compose import compose
+from .compose import pii_found, compose
 from .models import Pick
 from .publish import (PublishError, commit_and_push, publish_image_post,
                       publish_reply, publish_text_post, raw_url_for)
@@ -182,6 +182,10 @@ def run_auto() -> int:
     # 11-05: 글 끝 한 줄(closers.yaml)을 뗐다. 매번 붙는 홍보 문장이 AI 글 티를 냈다.
     post.follow_line = ""
     text = post.render_text()
+    if pii_found(text) or not post.hook:
+        # 11-05: 개인정보 모양이 남았거나 그 때문에 제목이 비었으면 내보내지 않는다
+        print(f"[main] 개인정보 모양 {pii_found(text)} 또는 빈 제목 — 이번 글은 만들지 않습니다.", file=sys.stderr)
+        return 1
 
     print("\n--- 본문 ---")
     print(text)
@@ -250,6 +254,10 @@ def run_draft() -> int:
     # 11-05: 글 끝 한 줄(closers.yaml)을 뗐다. 매번 붙는 홍보 문장이 AI 글 티를 냈다.
     post.follow_line = ""
     text = post.render_text()
+    if pii_found(text) or not post.hook:
+        # 11-05: 개인정보 모양이 남았거나 그 때문에 제목이 비었으면 내보내지 않는다
+        print(f"[main] 개인정보 모양 {pii_found(text)} 또는 빈 제목 — 이번 글은 만들지 않습니다.", file=sys.stderr)
+        return 1
 
     print("\n--- 초안 ---")
     print(text)
