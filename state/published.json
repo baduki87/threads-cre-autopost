@@ -2613,6 +2613,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-05T09:57:49+09:00",
+      "key": "fallback-AI건축물대장-2026-11-05",
+      "title": "[AI건축물대장] AI에 건축물대장을 맡길 때는 요약 문장보다 누락 항목을 확인해야 합니다",
+      "url": "",
+      "post_id": "17952754068301234",
+      "kind": "auto",
+      "type": "AI활용",
+      "slot": "08",
+      "closer": "AI 로 건물 서류 정리하는 법을 모으고 있습니다.",
+      "shape": "착각바로잡기",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
