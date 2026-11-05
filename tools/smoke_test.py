@@ -527,4 +527,14 @@ assert not _subj.title_problems("건물 앞 10분 점검", _subj.recent_subjects
 print("소재 겹침 통과: 종류를 넘어 10일 회피, 제목 검사")
 
 
+# 질문 주제가 다 쓰인 뒤에도 가장 오래전 것부터 (11-05: 임차인연락 5일 만에 반복)
+import yaml as _y2
+_qs = [t["label"] for t in _y2.safe_load(open("config/questions.yaml", encoding="utf-8"))["topics"]]
+_전부 = {"posts": [{"date": (_dt.datetime.now(state_mod.KST) - _dt.timedelta(days=1 + i)).isoformat(),
+                     "title": f"[{l}] x", "type": "질문"} for i, l in enumerate(_qs)]}
+_골라 = _pq(st=_전부).question_topic.split("|")[0]
+assert _골라 == _qs[-1], f"가장 오래전 주제가 아니라 {_골라} 를 골랐다"
+print("질문 주제 바닥난 뒤 가장 오래된 것부터 통과")
+
+
 sys.exit(code)

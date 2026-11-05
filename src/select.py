@@ -143,8 +143,15 @@ def pick_question(path: str = "config/questions.yaml",
     unseen = [t for t in topics if not any(t["label"] in r for r in recent)]
     hot = subj.recent_subjects(st)
     cool = [t for t in unseen if not (subj.topic_subjects(t) & hot)]
-    pool = cool or unseen or topics
-    topic = pool[datetime.now(KST).timetuple().tm_yday % len(pool)]
+    pool = cool or unseen
+    if pool:
+        topic = pool[datetime.now(KST).timetuple().tm_yday % len(pool)]
+    else:
+        # 21일 창(21건)이 주제 수(17개)보다 커서 '안 쓴 주제'는 금방 바닥난다. 예전에는 그때 날짜로
+        # 아무거나 골라 임차인연락이 5일 만에, 건물주첫만남이 6일 만에 다시 나왔다(11-05 점검).
+        # 최근 소재를 피하고, 그다음 가장 오래전에 쓴 주제부터.
+        topic = min(topics, key=lambda t: (bool(subj.topic_subjects(t) & hot),
+                                           _last_used(st, t["label"])))
 
     return Pick(
         article=None,
