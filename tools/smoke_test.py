@@ -554,7 +554,12 @@ for _t in ["양재역 이면 5층 건물", "약국장님 이야기를 들었다"
     assert not c_mod.pii_found(_t), _t
 _정리, _뺌 = c_mod.strip_pii("약국장님을 만났다. 번호는 010-1111-2222.\n조건 맞추려고 내일 다시 간다.")
 assert "010" not in _정리 and "약국장님" in _정리 and len(_뺌) == 1, (_정리, _뺌)
-print("개인정보 모양 차단 통과")
+for _t in ["오늘 하늘빌딩 영업 다녔다", "1층 약국에 영업하러 갔다", "이 건물을 영업 대상으로 잡았다"]:
+    assert c_mod.pii_found(_t), _t
+for _t in ["1층 영업시간을 본다", "영업 중인 가게가 많다"]:
+    assert not c_mod.pii_found(_t), _t
+assert "상호" in c_mod.MEMO_PROMPT, "메모 글에 가게 이름 금지 지침이 없다"
+print("개인정보 모양·영업 대상 문구 차단 통과")
 
 
 sys.exit(code)
