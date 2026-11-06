@@ -2681,6 +2681,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-07T01:47:05+09:00",
+      "key": "fallback-AI건물임장메모-2026-11-07",
+      "title": "[AI건물임장메모] 현장 사진과 횡설수설 메모, AI로 깔끔하게 남기려면?",
+      "url": "",
+      "post_id": "18083621168362168",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "문답",
+      "notion_page": "41081007-7564-815a-b1eb-f2e5494edb34",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
