@@ -2664,6 +2664,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-06T22:00:51+09:00",
+      "key": "question-빌딩공동중개-2026-11-06",
+      "title": "[빌딩공동중개] 빌딩 공동중개 현장 브리핑의 정답",
+      "url": "",
+      "post_id": "18180040081446836",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "통념확인",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
