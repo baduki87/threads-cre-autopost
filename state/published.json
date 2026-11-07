@@ -2698,6 +2698,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-07T20:44:57+09:00",
+      "key": "question-임대현수막-2026-11-07",
+      "title": "[임대현수막] 길가다 붙은 임대 현수막 보고 직접 전화해 본 경험",
+      "url": "",
+      "post_id": "18504734626105609",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "경험",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
