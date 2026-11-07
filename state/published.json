@@ -2715,6 +2715,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-08T00:41:33+09:00",
+      "key": "fallback-수익률계산법-2026-11-07",
+      "title": "[수익률계산법] 빌딩 건물 수익률 산출 순서 정리",
+      "url": "",
+      "post_id": "17978270037139033",
+      "kind": "notion",
+      "type": "방법론",
+      "slot": "21",
+      "closer": "",
+      "shape": "번호목록",
+      "notion_page": "41181007-7564-8135-842c-d49179b1ef5b",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
