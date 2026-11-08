@@ -2732,6 +2732,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-08T20:58:53+09:00",
+      "key": "question-주차결정-2026-11-08",
+      "title": "[주차결정] 꼬마빌딩 검토할 때 주차 대수는 부차적이라는 말",
+      "url": "",
+      "post_id": "18133634152761222",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "통념확인",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
