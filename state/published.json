@@ -2749,6 +2749,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-09T00:59:40+09:00",
+      "key": "fallback-AI렌트롤-2026-11-08",
+      "title": "[AI렌트롤] 꼬마빌딩 렌트롤 표 정리 순서",
+      "url": "",
+      "post_id": "17978250861143787",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "번호목록",
+      "notion_page": "41281007-7564-812a-b86d-f7aede77bd92",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
