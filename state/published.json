@@ -2783,6 +2783,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-10T04:51:23+09:00",
+      "key": "fallback-건물주질문-2026-11-10",
+      "title": "[건물주질문] 건물 매수 전 매도인에게 물어볼 실전 질문",
+      "url": "",
+      "post_id": "18077679311777089",
+      "kind": "notion",
+      "type": "방법론",
+      "slot": "21",
+      "closer": "",
+      "shape": "한줄읽기",
+      "notion_page": "41381007-7564-8142-a097-d0cf821bf050",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
