@@ -2766,6 +2766,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-09T23:00:49+09:00",
+      "key": "question-건물첫눈-2026-11-09",
+      "title": "[건물첫눈] 건물 현장에 도착해서 가장 먼저 확인하는 곳",
+      "url": "",
+      "post_id": "18108083471319765",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "경험",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
