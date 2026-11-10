@@ -2800,6 +2800,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-10T22:31:25+09:00",
+      "key": "question-1층공실-2026-11-10",
+      "title": "[1층공실] 오랫동안 비어 있는 상가건물 1층",
+      "url": "",
+      "post_id": "17912488251578164",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "통념확인",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
