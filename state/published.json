@@ -2817,6 +2817,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-11T02:04:38+09:00",
+      "key": "fallback-AI조사엑셀-2026-11-11",
+      "title": "[AI조사엑셀] \"담당자·만기 칸은 비워둘 것\" 한 줄을 프롬프트에 넣는 이유",
+      "url": "",
+      "post_id": "18058067798656388",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "한줄읽기",
+      "notion_page": "41481007-7564-81aa-8ea5-d7e0fc6f13a9",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
