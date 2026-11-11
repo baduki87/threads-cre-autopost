@@ -2834,6 +2834,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-11T21:44:43+09:00",
+      "key": "question-진짜매수자-2026-11-11",
+      "title": "[진짜매수자] 건물 매수 문의 전화, 첫 질문에서 갈린다",
+      "url": "",
+      "post_id": "18138415651570765",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "경험",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
