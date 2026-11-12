@@ -2851,6 +2851,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-12T22:49:18+09:00",
+      "key": "question-첫건물망설임-2026-11-12",
+      "title": "[첫건물망설임] 첫 건물 매수 시 가장 오래 걸리는 결심",
+      "url": "",
+      "post_id": "18084532844558279",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "통념확인",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
