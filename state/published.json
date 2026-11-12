@@ -2868,6 +2868,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-13T02:37:16+09:00",
+      "key": "fallback-용도지역-2026-11-13",
+      "title": "[용도지역] 내 건물에 올릴 수 있는 층수는 어디서 확인하나",
+      "url": "",
+      "post_id": "18187978318419682",
+      "kind": "notion",
+      "type": "방법론",
+      "slot": "21",
+      "closer": "",
+      "shape": "문답",
+      "notion_page": "41681007-7564-810a-b2f1-c19dea3ef870",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
