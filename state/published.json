@@ -2902,6 +2902,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-14T02:14:30+09:00",
+      "key": "fallback-AI제안서초안-2026-11-14",
+      "title": "[AI제안서초안] 건물주 전속 제안서 초안을 자동으로 뽑아도 되는가",
+      "url": "",
+      "post_id": "17949444912357401",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "문답",
+      "notion_page": "41781007-7564-810f-94da-ffe14b366658",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
