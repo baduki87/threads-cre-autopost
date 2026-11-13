@@ -2885,6 +2885,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-13T22:10:25+09:00",
+      "key": "question-렌트롤첫줄-2026-11-13",
+      "title": "[렌트롤첫줄] 상가건물 렌트롤을 펼쳤을 때 첫 시선",
+      "url": "",
+      "post_id": "18099014699124607",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "경험",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
