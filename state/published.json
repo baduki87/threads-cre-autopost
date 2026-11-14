@@ -2936,6 +2936,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-15T00:49:48+09:00",
+      "key": "fallback-첫건물실수-2026-11-14",
+      "title": "[첫건물실수] 첫 건물 매수 시 명도 특약 누락 피하는 법",
+      "url": "",
+      "post_id": "17916803754544463",
+      "kind": "notion",
+      "type": "방법론",
+      "slot": "21",
+      "closer": "",
+      "shape": "번호목록",
+      "notion_page": "41881007-7564-8124-9670-ea2d58e5147e",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
