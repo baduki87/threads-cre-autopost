@@ -2953,6 +2953,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-15T21:46:01+09:00",
+      "key": "question-공실대응-2026-11-15",
+      "title": "[공실대응] 상가나 사무실 공실이 났을 때 첫 대처",
+      "url": "",
+      "post_id": "18642807889046948",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "경험",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
