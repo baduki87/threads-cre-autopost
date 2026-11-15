@@ -2970,6 +2970,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-16T01:23:16+09:00",
+      "key": "fallback-AI스레드자동화-2026-11-15",
+      "title": "[AI스레드자동화] 스레드 자동 발행과 댓글 분류를 처리하는 방식",
+      "url": "",
+      "post_id": "18145809412620301",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "번호목록",
+      "notion_page": "41981007-7564-811b-82a1-d9f0a9ec7296",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
