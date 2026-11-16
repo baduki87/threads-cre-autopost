@@ -2987,6 +2987,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-16T22:49:04+09:00",
+      "key": "question-리모델링고민-2026-11-16",
+      "title": "[리모델링고민] 노후 상가건물 리모델링 필수론",
+      "url": "",
+      "post_id": "18126249562907698",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "통념확인",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
