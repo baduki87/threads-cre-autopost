@@ -3004,6 +3004,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-17T04:37:53+09:00",
+      "key": "fallback-노후설비-2026-11-17",
+      "title": "[노후설비] 건축물대장 '승강기' 칸에서 시작하는 빌딩 설비 점검",
+      "url": "",
+      "post_id": "17912725170575908",
+      "kind": "notion",
+      "type": "방법론",
+      "slot": "21",
+      "closer": "",
+      "shape": "한줄읽기",
+      "notion_page": "41a81007-7564-81f4-8c39-fdaf57b17169",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
