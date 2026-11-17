@@ -3038,6 +3038,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-18T03:36:02+09:00",
+      "key": "fallback-AI수익률표-2026-11-18",
+      "title": "[AI수익률표] AI 건물 수익률 산식 생성 문장",
+      "url": "",
+      "post_id": "18180576751453477",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "한줄읽기",
+      "notion_page": "41b81007-7564-81f1-8934-ce50c0f1889f",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
