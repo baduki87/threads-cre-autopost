@@ -3055,6 +3055,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-18T22:58:46+09:00",
+      "key": "question-건물주첫만남-2026-11-18",
+      "title": "[건물주첫만남] 건물주를 처음 만날 때의 첫마디",
+      "url": "",
+      "post_id": "17897998497427236",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "통념확인",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
