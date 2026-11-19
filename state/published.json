@@ -3072,6 +3072,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-19T23:37:25+09:00",
+      "key": "question-매각계기-2026-11-19",
+      "title": "[매각계기] 건물을 팔기로 마음먹게 되는 순간",
+      "url": "",
+      "post_id": "17997557985080434",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "경험",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
