@@ -3089,6 +3089,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-20T23:06:30+09:00",
+      "key": "question-건물주바람-2026-11-20",
+      "title": "[건물주바람] 건물주가 중개사에게 가장 바라는 소통 방식",
+      "url": "",
+      "post_id": "18119400827151845",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "통념확인",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
