@@ -3106,6 +3106,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-21T02:50:17+09:00",
+      "key": "fallback-건물주질문-2026-11-21",
+      "title": "[건물주질문] 건물 매수 전 매도인에게 무엇을 물어야 할까",
+      "url": "",
+      "post_id": "18028413176869189",
+      "kind": "notion",
+      "type": "방법론",
+      "slot": "21",
+      "closer": "",
+      "shape": "문답",
+      "notion_page": "41e81007-7564-819d-851a-d117205a2c6f",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
