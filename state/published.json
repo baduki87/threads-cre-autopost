@@ -3140,6 +3140,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-22T01:48:39+09:00",
+      "key": "fallback-AI파밍지도-2026-11-22",
+      "title": "[AI파밍지도] 파밍할 건물 수십 곳, 지도에는 어떻게 올리나",
+      "url": "",
+      "post_id": "18180791821453634",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "문답",
+      "notion_page": "41f81007-7564-811d-87c9-e14c7987ad39",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
