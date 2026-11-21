@@ -3123,6 +3123,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-21T22:28:58+09:00",
+      "key": "question-빌딩공동중개-2026-11-21",
+      "title": "[빌딩공동중개] 빌딩 공동중개 현장에서 손발이 안 맞는 지점",
+      "url": "",
+      "post_id": "17935434264412293",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "경험",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
