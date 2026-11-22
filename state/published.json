@@ -3157,6 +3157,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-22T22:22:37+09:00",
+      "key": "question-임차인바람-2026-11-22",
+      "title": "[임차인바람] 임차인이 건물주에게 바라는 단 한 가지",
+      "url": "",
+      "post_id": "18143583133624997",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "통념확인",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
