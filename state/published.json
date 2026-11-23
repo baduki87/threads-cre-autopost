@@ -3191,6 +3191,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-24T00:58:59+09:00",
+      "key": "question-임대현수막-2026-11-24",
+      "title": "[임대현수막] 임대 현수막 번호로 직접 전화해 본 경험",
+      "url": "",
+      "post_id": "18098134406158385",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "경험",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
