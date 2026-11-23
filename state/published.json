@@ -3208,6 +3208,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-24T06:27:22+09:00",
+      "key": "fallback-AI빌딩한계-2026-11-24",
+      "title": "[AI빌딩한계] 빌딩 데이터 분석에서 AI가 못 다루는 영역",
+      "url": "",
+      "post_id": "18131776072844221",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "번호목록",
+      "notion_page": "42181007-7564-8123-bc17-e1ba9d33a394",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
