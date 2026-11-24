@@ -3103,9 +3103,9 @@
       "shape": "통념확인",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 333,
+      "likes": 3,
+      "replies": 3
     },
     {
       "date": "2026-11-21T02:50:17+09:00",
@@ -3120,9 +3120,9 @@
       "shape": "문답",
       "notion_page": "41e81007-7564-819d-851a-d117205a2c6f",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 578,
+      "likes": 4,
+      "replies": 2
     },
     {
       "date": "2026-11-21T22:28:58+09:00",
