@@ -3225,6 +3225,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-25T00:54:03+09:00",
+      "key": "question-주차결정-2026-11-25",
+      "title": "[주차결정] 빌딩 매수 결정을 바꾸는 주차 여건",
+      "url": "",
+      "post_id": "18112067870306936",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "통념확인",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
