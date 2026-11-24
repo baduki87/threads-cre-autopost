@@ -3242,6 +3242,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-25T05:11:10+09:00",
+      "key": "fallback-1층상가보기-2026-11-25",
+      "title": "[1층상가보기] 건물 1층 상가 현장에서 눈으로 바로 파악하는 관찰점",
+      "url": "",
+      "post_id": "18134591725613656",
+      "kind": "notion",
+      "type": "방법론",
+      "slot": "21",
+      "closer": "",
+      "shape": "한줄읽기",
+      "notion_page": "42281007-7564-81dd-a259-da82f95f915b",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
