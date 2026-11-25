@@ -3276,6 +3276,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-26T04:17:10+09:00",
+      "key": "fallback-AI쇼츠편집-2026-11-26",
+      "title": "[AI쇼츠편집] 영상 받아쓰고 쇼츠 후보 뽑는 기준",
+      "url": "",
+      "post_id": "18108236198204771",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "한줄읽기",
+      "notion_page": "42381007-7564-815c-9900-ff5491860b63",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
