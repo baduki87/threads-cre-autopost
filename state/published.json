@@ -3137,9 +3137,9 @@
       "shape": "경험",
       "notion_page": "",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 200,
+      "likes": 2,
+      "replies": 0
     },
     {
       "date": "2026-11-22T01:48:39+09:00",
@@ -3154,9 +3154,9 @@
       "shape": "문답",
       "notion_page": "41f81007-7564-811d-87c9-e14c7987ad39",
       "dry_run": false,
-      "views": null,
-      "likes": null,
-      "replies": null
+      "views": 111,
+      "likes": 0,
+      "replies": 1
     },
     {
       "date": "2026-11-22T22:22:37+09:00",
