@@ -3259,6 +3259,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-26T00:37:03+09:00",
+      "key": "question-건물첫눈-2026-11-26",
+      "title": "[건물첫눈] 건물 앞에 섰을 때 가장 먼저 눈이 가는 곳",
+      "url": "",
+      "post_id": "17885993283652252",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "경험",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
