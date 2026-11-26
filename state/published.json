@@ -3293,6 +3293,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-27T00:15:20+09:00",
+      "key": "question-낡은건물걱정-2026-11-27",
+      "title": "[낡은건물걱정] 오래된 건물을 매수할 때 가장 먼저 배관 설비부터 뜯어",
+      "url": "",
+      "post_id": "18111119675368211",
+      "kind": "auto",
+      "type": "질문",
+      "slot": "17",
+      "closer": "",
+      "shape": "통념확인",
+      "notion_page": "",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
