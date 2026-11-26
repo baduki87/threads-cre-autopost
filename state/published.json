@@ -3310,6 +3310,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-27T04:01:06+09:00",
+      "key": "fallback-임대차현황표-2026-11-27",
+      "title": "[임대차현황표] 건물 매수할 때 받는 렌트롤, 무엇과 대조해야 하나요?",
+      "url": "",
+      "post_id": "18392313058224834",
+      "kind": "notion",
+      "type": "방법론",
+      "slot": "21",
+      "closer": "",
+      "shape": "문답",
+      "notion_page": "42481007-7564-8124-b0d0-f25358ab281e",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
