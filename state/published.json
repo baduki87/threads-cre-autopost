@@ -3327,6 +3327,23 @@
       "views": null,
       "likes": null,
       "replies": null
+    },
+    {
+      "date": "2026-11-28T04:00:39+09:00",
+      "key": "fallback-AI조사엑셀-2026-11-28",
+      "title": "[AI조사엑셀] 조사한 건물 층별 입주사 표를 엑셀로 바로 뽑아도 되나",
+      "url": "",
+      "post_id": "18118258682153614",
+      "kind": "notion",
+      "type": "AI활용",
+      "slot": "21",
+      "closer": "",
+      "shape": "문답",
+      "notion_page": "42581007-7564-81b9-a7af-ec3f1a9a4d55",
+      "dry_run": false,
+      "views": null,
+      "likes": null,
+      "replies": null
     }
   ],
   "series": {
